@@ -1,0 +1,83 @@
+Este portfólio tem 36 temas, e cada um tem versão clara e escura: são 72 combinações de cores, fontes de título, cantos e sombras. Os temas vêm de uma base que uso nos meus outros projetos, e muitos foram desenhados para painéis, não para texto longo. Alguns deixavam o texto secundário quase sumindo no fundo. Conferir 72 combinações no olho, toda vez que algo muda, não funciona. Então o contraste virou um teste.
+
+## Um tema é uma lista de variáveis
+
+Nenhum componente sabe qual tema está ativo. Eles usam papéis, como "texto", "fundo", "texto secundário" e "link", e cada tema só define o valor de cada papel como uma variável CSS. O Tailwind lê essas variáveis com `@theme inline`, então `bg-background` e `text-muted-foreground` funcionam em qualquer tema:
+
+```css
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-link: var(--link);
+}
+```
+
+Além das cores, um tema também pode mudar a personalidade: a fonte, o peso e a largura dos títulos, o raio dos cantos, a sombra e o brilho do fundo do hero. O texto corrido continua sempre na mesma fonte, para a leitura não mudar de tema para tema.
+
+## Trocar sem piscar
+
+Um site estático não sabe qual tema o visitante escolheu antes de o JavaScript rodar. Se o tema for aplicado depois que a página aparece, ela pisca no tema padrão. Para evitar isso, um script pequeno roda dentro do `<head>`, antes da primeira pintura: lê a escolha salva, decide entre claro e escuro e grava as variáveis direto no `<html>`.
+
+```js
+// P: os temas · D: o padrão · r: o <html> · m: matchMedia('(prefers-color-scheme: dark)')
+function apply(s) {
+  const p = P[s.preset] ? s.preset : D, mode = s.mode || 'system';
+  const dark = mode === 'dark' || (mode === 'system' && m.matches);
+  r.classList.toggle('dark', dark);
+  r.style.colorScheme = dark ? 'dark' : 'light';
+  for (const [k, v] of Object.entries(P[p][dark ? 'dark' : 'light'])) r.style.setProperty('--' + k, v);
+}
+```
+
+Sem JavaScript, um `<style>` com o tema padrão segue o modo claro ou escuro do sistema. E as fontes de título não são pré-carregadas: o navegador baixa só a do tema ativo, ou todas enquanto o menu de temas mostra as prévias.
+
+## Contraste como teste
+
+O WCAG define o contraste entre duas cores a partir da luminância relativa de cada uma. A razão é `(L1 + 0.05) / (L2 + 0.05)`, com a cor mais clara em cima, e o nível AA pede pelo menos 4,5:1 para texto normal. O script calcula isso para cada par que importa, em cada tema e em cada modo:
+
+```js
+const PAIRS = [
+  ['foreground', 'background', 4.5],
+  ['muted-foreground', 'background', 4.5],
+  ['muted-foreground', 'card', 4.5],
+  ['primary-foreground', 'primary', 4.5],
+  ['link', 'background', 4.5],
+  ['border', 'background', 1.15]
+  // ...
+];
+```
+
+Dois detalhes deram mais trabalho do que a fórmula. Primeiro, os temas escrevem cores em formatos diferentes, como hex, `hsl()`, `rgb()` e `oklch()`, então o script converte todos para sRGB antes de medir. Segundo, uma cor translúcida não tem contraste próprio: o mesmo cinza com 60% de opacidade fica diferente em cada fundo. Por isso o script primeiro mistura a cor com a superfície que está embaixo, e só depois mede:
+
+```js
+const over = (fg, bg) => [0, 1, 2].map((i) => fg[i] * fg[3] + bg[i] * (1 - fg[3])).concat(1);
+const lum = (c) => 0.2126 * linear(c[0]) + 0.7152 * linear(c[1]) + 0.0722 * linear(c[2]);
+const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+```
+
+Qualquer par abaixo do mínimo aparece na saída com o tema, o modo e a razão, e o script termina com código 1. A borda tem um mínimo mais baixo, porque ela só precisa ser visível, não legível.
+
+## Consertar sem descaracterizar
+
+Os temas originais ficam intactos no projeto de onde vêm. O site tem um arquivo próprio de ajustes, e um script junta os dois num `presets.json`. Um ajuste típico escurece só o necessário:
+
+```js
+tangerine: {
+  // O fundo claro original era um cinza médio que apagava o texto secundário e o laranja.
+  light: { background: '#f5f6f7', border: '#dcdfe3', primary: '#c4461f', 'muted-foreground': '#5f6673' },
+  dark: { 'primary-foreground': '#1c120e', link: '#f7724d' }
+}
+```
+
+Uma regra ajudou bastante: os links seguem a cor primária já corrigida, mas o brilho do hero mantém a cor original do tema, que costuma ser mais viva. Assim, escurecer a cor primária para passar no contraste não deixa o site sem graça. Quando a cor primária é clara demais para texto, o tema define um `link` separado.
+
+## O resultado, e o que ele não cobre
+
+```text
+All 36 presets pass.
+```
+
+São 720 verificações a cada mudança, sem abrir nenhum tema. O teste tem limites, e vale dizer quais. Ele mede tokens, não imagens nem gradientes. Ele usa 4,5:1 até para títulos grandes, que pelo WCAG precisariam só de 3:1, porque é mais simples ser rígido. E contraste é só uma parte da acessibilidade: foco visível e respeito ao movimento reduzido são cuidados à parte, que o site também tem.
+
+<Source path="scripts/check-themes.mjs" />

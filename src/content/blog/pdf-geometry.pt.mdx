@@ -1,0 +1,80 @@
+Em uma plataforma de automação em que trabalhei, robôs conferiam o valor de guias de impostos em PDF antes de mandar um e-mail para o cliente. Um centavo errado significa um e-mail errado, para a pessoa errada pagar o valor errado. O jeito óbvio de ler o PDF errava, e errava em silêncio.
+
+## O jeito óbvio: o primeiro número depois do rótulo
+
+Extrair o texto e pegar o primeiro valor em dinheiro depois de "Valor total do documento" parece suficiente:
+
+```python
+text = pdf.pages[0].extract_text()
+after = text.split("Valor total do documento", 1)[1]
+amount = next(t for t in after.split() if MONEY.match(t))
+```
+
+O problema são as caixas lado a lado. Uma guia típica tem "Valor original" e "Valor total do documento" em duas caixas na mesma linha. A extração de texto lê a página em linhas: primeiro os dois rótulos, depois os dois valores. O texto sai assim:
+
+```text
+Valor original Valor total do documento
+1.100,00 1.234,56
+```
+
+O primeiro número depois do rótulo é `1.100,00`, o valor da caixa vizinha. Nada quebra, nenhuma exceção aparece, e o robô segue com o número errado.
+
+## Ler pela posição, não pela ordem
+
+O `pdfplumber` devolve cada palavra com a sua caixa delimitadora (`x0`, `top`, `x1`, `bottom`). Com isso, dá para ler o documento como uma pessoa lê: achar o rótulo e olhar logo abaixo dele, dentro da mesma coluna.
+
+```python
+def money_below(words, label, max_gap=30):
+    """O valor impresso embaixo do rótulo, dentro da coluna do rótulo."""
+    box = find_label(words, label)
+    if not box:
+        return None
+    x0, _, x1, bottom = box
+    hits = [
+        w
+        for w in words
+        if MONEY.match(w["text"]) and 0 <= w["top"] - bottom <= max_gap and w["x1"] > x0 and w["x0"] < x1 + 20
+    ]
+    return to_decimal(min(hits, key=lambda w: w["top"])["text"]) if hits else None
+```
+
+`find_label` acha um rótulo de várias palavras procurando a sequência exata de palavras na mesma altura da página. Para valores que ficam na mesma linha, como "Totais ........ 1.234,56", existe a variante `money_right_of`.
+
+Dinheiro é sempre `Decimal`, nunca `float`. O formato brasileiro (`1.234,56`) é validado por uma expressão regular antes da conversão, para que um número de código ou de documento nunca seja lido como valor.
+
+## Ler três vezes e exigir que concordem
+
+Ler pela posição resolve as caixas lado a lado, mas o layout de uma guia pode mudar sem aviso. Por isso o valor que decide o envio é lido em até três lugares independentes do documento: a caixa do total, a linha de totais da tabela e o bloco de pagamento, que algumas guias nem têm.
+
+```python
+def read_amount(path):
+    with pdfplumber.open(path) as pdf:
+        words = pdf.pages[0].extract_words()
+    readings = {
+        "total box": money_below(words, "Valor total do documento"),
+        "totals row": money_right_of(words, "Totais"),
+        "payment block": money_right_of(words, "Valor do pagamento:"),  # opcional em algumas guias
+    }
+    found = {k: v for k, v in readings.items() if v is not None}
+    if readings["total box"] is None or len(found) < 2:
+        raise Unreadable(f"not enough readings: {readings}")
+    if len(set(found.values())) != 1:
+        raise Unreadable(f"readings disagree: {found}")
+    return readings["total box"]
+```
+
+A regra é simples: a leitura principal precisa existir, pelo menos duas leituras precisam ser encontradas, e todas as encontradas precisam ser iguais. Se não forem, o documento é tratado como ilegível.
+
+## Parar é uma resposta válida
+
+`Unreadable` não é um erro para esconder. No sistema real, ele virava uma pendência explicada para uma pessoa revisar, em vez de um e-mail com o valor errado. Um robô que para e diz "não tenho certeza" custa alguns minutos de alguém. Um robô que segue com o número errado custa a confiança do cliente.
+
+## O exemplo
+
+`pdf-geometry-extract` tem o leitor e uma checagem que gera três guias fictícias e confirma três coisas: que a ordem do texto pega a caixa vizinha, que a geometria acerta, e que leituras divergentes são recusadas. Todos os documentos são inventados pelo próprio teste.
+
+<Source path="examples/pdf-geometry-extract" />
+
+```bash
+uv run check.py
+```

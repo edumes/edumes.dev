@@ -1,0 +1,411 @@
+{
+  "meta": {
+    "title": "Eduardo Santarosa | Desenvolvedor Full Stack Node.js e React",
+    "description": "Eduardo Santarosa (edumes), desenvolvedor full stack desde 2022. Sistemas web de ponta a ponta com Node.js, TypeScript, React, Next.js, Python e PostgreSQL.",
+    "role": "Desenvolvedor Full Stack",
+    "stack": "Stack",
+    "caseStudy": "Estudo de caso",
+    "cvTitle": "Currículo | Eduardo Moreira Santarosa, Desenvolvedor Full Stack",
+    "cvDescription": "Currículo de Eduardo Moreira Santarosa, desenvolvedor full stack (Node.js, TypeScript, React, Python, PostgreSQL): experiência, estudos de caso, ferramentas e formação, com PDF."
+  },
+  "nav": {
+    "top": "Início",
+    "cases": "Casos",
+    "projects": "Projetos",
+    "about": "Sobre",
+    "experience": "Experiência",
+    "contact": "Contato",
+    "blog": "Blog"
+  },
+  "ui": {
+    "skip": "Pular para o conteúdo",
+    "menu": "Buscar e navegar",
+    "menuHint": "Digite para filtrar",
+    "menuEmpty": "Nada encontrado para essa busca.",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
+    "soundOn": "Ligar sons",
+    "soundOff": "Desligar sons",
+    "language": "English",
+    "copyEmail": "Copiar e-mail",
+    "copied": "E-mail copiado",
+    "draft": "Rascunho, aguardando aprovação",
+    "readCase": "Ler o estudo de caso",
+    "backToCases": "Todos os estudos de caso",
+    "nextCase": "Próximo estudo de caso",
+    "downloadCv": "Baixar currículo",
+    "downloaded": "Currículo baixado",
+    "saveContact": "Salvar contato",
+    "replay": "Rodar de novo",
+    "goTo": "Navegar",
+    "actions": "Ações"
+  },
+  "hero": {
+    "titles": [
+      "Do clique ao banco, e de volta.",
+      "Sistemas que rodam a empresa.",
+      "Apps para quem trabalha no armazém.",
+      "Planilha vira sistema.",
+      "Horas de trabalho viram minutos.",
+      "Menos copiar e colar entre sistemas.",
+      "Código que o próximo dev entende.",
+      "Entrego, e sigo cuidando em produção.",
+      "Do formulário ao banco, sem atalhos.",
+      "Integração que não cai de madrugada.",
+      "Funciona na sua máquina também.",
+      "Bom sistema ninguém percebe."
+    ],
+    "lead": "Desenvolvedor full stack desde 2022. Construo sistemas para empresas: interfaces em React, APIs em Node.js e Python, PostgreSQL, integrações com ERPs, apps mobile e automações, e mantenho tudo isso em produção.",
+    "primary": "Ver estudos de caso"
+  },
+  "trace": {
+    "app": "Sistema de pedidos (fictício)",
+    "form": "Novo pedido",
+    "fields": [
+      [
+        "Cliente",
+        "Distribuidora Exemplo"
+      ],
+      [
+        "Itens",
+        "3 produtos"
+      ],
+      [
+        "Total",
+        "R$ 1.234,56"
+      ]
+    ],
+    "save": "Salvar pedido",
+    "saving": "Salvando…",
+    "saved": "Pedido {n} salvo.",
+    "steps": [
+      {
+        "layer": "Interface",
+        "detail": "valida o formulário e envia POST /api/pedidos",
+        "tech": "React",
+        "ms": "12 ms"
+      },
+      {
+        "layer": "API",
+        "detail": "confere a sessão e a permissão de quem pediu",
+        "tech": "Node.js",
+        "ms": "3 ms"
+      },
+      {
+        "layer": "Regras de negócio",
+        "detail": "calcula o total e reserva o estoque",
+        "tech": "TypeScript",
+        "ms": "8 ms"
+      },
+      {
+        "layer": "Banco de dados",
+        "detail": "grava pedido, auditoria e evento na mesma transação",
+        "tech": "PostgreSQL",
+        "ms": "21 ms"
+      },
+      {
+        "layer": "Resposta",
+        "detail": "201 Created, e a tela mostra o pedido salvo",
+        "tech": "HTTP",
+        "ms": "44 ms"
+      },
+      {
+        "layer": "Integração",
+        "detail": "depois do commit, o pedido segue para o ERP",
+        "tech": "Worker",
+        "ms": "em segundo plano"
+      }
+    ],
+    "caption": "Ilustração com dados fictícios: o caminho de um clique por um sistema web, da tela ao banco e às integrações."
+  },
+  "cases": {
+    "title": "Estudos de caso",
+    "intro": "Problemas reais que resolvi no trabalho, contados sem expor clientes nem código.",
+    "problem": "O problema",
+    "how": "Como funciona",
+    "results": "Resultado",
+    "more": "Mais casos",
+    "empty": "Os estudos de caso estão sendo revisados e entram aqui em breve.",
+    "disclaimer": "Ilustrações conceituais com dados fictícios. Não representam a infraestrutura real."
+  },
+  "projects": {
+    "title": "Outros projetos",
+    "intro": "Coisas que construo por conta própria, para aprender, testar uma ideia ou só porque eu queria que existissem.",
+    "code": "Código no GitHub",
+    "items": [
+      {
+        "name": "Aurora Mainframe Banking",
+        "icon": "terminal",
+        "stack": [
+          "GnuCOBOL"
+        ],
+        "body": "Fechamento financeiro diário de um banco fictício em COBOL: normaliza as transações, contabiliza em partidas dobradas, concilia e gera relatórios batch."
+      },
+      {
+        "name": "LoreForge",
+        "icon": "book-text",
+        "stack": [
+          "Next.js",
+          "TypeScript"
+        ],
+        "body": "Espaço de trabalho local-first para worldbuilding: lê um cofre de arquivos Markdown, indexa e deixa navegar por lore, missões e roteiros."
+      },
+      {
+        "name": "Lyric Type",
+        "icon": "keyboard",
+        "stack": [
+          "Next.js",
+          "TypeScript"
+        ],
+        "body": "Treino de digitação sincronizado com a letra da música que está tocando."
+      },
+      {
+        "name": "My Garden",
+        "icon": "leafy-green",
+        "stack": [
+          "Go",
+          "React"
+        ],
+        "body": "Jogo de jardim virtual full stack: plantar, crescer, colher e compartilhar, com API própria em Go.",
+        "href": "https://github.com/edumes/my-garden"
+      },
+      {
+        "name": "Document Assistant",
+        "icon": "scan-text",
+        "stack": [
+          "TypeScript",
+          "Tesseract.js"
+        ],
+        "body": "Perguntas sobre PDFs e imagens com OCR feito no próprio navegador e respostas com referência ao trecho de origem."
+      },
+      {
+        "name": "Deep Drill",
+        "icon": "pickaxe",
+        "stack": [
+          "Go",
+          "TypeScript"
+        ],
+        "body": "Jogo idle de mineração no navegador, com refino, brocas, geradores, limite de energia e ganhos offline."
+      },
+      {
+        "name": "YT Radio Stream",
+        "icon": "radio-tower",
+        "stack": [
+          "Python",
+          "ffmpeg",
+          "Docker"
+        ],
+        "body": "Transmissão contínua para uma live do YouTube a partir de uma pasta de clipes, embaralhados sem repetir até fechar o ciclo."
+      },
+      {
+        "name": "Salário Contado",
+        "icon": "circle-dollar-sign",
+        "stack": [
+          "Next.js"
+        ],
+        "body": "Mostra em tempo real quanto você já ganhou hoje, a partir do salário e do horário de trabalho.",
+        "href": "https://github.com/edumes/salariocontado"
+      }
+    ]
+  },
+  "about": {
+    "title": "Sobre",
+    "body": [
+      "Sou desenvolvedor full stack desde 2022. Trabalho em sistemas que empresas usam todos os dias: sistemas de gestão, apps mobile, integrações com ERPs e APIs de parceiros, relatórios em PDF e Excel e automações, e mantenho tudo isso em produção.",
+      "Já passei por várias stacks e frameworks, conforme cada projeto pedia. O que se mantém é o cuidado com estabilidade e com quem vai dar suporte depois. Hoje curso Ciência da Computação na Faculdade de Americana."
+    ]
+  },
+  "skills": {
+    "title": "Ferramentas",
+    "groups": [
+      {
+        "name": "Backend",
+        "icon": "server",
+        "items": [
+          "Node.js",
+          "TypeScript",
+          "Fastify",
+          "Express",
+          "NestJS",
+          "Python",
+          "FastAPI",
+          "PHP",
+          "Laravel"
+        ]
+      },
+      {
+        "name": "Frontend",
+        "icon": "layout-panel-top",
+        "items": [
+          "React",
+          "Next.js",
+          "Vite",
+          "Tailwind CSS",
+          "shadcn/ui",
+          "Material UI"
+        ]
+      },
+      {
+        "name": "Mobile",
+        "icon": "smartphone-nfc",
+        "items": [
+          "React Native",
+          "Expo"
+        ]
+      },
+      {
+        "name": "Dados",
+        "icon": "database-backup",
+        "items": [
+          "PostgreSQL",
+          "MySQL",
+          "Redis",
+          "TypeORM",
+          "Prisma",
+          "Knex",
+          "SQLAlchemy"
+        ]
+      },
+      {
+        "name": "Automação",
+        "icon": "bot",
+        "items": [
+          "Playwright",
+          "Puppeteer",
+          "pywinauto",
+          "PDF e Excel"
+        ]
+      },
+      {
+        "name": "Infra",
+        "icon": "cloud-cog",
+        "items": [
+          "Docker",
+          "Git",
+          "GitFlow",
+          "AWS S3",
+          "WebSockets"
+        ]
+      }
+    ]
+  },
+  "experience": {
+    "title": "Experiência",
+    "jobs": [
+      {
+        "role": "Desenvolvedor Full Stack",
+        "org": "NEC Brasil",
+        "period": "ago. 2022 até hoje",
+        "place": "Americana, SP",
+        "body": "Desenvolvo e mantenho sistemas web para clientes de vários setores. Faço integrações com APIs de parceiros como Omie, TecnoSpeed, Vuupt e D4Sign, automações de relatórios em PDF e Excel, robôs de RPA e a sustentação de sistemas em produção."
+      }
+    ],
+    "domainsTitle": "Sistemas que já construí e mantive",
+    "domains": [
+      {
+        "name": "RH e férias",
+        "icon": "users",
+        "note": "saldos de férias, avisos de exames e documentos"
+      },
+      {
+        "name": "Qualidade e inspeções",
+        "icon": "clipboard-check",
+        "note": "inspeções, pesquisas e relatórios"
+      },
+      {
+        "name": "Financeiro",
+        "icon": "wallet",
+        "note": "contas a pagar, baixas e painéis"
+      },
+      {
+        "name": "Faturamento",
+        "icon": "receipt-text",
+        "note": "notas, clientes e cobrança"
+      },
+      {
+        "name": "Orçamentos e vendas",
+        "icon": "hand-coins",
+        "note": "aprovação, histórico e e-mails automáticos"
+      },
+      {
+        "name": "Oficinas",
+        "icon": "wrench",
+        "note": "ordens de serviço, estoque e contagem"
+      },
+      {
+        "name": "Equipamentos",
+        "icon": "cpu",
+        "note": "rastreio por número de série e assistência técnica"
+      },
+      {
+        "name": "Logística",
+        "icon": "boxes",
+        "note": "separação e conferência de pedidos no celular"
+      },
+      {
+        "name": "Transporte",
+        "icon": "truck",
+        "note": "autorizações de serviço e acerto de contas"
+      },
+      {
+        "name": "Portal de serviços",
+        "icon": "ticket",
+        "note": "tickets, agendamentos e reembolsos"
+      },
+      {
+        "name": "Automação fiscal",
+        "icon": "file-check",
+        "note": "robôs e conferência de documentos"
+      },
+      {
+        "name": "Integrações",
+        "icon": "webhook",
+        "note": "ERPs, e-commerce, assinatura digital e roteirização"
+      }
+    ],
+    "educationTitle": "Formação",
+    "education": [
+      {
+        "course": "Ciência da Computação",
+        "org": "Faculdade de Americana",
+        "period": "2024 a 2028, em andamento"
+      },
+      {
+        "course": "Ensino Médio e Técnico em Informática",
+        "org": "Colégio Politec",
+        "period": "2021 a 2023"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contato",
+    "body": "Quer conversar sobre um sistema, um projeto ou uma ideia? O caminho mais rápido é o e-mail."
+  },
+  "blog": {
+    "title": "Blog",
+    "intro": "Notas técnicas sobre problemas reais de sistemas web: banco de dados, APIs e integrações.",
+    "description": "Artigos de Eduardo Santarosa sobre desenvolvimento full stack com Node.js, TypeScript, PostgreSQL e Python, a partir de problemas reais.",
+    "read": "Ler o artigo",
+    "back": "Todos os artigos",
+    "minutes": "{n} min de leitura",
+    "relatedCase": "Estudo de caso relacionado",
+    "empty": "Os primeiros artigos estão em revisão e chegam em breve."
+  },
+  "cv": {
+    "place": "Americana, SP, Brasil",
+    "summaryTitle": "Resumo",
+    "summary": "Desenvolvedor full stack desde 2022. Construo sistemas web completos para empresas: interfaces em React, APIs em Node.js e Python, PostgreSQL, integrações com ERPs, apps mobile e automações. Curso Ciência da Computação.",
+    "bullets": [
+      "Desenvolvo e mantenho sistemas web para clientes de vários setores com TypeScript, Node.js, React, Next.js, PHP e React Native.",
+      "Sistemas de gestão para RH, financeiro, faturamento, oficinas, assistência técnica, logística e transporte, do banco de dados à interface.",
+      "App mobile de separação e conferência de pedidos por código de barras, com as regras cobertas por testes automatizados.",
+      "Integrações com ERPs e APIs de parceiros como Omie, TecnoSpeed, Vuupt e D4Sign, e automação de relatórios em PDF e Excel.",
+      "Robôs de RPA em Python e uma plataforma para agendá-los e acompanhá-los em estações Windows."
+    ],
+    "highlightsTitle": "Estudos de caso",
+    "languagesTitle": "Idiomas",
+    "languages": "Português nativo, inglês intermediário"
+  }
+}

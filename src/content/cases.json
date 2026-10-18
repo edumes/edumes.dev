@@ -1,0 +1,587 @@
+[
+  {
+    "id": "authsales",
+    "featured": true,
+    "icon": "blocks",
+    "stack": [
+      "TypeScript",
+      "Fastify",
+      "React",
+      "PostgreSQL",
+      "Redis",
+      "TypeORM"
+    ],
+    "pt": {
+      "slug": "authsales",
+      "category": "Produto próprio",
+      "title": "AuthSales, uma base para vários sistemas",
+      "summary": "Meu projeto pessoal: uma plataforma comercial SaaS que também serve de fundação para sistemas de outros domínios, como comercial, hospitalar e ERP.",
+      "problem": "Construir sozinho uma plataforma multiempresa que servisse de base para outros sistemas, sem cair em nenhuma destas três armadilhas.",
+      "how": [
+        {
+          "icon": "shield-check",
+          "title": "Escopo negado por padrão",
+          "body": "Um registro de outra conta responde igual a um que não existe."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Tudo ou nada",
+          "body": "Escrita, auditoria, recibo de idempotência e eventos vão na mesma transação."
+        },
+        {
+          "icon": "blocks",
+          "title": "Base em pacotes",
+          "body": "Backend, frontend e tipos publicados. Cada sistema só escreve o próprio domínio."
+        },
+        {
+          "icon": "calendar-days",
+          "title": "Quatro tipos de tempo",
+          "body": "Declarados no esquema, porque vencimento não é instante."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Pronto só com evidência",
+          "body": "API, permissão, persistência e navegador, com evidência executável."
+        },
+        {
+          "icon": "bot",
+          "title": "Extensões e agentes",
+          "body": "SDK declarativo e versionado, e agentes de IA locais cujo diff o sistema valida."
+        }
+      ],
+      "outcome": "Mais de cem serviços migraram sem mudar nenhuma assinatura pública, e cada sistema novo já nasce com autenticação, permissões, auditoria e temas."
+    },
+    "en": {
+      "slug": "authsales",
+      "category": "Own product",
+      "title": "AuthSales, one foundation for several systems",
+      "summary": "My personal project: a commercial SaaS platform that also serves as the foundation for systems in other domains, such as sales, healthcare and ERP.",
+      "problem": "Building a multi-company platform alone that could be the foundation for other systems, without falling into any of these three traps.",
+      "how": [
+        {
+          "icon": "shield-check",
+          "title": "Deny-by-default scope",
+          "body": "A record from another account answers the same as one that does not exist."
+        },
+        {
+          "icon": "database-backup",
+          "title": "All or nothing",
+          "body": "The write, its audit entry, idempotency receipt and events share one transaction."
+        },
+        {
+          "icon": "blocks",
+          "title": "A foundation in packages",
+          "body": "Backend, frontend and types are published. Each system only writes its own domain."
+        },
+        {
+          "icon": "calendar-days",
+          "title": "Four kinds of time",
+          "body": "Declared in the schema, because a due date is not an instant."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Done means evidence",
+          "body": "API, permission, persistence and browser, with executable evidence."
+        },
+        {
+          "icon": "bot",
+          "title": "Extensions and agents",
+          "body": "A declarative, versioned SDK, and local AI agents whose diffs the system validates."
+        }
+      ],
+      "outcome": "Over a hundred services moved without changing a single public signature, and every new system starts with authentication, permissions, audit and themes."
+    }
+  },
+  {
+    "id": "separacao-pedidos",
+    "featured": true,
+    "icon": "smartphone-nfc",
+    "stack": [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Jest"
+    ],
+    "pt": {
+      "slug": "separacao-pedidos",
+      "category": "Mobile",
+      "title": "Separar e conferir pedidos no depósito sem perder o fio",
+      "summary": "Um app de celular para separadores e conferentes bipar produtos, dividir pedidos em partes e retomar o trabalho de onde parou.",
+      "problem": "Separadores e conferentes bipam produtos com o celular no meio do depósito, e o app precisa saber exatamente onde cada pedido parou.",
+      "how": [
+        {
+          "icon": "workflow",
+          "title": "Regras em funções puras",
+          "body": "Continuar, recomeçar, abrir a próxima parte e detectar parte finalizada ficam fora das telas."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Cerca de 40 testes",
+          "body": "Chaves duplicadas, partes fora de ordem, coleta divergente, setor repetido e confirmação final."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Toda leitura tem resultado",
+          "body": "Aceita, repetida ou divergente, e uma divergência fica visível até o fim do pedido."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Atualização obrigatória",
+          "body": "Todo mundo trabalha sempre com a mesma regra."
+        }
+      ],
+      "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente."
+    },
+    "en": {
+      "slug": "order-picking",
+      "category": "Mobile",
+      "title": "Picking and checking orders on the warehouse floor without losing track",
+      "summary": "A phone app for pickers and checkers to scan products, split orders into parts and resume work where it stopped.",
+      "problem": "Pickers and checkers scan products with their phones in the middle of the warehouse, and the app has to know exactly where each order stopped.",
+      "how": [
+        {
+          "icon": "workflow",
+          "title": "Rules in pure functions",
+          "body": "Continue, restart, open the next part and detect a finished part live outside the screens."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "About 40 tests",
+          "body": "Duplicate keys, parts out of order, mismatched collection, repeated sector and final confirmation."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Every scan has a result",
+          "body": "Accepted, repeated or mismatched, and a mismatch stays visible until the order is done."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Mandatory updates",
+          "body": "Everyone always works with the same rules."
+        }
+      ],
+      "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer."
+    }
+  },
+  {
+    "id": "rastreio-equipamentos",
+    "featured": true,
+    "icon": "layout-grid",
+    "stack": [
+      "React",
+      "Node.js",
+      "Express",
+      "TypeScript",
+      "PostgreSQL"
+    ],
+    "pt": {
+      "slug": "rastreio-equipamentos",
+      "category": "Sistemas de gestão",
+      "title": "A vida de cada equipamento, do recebimento à garantia",
+      "summary": "Um sistema de gestão em que cada terminal de pagamento é rastreado pelo número de série, por compras, vendas, manutenções e garantia.",
+      "problem": "A empresa compra, vende e conserta terminais de pagamento, e cada aparelho precisa bater com as notas de entrada e com o ERP.",
+      "how": [
+        {
+          "icon": "scan-text",
+          "title": "O serial é a identidade",
+          "body": "Entrada, venda, troca, manutenção e garantia viram movimentações do mesmo aparelho."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Transações explícitas",
+          "body": "Registrar seriais, salvar uma venda ou excluir uma manutenção mexem em várias tabelas de uma vez."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Notas de entrada",
+          "body": "Importadas ou digitadas, com cancelamento e status próprio."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "ERP e leitor",
+          "body": "Produtos sincronizados com o ERP em nuvem e seriais cadastrados em lote pelo código de barras."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "Relatórios",
+          "body": "Venda, manutenção e rastreio por número de série."
+        }
+      ],
+      "outcome": "Dá para responder onde está e por onde passou cada aparelho sem planilha paralela."
+    },
+    "en": {
+      "slug": "equipment-tracking",
+      "category": "Business systems",
+      "title": "The life of every device, from receiving to warranty",
+      "summary": "A management system where every payment terminal is tracked by serial number through purchases, sales, repairs and warranty.",
+      "problem": "The company buys, sells and repairs payment terminals, and every device has to match the purchase invoices and the ERP.",
+      "how": [
+        {
+          "icon": "scan-text",
+          "title": "The serial is the identity",
+          "body": "Receiving, sale, swap, repair and warranty become movements of the same device."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Explicit transactions",
+          "body": "Registering serials, saving a sale or deleting a repair touch several tables at once."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Purchase invoices",
+          "body": "Imported or typed in, with cancellation and their own status."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "ERP and scanner",
+          "body": "Products synced with the cloud ERP and serials registered in bulk from the barcode."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "Reports",
+          "body": "Sales, repairs and tracking by serial number."
+        }
+      ],
+      "outcome": "Where each device is and where it has been can be answered without a side spreadsheet."
+    }
+  },
+  {
+    "id": "orquestracao-rpa",
+    "featured": true,
+    "icon": "bot",
+    "stack": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "WebSocket",
+      "React",
+      "pdfplumber"
+    ],
+    "pt": {
+      "slug": "orquestracao-rpa",
+      "category": "Automação",
+      "title": "Robôs que operam sistemas sem API, e um painel para comandá-los",
+      "summary": "Uma plataforma para agendar e acompanhar robôs em estações Windows de vários clientes, e robôs que leem documentos fiscais sem errar um centavo.",
+      "problem": "Dezenas de automações operavam portais do governo e sistemas contábeis desktop para muitas empresas, e as estações não aceitam conexões de entrada.",
+      "how": [
+        {
+          "icon": "plug-zap",
+          "title": "Conexão de saída",
+          "body": "O agente da estação abre um WebSocket para o painel. Nenhuma porta aberta no cliente."
+        },
+        {
+          "icon": "database-backup",
+          "title": "O banco é a verdade",
+          "body": "Uma ordem nunca se perde por desconexão, e cada estação tem a sua fila, um robô por vez."
+        },
+        {
+          "icon": "file-text",
+          "title": "Contrato de robô",
+          "body": "Configuração em JSON, eventos em JSON Lines e códigos de saída, incluindo \"precisa de alguém\"."
+        },
+        {
+          "icon": "users",
+          "title": "De quem é a vez",
+          "body": "Cada falha aponta o robô, o cliente ou o sistema externo, que só é culpado com prova."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Três leituras",
+          "body": "No PDF, cada valor é achado pelo rótulo e pela posição, e o valor que decide o envio é lido em três lugares."
+        },
+        {
+          "icon": "shield-check",
+          "title": "Pacotes assinados",
+          "body": "Identidade da máquina por par de chaves e atualização do agente com volta automática."
+        }
+      ],
+      "outcome": "Robôs disparados à mão passaram a rodar por agenda, com log ao vivo e auditoria, e divergências viram pendências explicadas em vez de e-mails errados."
+    },
+    "en": {
+      "slug": "rpa-orchestration",
+      "category": "Automation",
+      "title": "Robots that drive systems with no API, and a panel to command them",
+      "summary": "A platform to schedule and follow robots on Windows workstations across many clients, and robots that read tax documents without missing a cent.",
+      "problem": "Dozens of automations operated government portals and desktop accounting software for many companies, and the workstations accept no inbound connections.",
+      "how": [
+        {
+          "icon": "plug-zap",
+          "title": "Outbound connection",
+          "body": "The workstation's agent opens a WebSocket to the panel. No port is opened at the client."
+        },
+        {
+          "icon": "database-backup",
+          "title": "The database is the truth",
+          "body": "An order is never lost to a disconnect, and each workstation has its own queue, one robot at a time."
+        },
+        {
+          "icon": "file-text",
+          "title": "A robot contract",
+          "body": "JSON config, JSON Lines events and exit codes, including \"needs a person\"."
+        },
+        {
+          "icon": "users",
+          "title": "Whose turn it is",
+          "body": "Every failure points to the robot, the client or the external system, which is only blamed with proof."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Three reads",
+          "body": "In the PDF, each value is found by label and position, and the amount that decides sending is read in three places."
+        },
+        {
+          "icon": "shield-check",
+          "title": "Signed packages",
+          "body": "Machine identity from a key pair, and agent self-updates that roll back on their own."
+        }
+      ],
+      "outcome": "Robots that were started by hand now run on schedule with live logs and an audit trail, and mismatches become explained follow-ups instead of wrong e-mails."
+    }
+  },
+  {
+    "id": "checklist-notas-fiscais",
+    "featured": false,
+    "icon": "webhook",
+    "stack": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "XML",
+      "Webhooks"
+    ],
+    "pt": {
+      "slug": "checklist-notas-fiscais",
+      "category": "Integrações",
+      "title": "Um checklist automático entre a nota fiscal e o ERP",
+      "summary": "Notas de fornecedores conferidas contra pedidos e contratos no momento em que chegam.",
+      "problem": "Notas de fornecedores eram conferidas à mão contra pedidos e contratos no ERP antes do lançamento.",
+      "how": [
+        {
+          "icon": "webhook",
+          "title": "Entrada flexível",
+          "body": "XML por webhook ou em lote, com o tipo de documento identificado na chegada."
+        },
+        {
+          "icon": "badge-alert",
+          "title": "Exceções primeiro",
+          "body": "Cancelamento e descarte encerram antes de qualquer conferência."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Checklist",
+          "body": "Cerca de dez itens, e cada um grava se passou, falhou ou foi pulado."
+        },
+        {
+          "icon": "file-check",
+          "title": "Motivo legível",
+          "body": "A nota sai com o motivo para quem vai tratar, não só com um status."
+        },
+        {
+          "icon": "wrench",
+          "title": "Regras de casos reais",
+          "body": "Como saldo de pedido e fornecedor validado pelo emitente da nota."
+        }
+      ],
+      "outcome": "A triagem passou a acontecer na entrada, e o time fiscal só olha o que falhou, já com o motivo."
+    },
+    "en": {
+      "slug": "invoice-checklist",
+      "category": "Integrations",
+      "title": "An automatic checklist between the invoice and the ERP",
+      "summary": "Supplier invoices checked against purchase orders and contracts the moment they arrive.",
+      "problem": "Supplier invoices were checked by hand against purchase orders and contracts in the ERP before being posted.",
+      "how": [
+        {
+          "icon": "webhook",
+          "title": "Flexible intake",
+          "body": "XML by webhook or in batches, with the document type identified on arrival."
+        },
+        {
+          "icon": "badge-alert",
+          "title": "Exceptions first",
+          "body": "Cancellations and discards stop before any check runs."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Checklist",
+          "body": "About ten items, each recording whether it passed, failed or was skipped."
+        },
+        {
+          "icon": "file-check",
+          "title": "A readable reason",
+          "body": "Each invoice leaves with the reason for whoever handles it, not just a status."
+        },
+        {
+          "icon": "wrench",
+          "title": "Rules from real cases",
+          "body": "Such as order balance and supplier validated by the invoice issuer."
+        }
+      ],
+      "outcome": "Triage now happens on arrival, and the tax team only looks at what failed, reason included."
+    }
+  },
+  {
+    "id": "gestao-oficinas",
+    "featured": false,
+    "icon": "layout-grid",
+    "stack": [
+      "React",
+      "Node.js",
+      "Express",
+      "PostgreSQL",
+      "Android"
+    ],
+    "pt": {
+      "slug": "gestao-oficinas",
+      "category": "Sistemas de gestão",
+      "title": "Ordens de serviço e estoque para uma rede de oficinas",
+      "summary": "Cada oficina vê só o que é dela, e a contagem de estoque aponta onde o número não bate.",
+      "problem": "Uma rede de oficinas de pneus precisava de ordens de serviço e estoque por unidade, com a equipe de campo no celular e dados vindos de um sistema antigo.",
+      "how": [
+        {
+          "icon": "shield-check",
+          "title": "Escopo por oficina",
+          "body": "Cada unidade vê apenas as próprias ordens de serviço."
+        },
+        {
+          "icon": "search",
+          "title": "Busca por medida",
+          "body": "Pneus cadastrados e buscados por medida, e entradas validadas antes de gravar."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Contagem de estoque",
+          "body": "Aponta a divergência entre o contado e o esperado."
+        },
+        {
+          "icon": "smartphone-nfc",
+          "title": "App Android",
+          "body": "Para a equipe de campo, com envio de arquivos e aviso de ordem de serviço."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Migração",
+          "body": "Tabelas do sistema antigo levadas para a nova estrutura, com as sequências reajustadas."
+        }
+      ],
+      "outcome": "As oficinas passaram a trabalhar no mesmo sistema, cada uma com seus dados, e as diferenças de estoque aparecem na contagem."
+    },
+    "en": {
+      "slug": "workshop-management",
+      "category": "Business systems",
+      "title": "Work orders and stock for a network of workshops",
+      "summary": "Each workshop sees only its own data, and stock counts point out where the numbers don't match.",
+      "problem": "A network of tire workshops needed work orders and stock per location, with a field team on their phones and data coming from an old system.",
+      "how": [
+        {
+          "icon": "shield-check",
+          "title": "Per-workshop scope",
+          "body": "Each location sees only its own work orders."
+        },
+        {
+          "icon": "search",
+          "title": "Search by size",
+          "body": "Tires registered and searched by size, and receiving validated before it is saved."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Stock counts",
+          "body": "They point out the gap between what was counted and what was expected."
+        },
+        {
+          "icon": "smartphone-nfc",
+          "title": "Android app",
+          "body": "For the field team, with file uploads and work order notifications."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Migration",
+          "body": "The old system's tables moved to the new structure, with sequences reset."
+        }
+      ],
+      "outcome": "The workshops now work in the same system, each with its own data, and stock differences show up in the count."
+    }
+  },
+  {
+    "id": "financeiro-erp",
+    "featured": false,
+    "icon": "webhook",
+    "stack": [
+      "React",
+      "Node.js",
+      "Express",
+      "PostgreSQL",
+      "Omie API"
+    ],
+    "pt": {
+      "slug": "financeiro-erp",
+      "category": "Integrações",
+      "title": "Contas a pagar sincronizadas com um ERP em nuvem",
+      "summary": "Um painel financeiro para várias empresas de um grupo, com títulos agrupados por nota e sincronização com o ERP.",
+      "problem": "O financeiro de várias empresas de um grupo lançava contas num ERP em nuvem, com cadastros espalhados e uma API com limites e lentidão.",
+      "how": [
+        {
+          "icon": "refresh-cw",
+          "title": "Sincronização por empresa",
+          "body": "Categorias, contas bancárias, clientes, fornecedores, ordens de serviço e contratos."
+        },
+        {
+          "icon": "layers",
+          "title": "Lotes de 50",
+          "body": "Consultas ao ERP em lotes, com pausa entre eles, para respeitar os limites da API."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Agrupados por nota",
+          "body": "Baixa e estorno de títulos refletidos no ERP."
+        },
+        {
+          "icon": "shield-check",
+          "title": "Sem duplicidade",
+          "body": "Checagem antes da baixa, e exclusão de agrupamento só com justificativa registrada."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "Painéis",
+          "body": "Recebimentos e saídas de contas a pagar."
+        }
+      ],
+      "outcome": "Os lançamentos passaram a nascer no painel e chegar ao ERP sem retrabalho, com registro de quem excluiu o quê e por quê."
+    },
+    "en": {
+      "slug": "finance-erp",
+      "category": "Integrations",
+      "title": "Accounts payable in sync with a cloud ERP",
+      "summary": "A finance panel for several companies in a group, with bills grouped by invoice and synced with the ERP.",
+      "problem": "The finance team of several companies in one group posted bills in a cloud ERP, with scattered master data and a slow, rate-limited API.",
+      "how": [
+        {
+          "icon": "refresh-cw",
+          "title": "Per-company sync",
+          "body": "Categories, bank accounts, customers, suppliers, work orders and contracts."
+        },
+        {
+          "icon": "layers",
+          "title": "Batches of 50",
+          "body": "ERP queries in batches with a pause between them, to respect the API limits."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Grouped by invoice",
+          "body": "Settling and reversing bills is reflected in the ERP."
+        },
+        {
+          "icon": "shield-check",
+          "title": "No duplicates",
+          "body": "A check before settling, and group deletion only with a recorded justification."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "Dashboards",
+          "body": "Incoming payments and outgoing payables."
+        }
+      ],
+      "outcome": "Entries now start in the panel and reach the ERP without rework, with a record of who deleted what and why."
+    }
+  }
+]

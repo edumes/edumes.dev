@@ -1,0 +1,79 @@
+[
+  {
+    "id": "outbox",
+    "date": "2026-10-18",
+    "case": "authsales",
+    "tags": [
+      "Node.js",
+      "TypeScript",
+      "PostgreSQL"
+    ],
+    "pt": {
+      "slug": "outbox-transacional-postgresql",
+      "title": "Outbox transacional no PostgreSQL: escrita, auditoria e eventos na mesma transação",
+      "description": "Como evitar evento perdido e pedido duplicado com um outbox, um recibo de idempotência e FOR UPDATE SKIP LOCKED, em Node.js e TypeScript."
+    },
+    "en": {
+      "slug": "transactional-outbox-postgresql",
+      "title": "A transactional outbox in PostgreSQL: the write, the audit entry and the events in one transaction",
+      "description": "How to avoid lost events and duplicate orders with an outbox, an idempotency receipt and FOR UPDATE SKIP LOCKED, in Node.js and TypeScript."
+    }
+  },
+  {
+    "id": "themes",
+    "date": "2026-10-18",
+    "tags": [
+      "CSS",
+      "Next.js",
+      "Tailwind CSS"
+    ],
+    "pt": {
+      "slug": "contraste-wcag-36-temas",
+      "title": "36 temas e nenhum texto ilegível: contraste WCAG verificado por script",
+      "description": "Como este portfólio troca entre 36 temas claros e escuros sem piscar, com variáveis CSS e Tailwind, e um script em Node que reprova qualquer cor abaixo do contraste AA."
+    },
+    "en": {
+      "slug": "wcag-contrast-36-themes",
+      "title": "36 themes and no unreadable text: WCAG contrast checked by a script",
+      "description": "How this portfolio switches between 36 light and dark themes without a flash, using CSS variables and Tailwind, and a Node script that fails any color below AA contrast."
+    }
+  },
+  {
+    "id": "temporal",
+    "date": "2026-10-18",
+    "case": "authsales",
+    "tags": [
+      "TypeScript",
+      "PostgreSQL"
+    ],
+    "pt": {
+      "slug": "vencimento-nao-e-instante",
+      "title": "Vencimento não é instante: quatro tipos de tempo no PostgreSQL e no TypeScript",
+      "description": "timestamptz, date, time e timestamp guardam coisas diferentes. Dois bugs de fuso horário e como tipos com marca no TypeScript evitam os dois."
+    },
+    "en": {
+      "slug": "a-due-date-is-not-an-instant",
+      "title": "A due date is not an instant: four kinds of time in PostgreSQL and TypeScript",
+      "description": "timestamptz, date, time and timestamp hold different things. Two time zone bugs, and how branded types in TypeScript prevent both."
+    }
+  },
+  {
+    "id": "pdf-geometry",
+    "date": "2026-10-18",
+    "case": "orquestracao-rpa",
+    "tags": [
+      "Python",
+      "pdfplumber"
+    ],
+    "pt": {
+      "slug": "ler-pdf-pela-posicao",
+      "title": "Ler valores de PDF pela posição, não pela ordem do texto",
+      "description": "Em guias com caixas lado a lado, a extração de texto troca os valores. Como achar cada número pelo rótulo e pela posição com pdfplumber, e por que ler três vezes."
+    },
+    "en": {
+      "slug": "reading-pdf-amounts-by-position",
+      "title": "Reading amounts from a PDF by position, not by text order",
+      "description": "On forms with side-by-side boxes, text extraction swaps the values. How to find each number by label and position with pdfplumber, and why read it three times."
+    }
+  }
+]

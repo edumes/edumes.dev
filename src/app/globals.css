@@ -1,0 +1,470 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: var(--radius);
+  /* Capped so very round presets keep popovers and cards from turning into pills. */
+  --radius-lg: min(calc(var(--radius) * 1.6), 1.5rem);
+  --font-sans: var(--font-mona), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@property --ring-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+:root {
+  /* Critically damped spring (Apple: damping 1.0, response ~0.4s) as a CSS easing. */
+  --spring: linear(0, 0.0512, 0.1628, 0.2936, 0.4219, 0.5371, 0.6355, 0.7167, 0.7822, 0.8339, 0.8743, 0.9054, 0.9292, 0.9473, 0.9609, 0.9711, 0.9787, 0.9843, 0.9885, 0.9916, 0.9939, 0.9955, 0.9968, 0.9976, 1);
+  --spring-duration: 550ms;
+  --attention: oklch(0.74 0.15 72);
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+}
+
+@layer base {
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+}
+
+@layer components {
+/* Width carries hierarchy: wide for display, normal for reading, narrow for meta. Headings take the preset's
+   personality (font, weight, width, tracking, case; see src/themes/overrides.mjs); body text stays Mona Sans. */
+.type-display,
+.type-title,
+.type-heading {
+  font-family: var(--font-display, var(--font-sans));
+  text-transform: var(--display-case, none);
+}
+.type-display {
+  font-stretch: calc(118% * var(--stretch, 1));
+  font-weight: var(--display-weight, 640);
+  font-size: clamp(2.6rem, 1.4rem + 5.6vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: calc(-0.035em * var(--tracking, 1));
+  text-wrap: balance;
+}
+.type-title {
+  font-stretch: calc(112% * var(--stretch, 1));
+  font-weight: calc(var(--display-weight, 640) - 20);
+  font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: calc(-0.022em * var(--tracking, 1));
+  text-wrap: balance;
+}
+.type-heading {
+  font-stretch: calc(106% * var(--stretch, 1));
+  font-weight: calc(var(--display-weight, 640) - 40);
+  font-size: 1.3rem;
+  line-height: 1.25;
+  letter-spacing: calc(-0.01em * var(--tracking, 1));
+  text-wrap: balance;
+}
+.type-lead {
+  font-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem);
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+.type-meta {
+  font-stretch: 88%;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--muted-foreground);
+}
+p {
+  text-wrap: pretty;
+}
+/* Code in blog posts: Shiki emits both palettes as variables; the page's mode picks one, on the theme's own surface.
+   Styled here because MDX's component map skips elements a plugin creates. */
+pre.shiki {
+  margin-block: 1.5rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--muted) 60%, transparent);
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.625;
+}
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
+:not(pre) > code {
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+/* Translucent chrome: clear at the top of the page, glass with a hairline once content scrolls underneath.
+   The rest state is blur(0) rather than none so the filter interpolates. Unprefixed only: Lightning CSS adds
+   -webkit- itself, and writing both made it keep just the prefixed one, which Chrome ignores. */
+.material {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(0) saturate(100%);
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    backdrop-filter 300ms ease;
+}
+.material[data-scrolled] {
+  background: color-mix(in oklab, var(--background) 55%, transparent);
+  border-bottom-color: var(--border);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Home hero backdrop: animated glow (HeroGradient, z -2) under a fading dot grid + grain. Colors come from tokens,
+   so every preset/mode adapts. Lives on <main> (full width) instead of #top (max-w-6xl), so it bleeds edge to edge
+   without 100vw overflow. */
+main:has(> #top) {
+  position: relative;
+  isolation: isolate;
+  --fade: radial-gradient(ellipse 85% 80% at 50% 0%, #000 30%, transparent 100%);
+}
+main:has(> #top)::before,
+main:has(> #top)::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: min(60rem, 100svh);
+  z-index: -1;
+  pointer-events: none;
+}
+main:has(> #top)::before {
+  background: radial-gradient(color-mix(in oklab, var(--foreground) 10%, transparent) 0.6px, transparent 1.8px) 0 0 / 22px 22px;
+  mask-image: var(--fade);
+}
+/* Fades in after its first WebGL frame instead of popping in after hydration. The linear mask keeps the strip under
+   the clear navbar (h-16) close to the page background, so its links don't sit on the most saturated color. */
+.hero-gradient {
+  pointer-events: none;
+  mask-image:
+    linear-gradient(to bottom, transparent 2rem, #000 10rem),
+    radial-gradient(ellipse 90% 75% at 50% 0%, #000 40%, transparent 100%);
+  mask-composite: intersect;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.hero-gradient[data-ready] {
+  opacity: var(--glow-opacity, 0.75);
+}
+main:has(> #top)::after {
+  background: var(--foreground);
+  opacity: 0.05;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), var(--fade);
+  mask-size: 180px 180px, 100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+}
+
+/* SineRibbons dividers fade out on every side, so the band melts into the sections around it. */
+.ribbons {
+  pointer-events: none;
+  mask-image:
+    linear-gradient(to right, transparent, #000 15%, #000 85%, transparent),
+    linear-gradient(transparent, #000 15%, #000 85%, transparent);
+  mask-composite: intersect;
+}
+
+/* Floating surfaces: the preset's own shadow (tinted, hard or glowing) over a neutral lift. */
+.raised {
+  box-shadow: var(--shadow), 0 24px 48px -16px rgb(0 0 0 / 0.18);
+}
+
+/* Press feedback lands on pointer-down. */
+.pressable {
+  transition: transform 120ms ease-out, background-color 160ms ease, color 160ms ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* A light streak crosses the primary CTA every few seconds, tinted by the preset's text-on-primary color. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 42%, color-mix(in oklab, var(--primary-foreground) 35%, transparent) 50%, transparent 58%)
+    150% 0 / 250% 100% no-repeat;
+  animation: shimmer 4.5s ease-in-out 1.5s infinite;
+}
+@keyframes shimmer {
+  30%,
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+/* Chrome ring: a conic gradient in the preset's glow colors turns inside a transparent border. */
+.chrome-ring {
+  --ring-bg: var(--background);
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--ring-bg), var(--ring-bg)) padding-box,
+    conic-gradient(from var(--ring-angle), var(--border), var(--glow-1) 15%, var(--border) 35%, var(--glow-2) 65%, var(--border) 85%) border-box;
+  animation: ring-spin 6s linear infinite;
+}
+.chrome-ring:hover {
+  --ring-bg: var(--muted);
+}
+@keyframes ring-spin {
+  to {
+    --ring-angle: 360deg;
+  }
+}
+
+/* Reveals (<Words>, <Letters>): words or letters rise out of a blur, staggered by --i, once <Reveals /> marks the
+   block data-in. Hidden only on screen with JS and motion allowed, so no-JS, reduced motion and the printed CV always
+   get the text. */
+.word,
+.char {
+  display: inline-block;
+}
+@media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] :is(.word, .char) {
+    transition:
+      opacity 600ms ease,
+      filter 600ms ease,
+      transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: min(calc(var(--i) * 28ms), 900ms);
+  }
+  [data-reveal]:not([data-in]) .word {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(0.4em);
+  }
+  [data-reveal]:not([data-in]) .char {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(0.45em) rotate(5deg);
+  }
+  [data-reveal]:not([data-in]) .char:nth-child(odd) {
+    transform: translateY(-0.45em) rotate(-5deg);
+  }
+}
+
+/* Native popovers that materialize from their trigger and reverse mid-flight. */
+.popover {
+  inset: auto;
+  margin: 0;
+  opacity: 0;
+  transform: scale(0.94) translateY(-4px);
+  filter: blur(4px);
+  transition:
+    opacity 200ms ease,
+    transform var(--spring-duration) var(--spring),
+    filter 200ms ease,
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+.popover:popover-open {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+@starting-style {
+  .popover:popover-open {
+    opacity: 0;
+    transform: scale(0.94) translateY(-4px);
+    filter: blur(4px);
+  }
+}
+
+dialog.command {
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 180ms ease,
+    transform var(--spring-duration) var(--spring),
+    overlay 180ms allow-discrete,
+    display 180ms allow-discrete;
+}
+dialog.command[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  dialog.command[open] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+dialog.command::backdrop {
+  background: color-mix(in oklab, var(--foreground) 22%, transparent);
+  backdrop-filter: blur(2px);
+}
+}
+
+/* Case visuals (src/components/visuals). Unlayered so .lit beats a border utility on the same element. */
+.morph {
+  transition:
+    color 300ms ease,
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 400ms ease,
+    opacity 300ms ease,
+    transform var(--spring-duration) var(--spring);
+}
+/* Spot glow on whatever the data is passing through, in the preset's glow color. */
+.lit {
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 30%, transparent),
+    0 0 28px -8px var(--glow-1);
+}
+/* A dot running the length of a 1px wire. One keyframe serves both directions: across the wire the offset moves a
+   single pixel. Symmetric opacity so animation-direction: reverse also works. */
+.wire-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  margin: -3px 0 0 -3px;
+  border-radius: 999px;
+  background: var(--primary);
+  box-shadow: 0 0 10px 2px var(--glow-1);
+  animation: wire 650ms cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+@keyframes wire {
+  0% {
+    left: 0;
+    top: 0;
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    top: 100%;
+    opacity: 0;
+  }
+}
+/* A scanner's laser sweeping once over a barcode. */
+.laser {
+  position: absolute;
+  inset-inline: 0.5rem;
+  top: 10%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--destructive);
+  box-shadow: 0 0 8px 1px var(--destructive);
+  animation: laser 800ms ease-in-out forwards;
+}
+@keyframes laser {
+  0% {
+    top: 10%;
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  50% {
+    top: 85%;
+  }
+  100% {
+    top: 10%;
+    opacity: 0;
+  }
+}
+@keyframes fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Theme changes cross-fade instead of flashing. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .popover,
+  dialog.command {
+    transform: none !important;
+    filter: none !important;
+  }
+  .shimmer::after {
+    display: none;
+  }
+  .chrome-ring {
+    animation: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material[data-scrolled] {
+    background: var(--background);
+    backdrop-filter: none;
+  }
+}

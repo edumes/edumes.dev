@@ -1,0 +1,87 @@
+"Date" is one of the most overloaded words in business software. An invoice's due date, a store's opening hours, the moment an e-mail left and the time of a booked appointment look alike, but they are four different things. When the schema doesn't say which is which, the bugs show up in somebody's time zone.
+
+In AuthSales, my personal project, every time column declares its kind. There are four:
+
+| Kind | What it is | PostgreSQL | Example |
+| --- | --- | --- | --- |
+| Instant | a point on the timeline | `timestamptz` | `2026-08-15T03:00:00Z` |
+| Civil date | a day the parties agreed on | `date` | `2026-08-15` |
+| Local time | a time of day that repeats | `time` | `08:30:00` |
+| Local date-time | a clock reading with no zone | `timestamp` | `2026-08-15T08:30:00` |
+
+The rule that sums it up: **a date is a day the business agreed on; a `timestamptz` is a moment that happened.** Due dates, tax periods and birthdays are civil dates. `created_at`, `sent_at` and a job's lease are instants.
+
+## Bug 1: one moment, two stored values
+
+A `timestamp` column (no zone) stores the wall clock of whoever wrote it. When a driver gets a JavaScript `Date` for that column, it writes the time in the process's time zone, and the zone itself is lost.
+
+Midnight in São Paulo is 03:00 UTC. The same instant, written from a development machine in Brazil and from a container running in UTC:
+
+```ts
+const moment = new Date('2026-08-15T03:00:00.000Z'); // midnight in São Paulo
+
+wallClock(moment, 'America/Sao_Paulo'); // '2026-08-15T00:00:00'
+wallClock(moment, 'UTC');               // '2026-08-15T03:00:00'
+```
+
+Three hours apart in the column, and nothing in the row explains why. The bug only shows up once the system leaves the developer's machine. The fix is to declare the column as an instant (`timestamptz`), which stores the same value wherever the process runs.
+
+## Bug 2: overdue before the day is over
+
+A due date is a civil date, not an instant. An invoice due on the 15th is on time until the end of the 15th **where the business is**. Comparing against the UTC day flags it overdue at 9 p.m. in Brazil, three hours early:
+
+```ts
+const due = civilDate('2026-08-15');
+const lateEvening = new Date('2026-08-16T02:30:00.000Z'); // 11:30 p.m. on the 15th in São Paulo
+
+lateEvening.toISOString().slice(0, 10) > due;          // true: "overdue"
+isOverdue(due, lateEvening, 'America/Sao_Paulo');      // false: the day isn't over yet
+```
+
+The correct version asks which day it is right now for someone in that time zone, and only then compares dates:
+
+```ts
+export const civilDateIn = (d: Date, timeZone: string): CivilDate =>
+  new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d) as CivilDate;
+
+export const isOverdue = (due: CivilDate, now: Date, timeZone: string): boolean => civilDateIn(now, timeZone) > due;
+```
+
+## Types that don't mix
+
+In TypeScript the four kinds are branded strings. At run time they are still strings, but the compiler won't accept an instant where a civil date is expected:
+
+```ts
+export type Instant = string & { readonly kind: 'instant' };
+export type CivilDate = string & { readonly kind: 'civil-date' };
+export type LocalTime = string & { readonly kind: 'local-time' };
+export type LocalDateTime = string & { readonly kind: 'local-date-time' };
+```
+
+Only the constructors create these values, and they reject anything that isn't what it claims to be. `civilDate('2026-02-30')` and `civilDate('15/08/2026')` throw a `RangeError`, and so does `localTime('24:00:00')`.
+
+## The schema says what each column is
+
+In the database, every column picks a kind and a comment says why:
+
+```sql
+create table invoice (
+  id         bigserial primary key,
+  issued_on  date        not null,               -- civil date: the day printed on the document
+  due_on     date        not null,               -- civil date: overdue only after this day ends locally
+  created_at timestamptz not null default now(), -- instant: when the row was written
+  sent_at    timestamptz                         -- instant: when the e-mail actually left
+);
+```
+
+And when an agreed time has to become an instant, say an appointment booked for 8:30 in the customer's time, the time zone is stored right next to it, never implied by the server.
+
+## The example
+
+`temporal-kinds` has the types, the constructors, `isOverdue`, `wallClock` (what a driver writes into a `timestamp` column) and an example schema. Its tests show both bugs above. It has no dependencies: Node 23.6+ runs the TypeScript directly.
+
+<Source path="examples/temporal-kinds" />
+
+```bash
+node --test kinds.test.ts
+```

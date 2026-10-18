@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.edumes.dev" }],
+      "destination": "https://edumes.dev/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(icon|apple-icon)",
+      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+    },
+    {
+      "source": "/(.*)opengraph-image-(.*)",
+      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+    }
+  ]
+}

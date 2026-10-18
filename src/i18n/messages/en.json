@@ -1,0 +1,411 @@
+{
+  "meta": {
+    "title": "Eduardo Santarosa | Full-stack Developer, Node.js & React",
+    "description": "Eduardo Santarosa (edumes), full-stack developer in Brazil (UTC−3) since 2022. Web systems end to end with Node.js, TypeScript, React, Next.js, Python and PostgreSQL.",
+    "role": "Full-stack Developer",
+    "stack": "Stack",
+    "caseStudy": "Case study",
+    "cvTitle": "Résumé | Eduardo Moreira Santarosa, Full-stack Developer",
+    "cvDescription": "Résumé of Eduardo Moreira Santarosa, full-stack developer (Node.js, TypeScript, React, Python, PostgreSQL): experience, case studies, tools and education, with a PDF."
+  },
+  "nav": {
+    "top": "Home",
+    "cases": "Cases",
+    "projects": "Projects",
+    "about": "About",
+    "experience": "Experience",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "ui": {
+    "skip": "Skip to content",
+    "menu": "Search and navigate",
+    "menuHint": "Type to filter",
+    "menuEmpty": "Nothing matches that search.",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "soundOn": "Turn sounds on",
+    "soundOff": "Turn sounds off",
+    "language": "Português",
+    "copyEmail": "Copy e-mail",
+    "copied": "E-mail copied",
+    "draft": "Draft, awaiting approval",
+    "readCase": "Read the case study",
+    "backToCases": "All case studies",
+    "nextCase": "Next case study",
+    "downloadCv": "Download résumé",
+    "downloaded": "Résumé downloaded",
+    "saveContact": "Save contact",
+    "replay": "Run again",
+    "goTo": "Go to",
+    "actions": "Actions"
+  },
+  "hero": {
+    "titles": [
+      "Click to database, and back.",
+      "Systems companies run on.",
+      "Apps built for the warehouse floor.",
+      "From spreadsheet to software.",
+      "Hours of manual work, now minutes.",
+      "Less copy-paste between systems.",
+      "Code the next developer can read.",
+      "I ship it, then I keep it running.",
+      "Form to database, no shortcuts.",
+      "Integrations that don’t wake you up.",
+      "Works on your machine too.",
+      "Good systems go unnoticed."
+    ],
+    "lead": "Full-stack developer since 2022. I build systems for companies: React interfaces, Node.js and Python APIs, PostgreSQL, ERP integrations, mobile apps and automations, and I keep all of it running in production.",
+    "primary": "See case studies"
+  },
+  "trace": {
+    "app": "Order system (made up)",
+    "form": "New order",
+    "fields": [
+      [
+        "Customer",
+        "Example Distributor"
+      ],
+      [
+        "Items",
+        "3 products"
+      ],
+      [
+        "Total",
+        "R$ 1,234.56"
+      ]
+    ],
+    "save": "Save order",
+    "saving": "Saving…",
+    "saved": "Order {n} saved.",
+    "steps": [
+      {
+        "layer": "Interface",
+        "detail": "validates the form and sends POST /api/orders",
+        "tech": "React",
+        "ms": "12 ms"
+      },
+      {
+        "layer": "API",
+        "detail": "checks the session and the requester’s permission",
+        "tech": "Node.js",
+        "ms": "3 ms"
+      },
+      {
+        "layer": "Business rules",
+        "detail": "computes the total and reserves stock",
+        "tech": "TypeScript",
+        "ms": "8 ms"
+      },
+      {
+        "layer": "Database",
+        "detail": "writes order, audit entry and event in one transaction",
+        "tech": "PostgreSQL",
+        "ms": "21 ms"
+      },
+      {
+        "layer": "Response",
+        "detail": "201 Created, and the screen shows the saved order",
+        "tech": "HTTP",
+        "ms": "44 ms"
+      },
+      {
+        "layer": "Integration",
+        "detail": "after the commit, the order goes on to the ERP",
+        "tech": "Worker",
+        "ms": "in the background"
+      }
+    ],
+    "caption": "Illustration with made-up data: the path of one click through a web system, from the screen to the database and integrations."
+  },
+  "cases": {
+    "title": "Case studies",
+    "intro": "Real problems I solved at work, told without exposing clients or code.",
+    "problem": "The problem",
+    "how": "How it works",
+    "results": "Outcome",
+    "more": "More cases",
+    "empty": "The case studies are under review and will be here soon.",
+    "disclaimer": "Conceptual illustrations with made-up data. They do not depict the real infrastructure."
+  },
+  "projects": {
+    "title": "Other projects",
+    "intro": "Things I build on my own, to learn, to test an idea or just because I wanted them to exist.",
+    "code": "Code on GitHub",
+    "items": [
+      {
+        "name": "Aurora Mainframe Banking",
+        "icon": "terminal",
+        "stack": [
+          "GnuCOBOL"
+        ],
+        "body": "A made-up bank's daily financial closing in COBOL: normalizes transactions, posts double-entry accounting, reconciles and produces batch reports."
+      },
+      {
+        "name": "LoreForge",
+        "icon": "book-text",
+        "stack": [
+          "Next.js",
+          "TypeScript"
+        ],
+        "body": "A local-first workspace for worldbuilding: reads a vault of Markdown files, indexes it and lets you browse lore, quests and scripts."
+      },
+      {
+        "name": "Lyric Type",
+        "icon": "keyboard",
+        "stack": [
+          "Next.js",
+          "TypeScript"
+        ],
+        "body": "Typing practice synced to the lyrics of the song that is playing."
+      },
+      {
+        "name": "My Garden",
+        "icon": "leafy-green",
+        "stack": [
+          "Go",
+          "React"
+        ],
+        "body": "A full-stack virtual garden game: plant, grow, harvest and share, with its own Go API.",
+        "href": "https://github.com/edumes/my-garden"
+      },
+      {
+        "name": "Document Assistant",
+        "icon": "scan-text",
+        "stack": [
+          "TypeScript",
+          "Tesseract.js"
+        ],
+        "body": "Questions about PDFs and images, with OCR running in the browser and answers that point to the source passage."
+      },
+      {
+        "name": "Deep Drill",
+        "icon": "pickaxe",
+        "stack": [
+          "Go",
+          "TypeScript"
+        ],
+        "body": "A browser idle mining game with refining, drills, generators, energy limits and offline gains."
+      },
+      {
+        "name": "YT Radio Stream",
+        "icon": "radio-tower",
+        "stack": [
+          "Python",
+          "ffmpeg",
+          "Docker"
+        ],
+        "body": "A continuous YouTube live stream from a folder of clips, shuffled without repeats until the cycle ends."
+      },
+      {
+        "name": "Salário Contado",
+        "icon": "circle-dollar-sign",
+        "stack": [
+          "Next.js"
+        ],
+        "body": "Shows in real time how much you've earned today, from your salary and working hours.",
+        "href": "https://github.com/edumes/salariocontado"
+      }
+    ]
+  },
+  "about": {
+    "title": "About",
+    "body": [
+      "I've been a full-stack developer since 2022. I work on systems companies use every day: business software, mobile apps, integrations with ERPs and partner APIs, PDF and Excel reports and automations, and I keep all of it running in production.",
+      "I've moved across many stacks and frameworks as each project needed. What stays constant is care for stability and for whoever supports the system next. I'm currently studying Computer Science at Faculdade de Americana."
+    ]
+  },
+  "skills": {
+    "title": "Tools",
+    "groups": [
+      {
+        "name": "Backend",
+        "icon": "server",
+        "items": [
+          "Node.js",
+          "TypeScript",
+          "Fastify",
+          "Express",
+          "NestJS",
+          "Python",
+          "FastAPI",
+          "PHP",
+          "Laravel"
+        ]
+      },
+      {
+        "name": "Frontend",
+        "icon": "layout-panel-top",
+        "items": [
+          "React",
+          "Next.js",
+          "Vite",
+          "Tailwind CSS",
+          "shadcn/ui",
+          "Material UI"
+        ]
+      },
+      {
+        "name": "Mobile",
+        "icon": "smartphone-nfc",
+        "items": [
+          "React Native",
+          "Expo"
+        ]
+      },
+      {
+        "name": "Data",
+        "icon": "database-backup",
+        "items": [
+          "PostgreSQL",
+          "MySQL",
+          "Redis",
+          "TypeORM",
+          "Prisma",
+          "Knex",
+          "SQLAlchemy"
+        ]
+      },
+      {
+        "name": "Automation",
+        "icon": "bot",
+        "items": [
+          "Playwright",
+          "Puppeteer",
+          "pywinauto",
+          "PDF and Excel"
+        ]
+      },
+      {
+        "name": "Infra",
+        "icon": "cloud-cog",
+        "items": [
+          "Docker",
+          "Git",
+          "GitFlow",
+          "AWS S3",
+          "WebSockets"
+        ]
+      }
+    ]
+  },
+  "experience": {
+    "title": "Experience",
+    "jobs": [
+      {
+        "role": "Full-stack Developer",
+        "org": "NEC Brasil",
+        "period": "Aug 2022 to present",
+        "place": "Americana, Brazil",
+        "body": "I build and maintain web systems for clients across several industries: integrations with partner APIs such as Omie, TecnoSpeed, Vuupt and D4Sign, PDF and Excel report automation, RPA robots, and support for systems in production."
+      }
+    ],
+    "domainsTitle": "Systems I've built and maintained",
+    "domains": [
+      {
+        "name": "HR and vacations",
+        "icon": "users",
+        "note": "vacation balances, medical exam and document reminders"
+      },
+      {
+        "name": "Quality and inspections",
+        "icon": "clipboard-check",
+        "note": "inspections, surveys and reports"
+      },
+      {
+        "name": "Finance",
+        "icon": "wallet",
+        "note": "payables, settlements and dashboards"
+      },
+      {
+        "name": "Billing",
+        "icon": "receipt-text",
+        "note": "invoices, customers and collection"
+      },
+      {
+        "name": "Quotes and sales",
+        "icon": "hand-coins",
+        "note": "approval, history and automatic e-mails"
+      },
+      {
+        "name": "Workshops",
+        "icon": "wrench",
+        "note": "work orders, stock and counts"
+      },
+      {
+        "name": "Equipment",
+        "icon": "cpu",
+        "note": "serial number tracking and technical support"
+      },
+      {
+        "name": "Logistics",
+        "icon": "boxes",
+        "note": "order picking and checking on the phone"
+      },
+      {
+        "name": "Transport",
+        "icon": "truck",
+        "note": "service authorizations and settlements"
+      },
+      {
+        "name": "Service portal",
+        "icon": "ticket",
+        "note": "tickets, scheduling and refunds"
+      },
+      {
+        "name": "Tax automation",
+        "icon": "file-check",
+        "note": "robots and document checks"
+      },
+      {
+        "name": "Integrations",
+        "icon": "webhook",
+        "note": "ERPs, e-commerce, e-signature and routing"
+      }
+    ],
+    "educationTitle": "Education",
+    "education": [
+      {
+        "course": "Computer Science",
+        "org": "Faculdade de Americana",
+        "period": "2024 to 2028, in progress"
+      },
+      {
+        "course": "High school and IT technical course",
+        "org": "Colégio Politec",
+        "period": "2021 to 2023"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Want to talk about a system, a project or an idea? E-mail is the fastest way to reach me."
+  },
+  "blog": {
+    "title": "Blog",
+    "intro": "Technical notes on real problems in web systems: databases, APIs and integrations.",
+    "description": "Articles by Eduardo Santarosa on full-stack development with Node.js, TypeScript, PostgreSQL and Python, drawn from real problems.",
+    "read": "Read the article",
+    "back": "All articles",
+    "minutes": "{n} min read",
+    "relatedCase": "Related case study",
+    "empty": "The first articles are under review and will be here soon."
+  },
+  "cv": {
+    "place": "Americana, SP, Brazil",
+    "summaryTitle": "Summary",
+    "summary": "Full-stack developer since 2022. I build complete web systems for companies: React interfaces, Node.js and Python APIs, PostgreSQL, ERP integrations, mobile apps and automations. Computer Science student.",
+    "bullets": [
+      "Build and maintain web systems for clients across industries with TypeScript, Node.js, React, Next.js, PHP and React Native.",
+      "Business systems for HR, finance, billing, workshops, technical support, logistics and transport, from the database to the interface.",
+      "A mobile app for barcode-based order picking and checking, with its rules covered by automated tests.",
+      "Integrations with ERPs and partner APIs such as Omie, TecnoSpeed, Vuupt and D4Sign, plus PDF and Excel report automation.",
+      "Python RPA robots and a platform to schedule and follow them on Windows workstations."
+    ],
+    "highlightsTitle": "Case studies",
+    "languagesTitle": "Languages",
+    "languages": "Portuguese (native), English (intermediate)"
+  }
+}

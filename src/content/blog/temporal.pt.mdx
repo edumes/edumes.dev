@@ -1,0 +1,87 @@
+"Data" é uma das palavras mais carregadas de um sistema de gestão. O vencimento de uma fatura, o horário de abertura de uma loja, o momento em que um e-mail saiu e o horário marcado de uma consulta parecem a mesma coisa, mas são quatro coisas diferentes. Quando o esquema não diz qual é qual, os bugs aparecem no fuso horário de alguém.
+
+No AuthSales, meu projeto pessoal, cada coluna de tempo declara o seu tipo. São quatro:
+
+| Tipo | O que é | PostgreSQL | Exemplo |
+| --- | --- | --- | --- |
+| Instante | um ponto na linha do tempo | `timestamptz` | `2026-08-15T03:00:00Z` |
+| Data civil | um dia que as partes combinaram | `date` | `2026-08-15` |
+| Hora local | uma hora do dia que se repete | `time` | `08:30:00` |
+| Data-hora local | uma leitura de relógio, sem fuso | `timestamp` | `2026-08-15T08:30:00` |
+
+A regra que resume tudo: **uma data é um dia que o negócio combinou; um `timestamptz` é um momento que aconteceu.** Vencimento, competência e aniversário são datas civis. `created_at`, `sent_at` e a trava de um job são instantes.
+
+## Bug 1: o mesmo momento, dois valores gravados
+
+Uma coluna `timestamp` (sem fuso) guarda o relógio de parede de quem escreveu. Quando um driver recebe um `Date` do JavaScript para essa coluna, ele escreve a hora no fuso do processo, e o fuso em si se perde.
+
+Meia-noite em São Paulo é 03:00 em UTC. O mesmo instante, gravado de uma máquina de desenvolvimento no Brasil e de um container em UTC:
+
+```ts
+const moment = new Date('2026-08-15T03:00:00.000Z'); // meia-noite em São Paulo
+
+wallClock(moment, 'America/Sao_Paulo'); // '2026-08-15T00:00:00'
+wallClock(moment, 'UTC');               // '2026-08-15T03:00:00'
+```
+
+Três horas de diferença na coluna, e nada na linha explica por quê. O bug só aparece quando o sistema sai da máquina do desenvolvedor. A correção é declarar a coluna como instante (`timestamptz`), que guarda o mesmo valor em qualquer lugar onde o processo rode.
+
+## Bug 2: atrasado antes de o dia acabar
+
+Vencimento é uma data civil, não um instante. Uma fatura que vence no dia 15 está em dia até o fim do dia 15 **onde o negócio fica**. Comparar com o dia em UTC acusa atraso às 21h no Brasil, três horas antes da hora:
+
+```ts
+const due = civilDate('2026-08-15');
+const lateEvening = new Date('2026-08-16T02:30:00.000Z'); // 23:30 do dia 15 em São Paulo
+
+lateEvening.toISOString().slice(0, 10) > due;          // true: "atrasada"
+isOverdue(due, lateEvening, 'America/Sao_Paulo');      // false: o dia ainda não acabou
+```
+
+A versão certa pergunta que dia é agora para alguém naquele fuso, e só então compara datas:
+
+```ts
+export const civilDateIn = (d: Date, timeZone: string): CivilDate =>
+  new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d) as CivilDate;
+
+export const isOverdue = (due: CivilDate, now: Date, timeZone: string): boolean => civilDateIn(now, timeZone) > due;
+```
+
+## Tipos que não se misturam
+
+No TypeScript, os quatro tipos são strings com marca (*branded types*). Em tempo de execução continuam sendo strings, mas o compilador não deixa passar um instante onde se espera uma data civil:
+
+```ts
+export type Instant = string & { readonly kind: 'instant' };
+export type CivilDate = string & { readonly kind: 'civil-date' };
+export type LocalTime = string & { readonly kind: 'local-time' };
+export type LocalDateTime = string & { readonly kind: 'local-date-time' };
+```
+
+Só os construtores criam esses valores, e eles recusam o que não é o que diz ser. `civilDate('2026-02-30')` e `civilDate('15/08/2026')` lançam `RangeError`, e `localTime('24:00:00')` também.
+
+## O esquema diz o que cada coluna é
+
+No banco, cada coluna escolhe um tipo e um comentário diz por quê:
+
+```sql
+create table invoice (
+  id         bigserial primary key,
+  issued_on  date        not null,               -- data civil: o dia impresso no documento
+  due_on     date        not null,               -- data civil: atrasa só depois que este dia acaba no local
+  created_at timestamptz not null default now(), -- instante: quando a linha foi gravada
+  sent_at    timestamptz                         -- instante: quando o e-mail realmente saiu
+);
+```
+
+E quando um horário combinado precisa virar instante, por exemplo uma consulta marcada para as 08:30 no horário do cliente, o fuso fica gravado ao lado, nunca implícito no servidor.
+
+## O exemplo
+
+`temporal-kinds` tem os tipos, os construtores, `isOverdue`, `wallClock` (o que um driver escreve numa coluna `timestamp`) e um esquema de exemplo. Os testes mostram os dois bugs acima. Não tem dependências: o Node 23.6+ roda o TypeScript direto.
+
+<Source path="examples/temporal-kinds" />
+
+```bash
+node --test kinds.test.ts
+```

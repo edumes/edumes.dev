@@ -1,0 +1,80 @@
+On an automation platform I worked on, robots checked the amount on tax payment forms in PDF before e-mailing the customer. One wrong cent means a wrong e-mail, telling the wrong person to pay the wrong amount. The obvious way to read the PDF got it wrong, and got it wrong silently.
+
+## The obvious way: the first number after the label
+
+Extracting the text and taking the first money amount after "Valor total do documento" (the document total) looks good enough:
+
+```python
+text = pdf.pages[0].extract_text()
+after = text.split("Valor total do documento", 1)[1]
+amount = next(t for t in after.split() if MONEY.match(t))
+```
+
+The problem is side-by-side boxes. A typical form has "Valor original" and "Valor total do documento" in two boxes on the same row. Text extraction reads the page line by line: first both labels, then both values. The text comes out like this:
+
+```text
+Valor original Valor total do documento
+1.100,00 1.234,56
+```
+
+The first number after the label is `1.100,00`, the value of the neighbouring box. Nothing breaks, no exception is raised, and the robot carries on with the wrong number.
+
+## Read by position, not by order
+
+`pdfplumber` returns every word with its bounding box (`x0`, `top`, `x1`, `bottom`). With that, the document can be read the way a person reads it: find the label and look right below it, inside the same column.
+
+```python
+def money_below(words, label, max_gap=30):
+    """The amount printed under the label, inside the label's column."""
+    box = find_label(words, label)
+    if not box:
+        return None
+    x0, _, x1, bottom = box
+    hits = [
+        w
+        for w in words
+        if MONEY.match(w["text"]) and 0 <= w["top"] - bottom <= max_gap and w["x1"] > x0 and w["x0"] < x1 + 20
+    ]
+    return to_decimal(min(hits, key=lambda w: w["top"])["text"]) if hits else None
+```
+
+`find_label` finds a multi-word label by looking for the exact sequence of words at the same height on the page. For amounts on the same line, like "Totais ........ 1.234,56", there's a `money_right_of` variant.
+
+Money is always `Decimal`, never `float`. The Brazilian format (`1.234,56`) is validated by a regular expression before the conversion, so a code or document number is never read as an amount.
+
+## Read it three times and demand agreement
+
+Reading by position fixes side-by-side boxes, but a form's layout can change without notice. So the amount that decides whether the e-mail goes out is read from up to three independent places in the document: the total box, the totals row of the breakdown table, and the payment block, which some forms don't even have.
+
+```python
+def read_amount(path):
+    with pdfplumber.open(path) as pdf:
+        words = pdf.pages[0].extract_words()
+    readings = {
+        "total box": money_below(words, "Valor total do documento"),
+        "totals row": money_right_of(words, "Totais"),
+        "payment block": money_right_of(words, "Valor do pagamento:"),  # optional on some forms
+    }
+    found = {k: v for k, v in readings.items() if v is not None}
+    if readings["total box"] is None or len(found) < 2:
+        raise Unreadable(f"not enough readings: {readings}")
+    if len(set(found.values())) != 1:
+        raise Unreadable(f"readings disagree: {found}")
+    return readings["total box"]
+```
+
+The rule is simple: the main reading must exist, at least two readings must be found, and every reading found must be equal. Otherwise the document is treated as unreadable.
+
+## Stopping is a valid answer
+
+`Unreadable` is not an error to hide. In the real system it became an explained follow-up for a person to review, instead of an e-mail with the wrong amount. A robot that stops and says "I'm not sure" costs someone a few minutes. A robot that carries on with the wrong number costs the customer's trust.
+
+## The example
+
+`pdf-geometry-extract` has the reader and a check that builds three made-up forms and confirms three things: that text order picks the neighbouring box, that geometry gets it right, and that disagreeing readings are refused. Every document is invented by the check itself.
+
+<Source path="examples/pdf-geometry-extract" />
+
+```bash
+uv run check.py
+```

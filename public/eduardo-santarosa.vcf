@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Santarosa;Eduardo;Moreira;;
+FN:Eduardo Moreira Santarosa
+TITLE:Desenvolvedor Full Stack
+EMAIL;TYPE=INTERNET:dev.eduardosantarosa@gmail.com
+URL:https://edumes.dev
+URL:https://www.linkedin.com/in/edumesz/
+URL:https://github.com/edumes
+ADR;TYPE=WORK:;;;Americana;SP;;Brasil
+END:VCARD

@@ -1,0 +1,83 @@
+This portfolio has 36 themes, each with a light and a dark version: 72 combinations of colors, heading fonts, corners and shadows. The themes come from a foundation I use in my other projects, and many were designed for dashboards, not for long text. Some left secondary text barely visible against the page. Checking 72 combinations by eye every time something changes doesn't work. So contrast became a test.
+
+## A theme is a list of variables
+
+No component knows which theme is active. Components use roles such as "text", "page", "secondary text" and "link", and each theme only sets the value of each role as a CSS variable. Tailwind reads those variables through `@theme inline`, so `bg-background` and `text-muted-foreground` work in any theme:
+
+```css
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-link: var(--link);
+}
+```
+
+Besides colors, a theme can change the personality: the heading font, weight and width, the corner radius, the shadow and the glow behind the hero. Body text always stays in the same font, so reading doesn't change from theme to theme.
+
+## Switching without a flash
+
+A static site doesn't know which theme the visitor picked until JavaScript runs. If the theme is applied after the page shows up, the page flashes in the default theme first. To avoid that, a small script runs inside `<head>`, before the first paint: it reads the saved choice, decides between light and dark and writes the variables straight onto `<html>`.
+
+```js
+// P: the themes · D: the default · r: the <html> · m: matchMedia('(prefers-color-scheme: dark)')
+function apply(s) {
+  const p = P[s.preset] ? s.preset : D, mode = s.mode || 'system';
+  const dark = mode === 'dark' || (mode === 'system' && m.matches);
+  r.classList.toggle('dark', dark);
+  r.style.colorScheme = dark ? 'dark' : 'light';
+  for (const [k, v] of Object.entries(P[p][dark ? 'dark' : 'light'])) r.style.setProperty('--' + k, v);
+}
+```
+
+Without JavaScript, a `<style>` with the default theme follows the system's light or dark mode. And heading fonts aren't preloaded: the browser downloads only the active theme's font, or all of them while the theme menu shows its previews.
+
+## Contrast as a test
+
+WCAG defines the contrast between two colors from the relative luminance of each. The ratio is `(L1 + 0.05) / (L2 + 0.05)`, with the lighter color on top, and level AA asks for at least 4.5:1 for normal text. The script computes it for every pair that matters, in every theme and every mode:
+
+```js
+const PAIRS = [
+  ['foreground', 'background', 4.5],
+  ['muted-foreground', 'background', 4.5],
+  ['muted-foreground', 'card', 4.5],
+  ['primary-foreground', 'primary', 4.5],
+  ['link', 'background', 4.5],
+  ['border', 'background', 1.15]
+  // ...
+];
+```
+
+Two details took more work than the formula. First, the themes write colors in different formats, such as hex, `hsl()`, `rgb()` and `oklch()`, so the script converts them all to sRGB before measuring. Second, a translucent color has no contrast of its own: the same gray at 60% opacity looks different on every surface. So the script first blends the color over the surface underneath, and only then measures:
+
+```js
+const over = (fg, bg) => [0, 1, 2].map((i) => fg[i] * fg[3] + bg[i] * (1 - fg[3])).concat(1);
+const lum = (c) => 0.2126 * linear(c[0]) + 0.7152 * linear(c[1]) + 0.0722 * linear(c[2]);
+const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+```
+
+Any pair below its minimum is printed with the theme, the mode and the ratio, and the script exits with code 1. Borders get a lower minimum, because they only need to be visible, not readable.
+
+## Fixing without flattening
+
+The original themes stay untouched in the project they come from. The site has its own file of adjustments, and a script merges both into a `presets.json`. A typical adjustment darkens only what it must:
+
+```js
+tangerine: {
+  // The original light page was a mid gray that sank the secondary text and the orange.
+  light: { background: '#f5f6f7', border: '#dcdfe3', primary: '#c4461f', 'muted-foreground': '#5f6673' },
+  dark: { 'primary-foreground': '#1c120e', link: '#f7724d' }
+}
+```
+
+One rule helped a lot: links follow the corrected primary color, but the hero's glow keeps the theme's original color, which is usually brighter. That way, darkening the primary color to pass contrast doesn't make the site dull. When the primary color is too light for text, the theme sets a separate `link`.
+
+## The result, and what it doesn't cover
+
+```text
+All 36 presets pass.
+```
+
+That's 720 checks on every change, without opening a single theme. The test has limits, and they're worth naming. It measures tokens, not images or gradients. It uses 4.5:1 even for large headings, which WCAG only requires at 3:1, because being strict is simpler. And contrast is only one part of accessibility: visible focus and respecting reduced motion are separate concerns, which the site also handles.
+
+<Source path="scripts/check-themes.mjs" />

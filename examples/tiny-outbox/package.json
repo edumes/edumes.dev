@@ -1,0 +1,14 @@
+{
+  "name": "tiny-outbox",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node check.ts"
+  },
+  "dependencies": {
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.0"
+  }
+}

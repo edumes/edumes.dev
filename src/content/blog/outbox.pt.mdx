@@ -1,0 +1,96 @@
+Um sistema que grava um pedido e depois avisa outro sistema (um ERP, um serviço de e-mail, uma fila) pode errar de dois jeitos clássicos. Grava e não avisa, porque o processo caiu entre o commit e o envio. Ou avisa e não grava, porque a mensagem saiu e a transação voltou. Quando o cliente repete a requisição depois de um timeout, aparece um terceiro erro: gravar duas vezes.
+
+No AuthSales, meu projeto pessoal, nenhum dos três pode acontecer. A solução não precisa de um broker novo: usa o PostgreSQL que o sistema já tem.
+
+## Dois sistemas, nenhuma transação em comum
+
+O código ingênuo parece inofensivo:
+
+```ts
+await db.query('insert into orders (customer, total) values ($1, $2)', [customer, total]);
+await queue.publish('order.placed', { customer, total }); // e se o processo morrer aqui?
+```
+
+O banco e a fila não participam da mesma transação. Qualquer ordem que você escolha deixa uma janela em que um lado aconteceu e o outro não. Esse é o problema do *dual write*, e try/catch não resolve, porque o processo pode simplesmente parar.
+
+## O evento também é uma linha
+
+A ideia do outbox transacional é não publicar nada durante a requisição. O evento vira uma linha numa tabela `outbox`, no mesmo banco, gravada **na mesma transação** que o pedido:
+
+```sql
+create table outbox (
+  id           bigserial primary key,
+  topic        text not null,
+  payload      jsonb not null,
+  available_at timestamptz not null default now(),
+  processed_at timestamptz,
+  attempts     int not null default 0,
+  last_error   text
+);
+```
+
+No AuthSales, a mesma transação leva quatro coisas: a escrita de negócio, a entrada de auditoria, o recibo de idempotência e os eventos. Ou as quatro existem, ou nenhuma existe.
+
+```ts
+const { rows } = await c.query('insert into orders (customer, total) values ($1, $2) returning id', [order.customer, order.total]);
+const orderId = Number(rows[0].id);
+await c.query(`insert into audit (entity, entity_id, action, data) values ('order', $1, 'placed', $2)`, [orderId, order]);
+await c.query(`insert into outbox (topic, payload) values ('order.placed', $1)`, [{ orderId, ...order }]);
+await c.query('insert into idempotency (key, response) values ($1, $2)', [key, { orderId }]);
+```
+
+Se qualquer passo falhar, o rollback leva tudo junto. Não existe pedido sem evento, nem evento sem pedido.
+
+## A mesma requisição, a mesma resposta
+
+O cliente manda uma chave de idempotência em cada operação que muda dados. A chave é a chave primária da tabela `idempotency`, e é isso que decide uma corrida. Se duas requisições com a mesma chave chegam juntas, as duas tentam inserir o recibo, e a segunda recebe o erro `23505` (violação de unicidade) e faz rollback. Em vez de devolver erro, ela lê a resposta da primeira:
+
+```ts
+} catch (e) {
+  if ((e as { code?: string }).code !== '23505') throw e;
+  const { rows } = await pool.query('select response from idempotency where key = $1', [key]);
+  return { ...rows[0].response, replayed: true };
+}
+```
+
+Uma repetição depois de um timeout recebe o mesmo `orderId` da primeira vez, e nada é gravado de novo.
+
+## Entregar depois, com vários workers
+
+Um worker separado lê o outbox e entrega cada evento. Para vários workers rodarem ao mesmo tempo sem pegar o mesmo evento, a consulta usa `FOR UPDATE SKIP LOCKED`: cada worker trava as linhas que pegou, e os outros simplesmente pulam essas linhas em vez de esperar.
+
+```sql
+select id, topic, payload, attempts from outbox
+ where processed_at is null and available_at <= now()
+ order by id limit $1
+ for update skip locked
+```
+
+Uma entrega que falha não some. A linha ganha mais uma tentativa, guarda o erro e volta para a fila mais tarde, com espera exponencial:
+
+```sql
+update outbox set attempts = attempts + 1, last_error = $2,
+       available_at = now() + make_interval(secs => power(2, attempts))
+ where id = $1
+```
+
+Tem um detalhe importante: a entrega é **pelo menos uma vez**, não exatamente uma vez. Se o worker entrega o evento e cai antes do commit, o evento sai de novo. Por isso quem consome precisa ser idempotente também, por exemplo ignorando um `id` de evento que já processou.
+
+## O que isso me deu
+
+- **Nada pela metade.** Uma falha simulada depois de todas as escritas deixa o banco exatamente como estava.
+- **Auditoria de graça.** Ela entra na mesma transação, então nunca diverge do dado que descreve.
+- **Menos peças.** O PostgreSQL já é a autoridade para sessão, permissões e trabalho durável. Um broker pode entrar depois, alimentado pelo outbox, sem mudar a regra.
+
+E os limites, que vale conhecer antes de usar. A tabela cresce, então as linhas processadas precisam de limpeza periódica. O worker trabalha por polling, então existe uma latência pequena entre o commit e a entrega. E o exemplo não tem uma tabela de mensagens mortas: um evento que nunca dá certo continua sendo tentado, cada vez mais espaçado.
+
+## O exemplo
+
+Escrevi uma versão em um arquivo, do zero e com dados fictícios: `tiny-outbox`, em Node.js, TypeScript e `pg`. A checagem cobre a escrita atômica, a repetição com a mesma chave, o rollback em falha, uma corrida de cinco requisições com uma chave só, dois workers que nunca pegam o mesmo evento e uma falha reagendada.
+
+<Source path="examples/tiny-outbox" />
+
+```bash
+npm install
+npm run check
+```
