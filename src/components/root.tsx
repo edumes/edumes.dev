@@ -19,6 +19,7 @@ import {
 } from 'next/font/google';
 import { NextIntlClientProvider, useMessages } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { Analytics } from '@vercel/analytics/next';
 import { profile } from '@/content/site';
 import { localeConfig, type Locale } from '@/i18n/config';
 import { ThemeHead } from '@/themes/theme';
@@ -73,6 +74,7 @@ export function RootLayout({ locale, children }: { locale: Locale; children: Rea
       </head>
       <body>
         <NextIntlClientProvider messages={{ ui, nav, hero, trace, cases }}>{children}</NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
