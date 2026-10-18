@@ -6,11 +6,11 @@ import { useMessages } from 'next-intl';
 
 const HOLD_MS = 4500;
 
-// Rotating hero headline. Every phrase also sits invisibly in the same grid cell, so the block always has the height
-// of the tallest one at the current width and nothing below it moves when the phrase changes. Shorter phrases sit at
-// the top of that block, right under the header, so the spare line lands between headline and lead instead.
+// Hero headline: a fixed opening line, then a rotating ending. Every ending also sits invisibly in the same grid cell,
+// so the block always has the height of the tallest one at the current width and nothing below it moves when the
+// ending changes. Shorter endings sit at the top of that block, so the spare line lands between headline and lead.
 export function HeroTitle({ heading }: { heading: string }) {
-  const titles = useMessages().hero.titles;
+  const { opening, titles } = useMessages().hero;
   // SSR, no-JS, crawlers and screen readers get phrase 0. The inline script after this component (home.tsx) swaps in
   // the start phrase for this load before paint and leaves its index here, so hydration matches what is on screen.
   // The rest follow in a shuffled order.
@@ -38,12 +38,15 @@ export function HeroTitle({ heading }: { heading: string }) {
 
   const current = order[tick % order.length];
 
-  // The h1 names the page for search engines and screen readers (name and role); the rotating phrases are decoration,
-  // and only the fixed one is read out, so nobody gets the hidden sizers.
+  // The h1 names the page for search engines and screen readers (name and role); the visible headline is decoration,
+  // and only opening + first ending is read out, so nobody gets the hidden sizers.
   return (
     <div className="type-display max-w-[13ch]" onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
       <h1 className="sr-only">{heading}</h1>
-      <p className="sr-only">{titles[0]}</p>
+      <p className="sr-only">{`${opening} ${titles[0]}`}</p>
+      <span aria-hidden className="block">
+        {opening}
+      </span>
       {/* Padding + negative margin widen the clip so accents and descenders aren't cut at rest; the mask feathers
           its outer edge so phrases fade in and out of the slot instead of being sliced. Phrases sit on a drum: the
           origin is pushed 1em behind the text, so rotateX rolls the next one up from below like a reel. */}

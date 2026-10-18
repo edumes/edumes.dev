@@ -43,21 +43,15 @@
     "actions": "Ações"
   },
   "hero": {
+    "opening": "Sistemas para empresas,",
     "titles": [
-      "Do clique ao banco, e de volta.",
-      "Sistemas que rodam a empresa.",
-      "Apps para quem trabalha no armazém.",
-      "Planilha vira sistema.",
-      "Horas de trabalho viram minutos.",
-      "Menos copiar e colar entre sistemas.",
-      "Código que o próximo dev entende.",
-      "Entrego, e sigo cuidando em produção.",
-      "Do formulário ao banco, sem atalhos.",
-      "Integração que não cai de madrugada.",
-      "Funciona na sua máquina também.",
-      "Bom sistema ninguém percebe."
+      "desenhados a partir do processo.",
+      "modelados com quem vai usar.",
+      "feitos para durar anos.",
+      "legíveis para quem vier depois.",
+      "acompanhados depois do deploy."
     ],
-    "lead": "Desenvolvedor full stack desde 2022. Construo sistemas para empresas: interfaces em React, APIs em Node.js e Python, PostgreSQL, integrações com ERPs, apps mobile e automações, e mantenho tudo isso em produção.",
+    "lead": "Antes do código, o processo: quem usa, onde trava, de onde vem o dado. Depois, uma base simples de mudar e acompanhamento em produção, porque sistema de empresa vive anos. React, Node.js, Python e PostgreSQL.",
     "primary": "Ver estudos de caso"
   },
   "trace": {

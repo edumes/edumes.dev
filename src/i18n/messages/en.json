@@ -43,21 +43,15 @@
     "actions": "Actions"
   },
   "hero": {
+    "opening": "Business systems,",
     "titles": [
-      "Click to database, and back.",
-      "Systems companies run on.",
-      "Apps built for the warehouse floor.",
-      "From spreadsheet to software.",
-      "Hours of manual work, now minutes.",
-      "Less copy-paste between systems.",
-      "Code the next developer can read.",
-      "I ship it, then I keep it running.",
-      "Form to database, no shortcuts.",
-      "Integrations that don’t wake you up.",
-      "Works on your machine too.",
-      "Good systems go unnoticed."
+      "designed around the process.",
+      "modeled with the people who use them.",
+      "built to last for years.",
+      "readable for whoever comes next.",
+      "looked after once they’re live."
     ],
-    "lead": "Full-stack developer since 2022. I build systems for companies: React interfaces, Node.js and Python APIs, PostgreSQL, ERP integrations, mobile apps and automations, and I keep all of it running in production.",
+    "lead": "Process first: who uses it, where it gets stuck, where the data comes from. Then a codebase that stays easy to change, and ongoing care in production, because business systems live for years. React, Node.js, Python and PostgreSQL.",
     "primary": "See case studies"
   },
   "trace": {
