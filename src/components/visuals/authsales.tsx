@@ -178,17 +178,17 @@ export function Foundation() {
                     <span key={d} className="size-1 rounded-full bg-border @md:size-1.5" />
                   ))}
                 </span>
-                <p className="mt-2 flex flex-col gap-1 text-[0.6875rem] font-semibold leading-tight [font-stretch:104%] @md:flex-row @md:items-center @md:gap-1.5 @xl:text-[0.8125rem]">
+                <p className="mt-2 flex flex-col gap-1 text-[0.6875rem] leading-tight font-semibold font-stretch-104% @md:flex-row @md:items-center @md:gap-1.5 @xl:text-[0.8125rem]">
                   <Icon name={SYSTEM_ICONS[i]} size={14} play={booting === i} className="text-muted-foreground" />
                   {name}
                   {tag && <span className="hidden font-normal text-muted-foreground @3xl:inline">· {tag}</span>}
                 </p>
-                <p className="mt-2 flex items-center gap-[3px]">
+                <p className="mt-2 flex items-center gap-0.75">
                   <span className="mr-1 hidden text-[0.6875rem] text-muted-foreground @2xl:inline">{t.fromBase}</span>
                   {base.map((b, j) => (
                     <span
                       key={b}
-                      className={`morph size-1.5 rounded-[2px] @xl:size-2 ${on ? 'bg-primary' : 'bg-border'}`}
+                      className={`morph size-1.5 rounded-xs @xl:size-2 ${on ? 'bg-primary' : 'bg-border'}`}
                       style={{ ...delay(on, 250 + j * 90), boxShadow: booting === i ? glow : 'none' }}
                     />
                   ))}
@@ -215,8 +215,8 @@ export function Foundation() {
           );
         })}
       </ul>
-      <div className={`morph rounded-md border border-primary/40 bg-primary/[0.06] p-2.5 @md:p-4 ${booting >= 0 ? 'lit' : ''}`}>
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.8125rem] font-semibold [font-stretch:104%] @xl:text-[0.9375rem]">
+      <div className={`morph rounded-md border border-primary/40 bg-primary/6 p-2.5 @md:p-4 ${booting >= 0 ? 'lit' : ''}`}>
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.8125rem] font-semibold font-stretch-104% @xl:text-[0.9375rem]">
           <Icon name="blocks" size={16} play={booting >= 0} className="text-muted-foreground" />
           {t.title}
           <span className="text-xs font-normal text-muted-foreground">{t.packages}</span>
@@ -225,7 +225,7 @@ export function Foundation() {
           {base.map((b, j) => (
             <li key={b} className="flex items-center gap-1.5 rounded-sm border border-border bg-card px-2 py-1 text-[0.6875rem] leading-tight @xl:text-[0.8125rem]">
               <span
-                className={`morph size-1.5 shrink-0 rounded-[2px] @xl:size-2 ${booting >= 0 ? 'bg-primary' : 'bg-primary/50'}`}
+                className={`morph size-1.5 shrink-0 rounded-xs @xl:size-2 ${booting >= 0 ? 'bg-primary' : 'bg-primary/50'}`}
                 style={{ ...delay(booting >= 0, j * 90), boxShadow: booting >= 0 ? glow : 'none' }}
               />
               {b}
@@ -297,7 +297,7 @@ function Drift() {
           return (
             <div
               key={n}
-              className={`morph rounded-sm border px-2 py-2 text-xs leading-tight ${
+              className={`morph rounded-sm border px-2 py-2 text-xs/tight ${
                 state === 'fixed' ? tone.ok : state === 'stale' ? tone.warn : tone.idle
               }`}
             >
@@ -345,12 +345,12 @@ export function Pipeline() {
       <Tabs labels={t.tabs} s={s} total={FLOW.totals[s]} on={on} inView={inView} />
 
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="send" title={t.request} active={p === 0} className="lg:w-[7.5rem]">
+        <Stage icon="send" title={t.request} active={p === 0} className="lg:w-30">
           <p className="font-mono">{end === 'denied' ? 'GET /orders/87' : 'POST /orders'}</p>
           <p className="mt-1 text-muted-foreground">{t.session}</p>
         </Stage>
         <Wire state={wire(1)} />
-        <Stage icon="shield-check" title={t.context} active={p === 1} className="lg:w-[9.5rem]">
+        <Stage icon="shield-check" title={t.context} active={p === 1} className="lg:w-38">
           <ul className="flex flex-wrap gap-1">
             {t.chips.map((c, k) => (
               <li key={c} className={`morph rounded-sm px-1.5 py-0.5 ${p >= 1 ? 'bg-secondary text-secondary-foreground' : 'bg-foreground/[0.07] text-transparent'}`} style={delay(p >= 1, k * 140)}>
@@ -361,12 +361,12 @@ export function Pipeline() {
           <p className="mt-1 text-muted-foreground">{t.immutable}</p>
         </Stage>
         <Wire state={wire(2)} />
-        <Stage icon="search" title={t.scope} active={p === 2} className={`lg:w-[9rem] ${end === 'denied' && p >= 2 ? 'border-destructive/60!' : ''}`}>
-          <p className={`morph min-h-[2.5rem] ${p < 2 ? 'text-transparent' : end === 'denied' ? 'text-destructive' : ''}`}>{end === 'denied' ? t.denied : t.inside}</p>
+        <Stage icon="search" title={t.scope} active={p === 2} className={`lg:w-36 ${end === 'denied' && p >= 2 ? 'border-destructive/60!' : ''}`}>
+          <p className={`morph min-h-10 ${p < 2 ? 'text-transparent' : end === 'denied' ? 'text-destructive' : ''}`}>{end === 'denied' ? t.denied : t.inside}</p>
         </Stage>
         <Wire state={end === 'denied' ? (p >= 2 ? 'blocked' : 'idle') : wire(3)} />
-        <div className={`morph rounded-md border border-primary/40 bg-primary/[0.06] p-3 lg:flex-1 ${p === 3 || (end === 'commit' && p === 4) ? 'lit' : ''} ${end === 'rollback' && p >= 4 ? 'border-destructive/60!' : ''}`}>
-          <p className="flex items-center gap-2 text-[0.8125rem] font-semibold leading-tight [font-stretch:104%]">
+        <div className={`morph rounded-md border border-primary/40 bg-primary/6 p-3 lg:flex-1 ${p === 3 || (end === 'commit' && p === 4) ? 'lit' : ''} ${end === 'rollback' && p >= 4 ? 'border-destructive/60!' : ''}`}>
+          <p className="flex items-center gap-2 text-[0.8125rem] leading-tight font-semibold font-stretch-104%">
             <Icon name="database-backup" size={14} play={p === 3} className="text-muted-foreground" />
             {t.transaction}
           </p>
@@ -384,7 +384,7 @@ export function Pipeline() {
               const mark = { idle: '', pending: '…', ok: '✓', fail: '✗', undone: '↺' }[state];
               const wait = state === 'pending' || state === 'fail' ? k * 220 : state === 'undone' ? (3 - k) * 120 : 0;
               return (
-                <li key={label} className={`morph flex items-center justify-between gap-2 rounded-sm border px-2 py-1 text-xs leading-tight ${look}`} style={{ transitionDelay: `${wait}ms` }}>
+                <li key={label} className={`morph flex items-center justify-between gap-2 rounded-sm border px-2 py-1 text-xs/tight ${look}`} style={{ transitionDelay: `${wait}ms` }}>
                   {label}
                   <span className="font-mono">{mark}</span>
                 </li>
@@ -396,7 +396,7 @@ export function Pipeline() {
           </p>
         </div>
         <Wire state={end === 'commit' ? wire(5) : end === 'rollback' && p >= 4 ? 'blocked' : 'idle'} />
-        <Stage icon="cog" title="Workers" active={p === 5} className="lg:w-[7rem]">
+        <Stage icon="cog" title="Workers" active={p === 5} className="lg:w-28">
           <ul className="flex flex-wrap gap-1 lg:flex-col">
             {['E-mail', 'PDF', 'ERP'].map((w, k) => {
               const lit = end === 'commit' && p >= 5;
@@ -434,9 +434,9 @@ export function Migration() {
     </motion.li>
   );
   const box = (title: string, lit: boolean, items: string[]) => (
-    <div className={`morph rounded-md border p-3 lg:flex-1 ${lit ? 'lit bg-primary/[0.06]' : 'border-border bg-background/60'}`}>
-      <p className="text-[0.8125rem] font-semibold [font-stretch:104%]">{title}</p>
-      <ul className="mt-2 flex min-h-[4.5rem] flex-wrap content-start gap-1.5">{items.map(chip)}</ul>
+    <div className={`morph rounded-md border p-3 lg:flex-1 ${lit ? 'lit bg-primary/6' : 'border-border bg-background/60'}`}>
+      <p className="text-[0.8125rem] font-semibold font-stretch-104%">{title}</p>
+      <ul className="mt-2 flex min-h-18 flex-wrap content-start gap-1.5">{items.map(chip)}</ul>
     </div>
   );
 
@@ -444,7 +444,7 @@ export function Migration() {
     <div ref={ref} role="img" aria-label={t.label}>
       <div aria-hidden>
         <div className={`morph rounded-md border bg-card px-3 py-2.5 ${done ? 'lit' : 'border-border'}`}>
-          <p className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.8125rem] font-semibold [font-stretch:104%]">
+          <p className="flex flex-wrap items-baseline justify-between gap-x-3 text-[0.8125rem] font-semibold font-stretch-104%">
             {t.signatures}
             <span className="text-xs font-normal text-muted-foreground">{t.same}</span>
           </p>

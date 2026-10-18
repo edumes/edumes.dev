@@ -83,7 +83,7 @@ function LoreForge() {
       {notes.map(([n, x, y], k) => (
         <span
           key={n}
-          className={`morph absolute -translate-x-1/2 -translate-y-1/2 rounded-sm border px-1.5 py-0.5 text-[0.625rem] whitespace-nowrap ${k === a || k === b ? 'lit border-primary/60 bg-card' : 'border-border bg-background'}`}
+          className={`morph absolute -translate-1/2 rounded-sm border px-1.5 py-0.5 text-[0.625rem] whitespace-nowrap ${k === a || k === b ? 'lit border-primary/60 bg-card' : 'border-border bg-background'}`}
           style={{ left: `${x}%`, top: `${y}%` }}
         >
           [[{n}]]
@@ -111,7 +111,7 @@ function LyricType() {
           <span key={on && step > 0 ? 'play' : 'rest'} className="block h-full bg-primary" style={!on ? undefined : step === 0 ? { width: 0 } : { animation: `fill ${SONG_MS}ms linear forwards` }} />
         </span>
       </p>
-      <p className="font-mono text-base leading-snug tracking-tight">
+      <p className="font-mono text-base/snug tracking-tight">
         <span>{line.slice(0, typed)}</span>
         <span className="inline-block h-[1.1em] w-px translate-y-[0.15em] bg-primary motion-safe:animate-pulse" />
         <span className="text-muted-foreground/60">{line.slice(typed)}</span>
@@ -128,12 +128,12 @@ function LyricType() {
 const GROW = [800, 800, 800, 1300];
 function Plant({ stage }: { stage: number }) {
   return (
-    <svg viewBox="0 0 20 24" className="h-full w-full" aria-hidden>
+    <svg viewBox="0 0 20 24" className="size-full" aria-hidden>
       <ellipse cx="10" cy="21" rx="8" ry="2.5" className="fill-muted-foreground/25" />
       <g className="morph origin-bottom" style={{ transform: `scale(${[0.001, 0.45, 0.8, 1][stage]})`, transformOrigin: '10px 21px' }}>
         <path d="M10 21V9" className="stroke-primary" strokeWidth="1.4" strokeLinecap="round" />
         <path d="M10 15c-3 0-5-2-5-4 3 0 5 2 5 4zM10 13c3 0 5-2 5-4-3 0-5 2-5 4z" className="fill-primary/60" />
-        {stage === 3 && <circle cx="10" cy="7" r="3" className="fill-[var(--attention)]" />}
+        {stage === 3 && <circle cx="10" cy="7" r="3" className="fill-(--attention)" />}
       </g>
     </svg>
   );
@@ -152,7 +152,7 @@ function MyGarden() {
         {[0, 1, 2, 3, 4, 5, 6, 7].map((k) => {
           const stage = (step + k) % 4;
           return (
-            <li key={k} className={`morph min-h-0 rounded-sm border p-1 ${stage === 3 ? 'border-[var(--attention)]' : 'border-border bg-background'}`}>
+            <li key={k} className={`morph min-h-0 rounded-sm border p-1 ${stage === 3 ? 'border-(--attention)' : 'border-border bg-background'}`}>
               <Plant stage={stage} />
             </li>
           );
@@ -174,7 +174,7 @@ function DocumentAssistant() {
         <p className="text-[0.5625rem] text-muted-foreground">{t.file}</p>
         <div className="mt-1.5 grid gap-1.5">
           {widths.map((w, k) => (
-            <span key={k} className={`morph block h-1.5 rounded-full ${w} ${k === 3 && step >= 3 ? 'bg-[var(--attention)] shadow-[0_0_8px_var(--attention)]' : 'bg-border'}`} />
+            <span key={k} className={`morph block h-1.5 rounded-full ${w} ${k === 3 && step >= 3 ? 'bg-(--attention) shadow-[0_0_8px_var(--attention)]' : 'bg-border'}`} />
           ))}
         </div>
         {step === 1 && <span className="laser" style={{ background: 'var(--primary)', boxShadow: '0 0 8px 1px var(--glow-1)', animationDuration: '1000ms' }} />}
@@ -182,7 +182,7 @@ function DocumentAssistant() {
       <div className="flex flex-col justify-end gap-1.5 text-[0.6875rem] leading-snug">
         <p className={`morph ml-auto max-w-[95%] rounded-md rounded-br-none bg-primary px-2 py-1 text-primary-foreground ${step >= 2 ? '' : 'opacity-0'}`}>{t.question}</p>
         <p className={`morph max-w-[95%] rounded-md rounded-bl-none border border-border bg-background px-2 py-1 ${step >= 3 ? '' : 'opacity-0'}`} style={{ transform: step >= 3 ? 'none' : 'translateY(4px)' }}>
-          {t.answer} <span className="text-[var(--attention)]">[p. 2]</span>
+          {t.answer} <span className="text-(--attention)">[p. 2]</span>
         </p>
       </div>
     </div>
@@ -191,7 +191,7 @@ function DocumentAssistant() {
 
 // A drill going deeper through rock layers while ore piles up and energy runs low.
 const DIG = [700, 700, 700, 700, 700, 1600];
-const LAYERS = ['bg-muted-foreground/15', 'bg-muted-foreground/25', 'bg-[var(--attention)]/25', 'bg-muted-foreground/30', 'bg-primary/25', 'bg-muted-foreground/35', 'bg-[var(--attention)]/30', 'bg-muted-foreground/25'];
+const LAYERS = ['bg-muted-foreground/15', 'bg-muted-foreground/25', 'bg-(--attention)/25', 'bg-muted-foreground/30', 'bg-primary/25', 'bg-muted-foreground/35', 'bg-(--attention)/30', 'bg-muted-foreground/25'];
 function DeepDrill() {
   const t = useCopy().deepDrill;
   const { ref, step } = useLoop(DIG);
@@ -203,7 +203,7 @@ function DeepDrill() {
             <span key={k} className={`block h-5 ${l}`} />
           ))}
         </div>
-        <span className="absolute top-1/2 left-1/2 h-6 w-2 -translate-x-1/2 -translate-y-1/2 rounded-b-full bg-foreground" />
+        <span className="absolute top-1/2 left-1/2 h-6 w-2 -translate-1/2 rounded-b-full bg-foreground" />
       </div>
       <div className="grid content-center gap-1.5 text-[0.6875rem]">
         <p className="font-mono text-lg leading-none tabular-nums">{120 + step * 14} m</p>

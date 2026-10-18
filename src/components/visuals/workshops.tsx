@@ -220,8 +220,8 @@ export function WorkshopHow() {
   return (
     <div ref={ref} role="img" aria-label={t.label}>
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <div className={`morph rounded-md border border-border bg-card p-3 text-card-foreground lg:w-[15rem] ${step >= 1 && !compared ? 'lit' : ''}`}>
-          <p className="text-[0.8125rem] font-semibold [font-stretch:104%]">{t.count}</p>
+        <div className={`morph rounded-md border border-border bg-card p-3 text-card-foreground lg:w-60 ${step >= 1 && !compared ? 'lit' : ''}`}>
+          <p className="text-[0.8125rem] font-semibold font-stretch-104%">{t.count}</p>
           <ul className="mt-2 grid gap-1 text-xs">
             {SIZES.map(([size, , count], k) => (
               <li key={size} className="flex items-center justify-between gap-3 rounded-sm border border-border px-2 py-1">

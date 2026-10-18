@@ -54,7 +54,7 @@ function PostDate({ post, source }: { post: Post; source?: string }) {
     <p className="type-meta flex flex-wrap items-center gap-x-3 gap-y-1">
       <time dateTime={post.date}>{format.dateTime(new Date(post.date), { dateStyle: 'long', timeZone: 'UTC' })}</time>
       {source && <span>{t('blog.minutes', { n: minutes(source) })}</span>}
-      {post.draft && <span className="rounded-sm border border-dashed border-[var(--attention)] px-2 py-0.5 text-xs text-foreground">{t('ui.draft')}</span>}
+      {post.draft && <span className="rounded-sm border border-dashed border-(--attention) px-2 py-0.5 text-xs text-foreground">{t('ui.draft')}</span>}
     </p>
   );
 }
@@ -66,8 +66,8 @@ export function BlogIndex() {
   return (
     <>
       <Header altHref={localeConfig[localeConfig[locale].alt].blog} blog={blogHref(locale)} />
-      <main id="main" className="mx-auto max-w-6xl px-[var(--gutter)] pt-28 pb-20 sm:pt-36">
-        <h1 className="type-display !text-[clamp(2.2rem,1.4rem+3.6vw,4.4rem)]">{t('title')}</h1>
+      <main id="main" className="mx-auto max-w-6xl px-(--gutter) pt-28 pb-20 sm:pt-36">
+        <h1 className="type-display text-[clamp(2.2rem,1.4rem+3.6vw,4.4rem)]!">{t('title')}</h1>
         <p className="type-lead mt-6 max-w-[56ch] text-muted-foreground">{t('intro')}</p>
         {posts.length === 0 && <p className="mt-14 text-muted-foreground">{t('empty')}</p>}
         <ul className="mt-14 grid max-w-3xl">
@@ -96,7 +96,7 @@ export function BlogIndex() {
 // MDX elements in the site's type scale. Shiki colors the code at build time; globals.css picks its light or dark set.
 const mdx: MDXComponents = {
   h2: (props) => <h2 className="type-heading mt-14 mb-4" {...props} />,
-  h3: (props) => <h3 className="mt-10 mb-3 font-semibold [font-stretch:104%]" {...props} />,
+  h3: (props) => <h3 className="mt-10 mb-3 font-semibold font-stretch-104%" {...props} />,
   p: (props) => <p className="my-5" {...props} />,
   a: (props) => <a className="text-link underline underline-offset-4" {...props} />,
   ul: (props) => <ul className="my-5 list-disc space-y-2 pl-6 marker:text-muted-foreground" {...props} />,
@@ -104,7 +104,7 @@ const mdx: MDXComponents = {
   blockquote: (props) => <blockquote className="my-6 border-l-2 border-border pl-5 text-muted-foreground" {...props} />,
   table: (props) => (
     <div className="my-6 overflow-x-auto">
-      <table className="w-full text-left text-[0.9375rem] [&_td]:border-t [&_td]:border-border [&_td]:py-2 [&_td]:pr-4 [&_th]:pb-2 [&_th]:pr-4 [&_th]:font-semibold" {...props} />
+      <table className="w-full text-left text-[0.9375rem] [&_td]:border-t [&_td]:border-border [&_td]:py-2 [&_td]:pr-4 [&_th]:pr-4 [&_th]:pb-2 [&_th]:font-semibold" {...props} />
     </div>
   )
 };
@@ -160,14 +160,14 @@ export async function PostPage({ locale, slug }: { locale: Locale; slug: string 
         }}
       />
       <Header altHref={postHref(alt, p)} blog={blog} />
-      <main id="main" className="mx-auto max-w-6xl px-[var(--gutter)] pt-28 pb-20 sm:pt-36">
+      <main id="main" className="mx-auto max-w-6xl px-(--gutter) pt-28 pb-20 sm:pt-36">
         <a href={blog} className="type-meta inline-flex items-center gap-1.5 hover:text-foreground" data-cuelume-navigate="back" data-icon-host>
           <Icon name="arrow-left" size={14} />
           {t('back')}
         </a>
         <article className="mt-10 max-w-[68ch]">
           <PostDate post={p} source={source} />
-          <h1 className="type-display mt-3 !text-[clamp(2.1rem,1.4rem+3vw,3.8rem)]">{p[locale].title}</h1>
+          <h1 className="type-display mt-3 text-[clamp(2.1rem,1.4rem+3vw,3.8rem)]!">{p[locale].title}</h1>
           <p className="type-lead mt-6 text-muted-foreground">{p[locale].description}</p>
           <div className="mt-10">
             <Body components={{ ...mdx, Source: (props: { path: string }) => <Source label={code} {...props} /> }} />

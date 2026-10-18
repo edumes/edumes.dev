@@ -64,7 +64,7 @@ function Section({ id, title, children }: { id: keyof typeof sectionIcons; title
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="mx-auto max-w-6xl px-[var(--gutter)] py-20 sm:py-28 lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16"
+      className="mx-auto max-w-6xl px-(--gutter) py-20 sm:py-28 lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-16"
     >
       <h2 id={`${id}-title`} className="type-heading flex items-start gap-2.5 lg:sticky lg:top-24 lg:self-start" data-icon-host>
         <Icon name={sectionIcons[id]} size={20} className="mt-[0.15em] text-muted-foreground" />
@@ -119,7 +119,7 @@ export function Home() {
         <HeroGradient />
         <RippleGrid />
         <Reveals />
-        <section id="top" className="mx-auto max-w-6xl px-[var(--gutter)] pt-24 pb-8 sm:pt-28">
+        <section id="top" className="mx-auto max-w-6xl px-(--gutter) pt-24 pb-8 sm:pt-28">
           <HeroTitle heading={`${profile.name}, ${t('meta.role')}`} />
           {/* Each load starts on the phrase after the last one shown (random on a first visit), swapped in before paint
               from the hidden sizers so it never flashes phrase 0. HeroTitle picks the index up when it hydrates. */}
@@ -175,7 +175,7 @@ export function Home() {
                         {text.category}
                       </span>
                       {c.draft && (
-                        <span className="rounded-sm border border-dashed border-[var(--attention)] px-2 py-0.5 text-xs text-foreground">{t('ui.draft')}</span>
+                        <span className="rounded-sm border border-dashed border-(--attention) px-2 py-0.5 text-xs text-foreground">{t('ui.draft')}</span>
                       )}
                     </p>
                     <h3 className="type-title mt-3">
@@ -218,7 +218,7 @@ export function Home() {
                           {c.icon && <Icon name={c.icon as IconName} size={14} />}
                           {c[locale].category}
                         </p>
-                        <p className="mt-1 font-semibold [font-stretch:104%] underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-border">
+                        <p className="mt-1 font-semibold font-stretch-104% underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-border">
                           {c[locale].title}
                         </p>
                         <p className="mt-1.5 text-[0.9375rem] text-muted-foreground">{c[locale].summary}</p>
@@ -235,7 +235,7 @@ export function Home() {
           <p className="type-lead max-w-[60ch] text-muted-foreground" data-reveal>
             <Words text={t('projects.intro')} />
           </p>
-          <ul className="mt-12 grid gap-x-10 gap-y-10 md:grid-cols-2">
+          <ul className="mt-12 grid gap-10 md:grid-cols-2">
             {m.projects.items.map((p) => (
               <li key={p.name} className="border-t border-border pt-5" data-icon-host>
                 <ProjectScene name={p.name} />
@@ -259,7 +259,7 @@ export function Home() {
         </Section>
         <SineRibbons seed={2} className="-my-12 sm:-my-16" />
         <Section id="about" title={t('about.title')}>
-          <div className="grid max-w-[62ch] gap-5 type-lead">
+          <div className="type-lead grid max-w-[62ch] gap-5">
             {m.about.body.map((p) => (
               <p key={p} data-reveal>
                 <Words text={p} />
@@ -410,7 +410,7 @@ export function Footer() {
   const t = useTranslations('nav');
   const blog = blogHref(locale);
   return (
-    <footer className="type-meta mx-auto flex max-w-6xl flex-wrap justify-between gap-x-8 gap-y-3 px-[var(--gutter)] pt-8 pb-28 md:pb-16">
+    <footer className="type-meta mx-auto flex max-w-6xl flex-wrap justify-between gap-x-8 gap-y-3 px-(--gutter) pt-8 pb-28 md:pb-16">
       <p>© 2026 {profile.fullName}</p>
       <ul className="flex flex-wrap gap-x-5 gap-y-2">
         {blog && (

@@ -14,7 +14,7 @@ export async function cvMetadata(locale: Locale) {
 }
 
 const H = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="mt-4 border-b border-neutral-300 pb-1 text-[0.8rem] font-semibold tracking-wide text-[#3446b8] [font-stretch:110%]">
+  <h2 className="mt-4 border-b border-neutral-300 pb-1 text-[0.8rem] font-semibold tracking-wide text-[#3446b8] font-stretch-110%">
     {children}
   </h2>
 );
@@ -29,7 +29,7 @@ export function CvPage() {
     <main className="mx-auto min-h-screen max-w-[210mm] bg-white px-[16mm] py-[14mm] text-[0.78rem] leading-[1.45] text-neutral-800 print:p-0">
       <style>{`@page{size:A4;margin:14mm 16mm}@media print{html,body{background:#fff!important}}`}</style>
       <header>
-        <h1 className="text-[1.9rem] font-semibold leading-none tracking-[-0.02em] text-neutral-950 [font-stretch:115%]">{profile.fullName}</h1>
+        <h1 className="text-[1.9rem] leading-none font-semibold tracking-[-0.02em] text-neutral-950 font-stretch-115%">{profile.fullName}</h1>
         <p className="mt-2 text-[1rem] text-neutral-700">{t('meta.role')}</p>
         <ul className="mt-3 flex flex-wrap gap-x-3.5 gap-y-1 text-neutral-600">
           <li>{t('cv.place')}</li>

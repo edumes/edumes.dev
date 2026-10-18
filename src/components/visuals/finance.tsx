@@ -241,7 +241,7 @@ export function FinanceHow() {
   return (
     <div ref={ref} role="img" aria-label={t.label}>
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="wallet" title={t.panel} active={step === 0} className="lg:w-[13rem]">
+        <Stage icon="wallet" title={t.panel} active={step === 0} className="lg:w-52">
           <ul className="flex flex-wrap gap-1">
             {t.entities.map((e) => (
               <li key={e} className="rounded-sm bg-secondary px-1.5 py-0.5 text-secondary-foreground">
@@ -253,7 +253,7 @@ export function FinanceHow() {
         <Wire key={sending ? `l${step}` : 'w'} state={sending ? 'live' : step > 0 ? 'done' : 'idle'} />
         <div className={`morph flex gap-3 rounded-md border border-border bg-card p-3 text-card-foreground lg:flex-1 ${sending ? 'lit' : ''}`}>
           <div className="flex-1">
-            <p className="text-[0.8125rem] font-semibold [font-stretch:104%]">{t.batches}</p>
+            <p className="text-[0.8125rem] font-semibold font-stretch-104%">{t.batches}</p>
             <ul className="mt-2 grid grid-cols-4 gap-1.5">
               {[0, 1, 2, 3].map((k) => {
                 const state = step > 2 * k + 1 ? 'done' : step === 2 * k + 1 ? 'live' : 'idle';
@@ -277,7 +277,7 @@ export function FinanceHow() {
           </div>
         </div>
         <Wire key={step === 7 ? 'erp7' : 'erp'} state={step === 7 ? 'live' : done ? 'done' : 'idle'} />
-        <Stage icon="cloud-cog" title={t.erp} active={step === 7 || done} className="lg:w-[10rem]">
+        <Stage icon="cloud-cog" title={t.erp} active={step === 7 || done} className="lg:w-40">
           <p className={done ? '' : 'text-muted-foreground'}>{done ? t.synced : '—'}</p>
         </Stage>
       </div>

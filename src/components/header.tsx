@@ -61,11 +61,11 @@ export function Header({ altHref, cases = [], section, blog }: { altHref: string
   return (
     <MotionConfig reducedMotion="user" transition={{ type: 'spring', bounce: 0, duration: 0.45 }}>
       <motion.header layoutRoot className="material fixed inset-x-0 top-0 z-40" data-scrolled={scrolled || undefined}>
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3">
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4">
           {t('ui.skip')}
         </a>
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-[var(--gutter)]">
-          <a href={`${home}#top`} className="type-meta !text-foreground font-semibold [font-stretch:110%]" data-cuelume-navigate>
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-(--gutter)">
+          <a href={`${home}#top`} className="type-meta font-semibold text-foreground! font-stretch-110%" data-cuelume-navigate>
             {profile.name}
           </a>
           <nav className="hidden md:block" aria-label={t('ui.menu')}>
@@ -166,7 +166,7 @@ function MobileNav({ home, active }: { home: string; active: Page }) {
 
   return (
     <nav aria-label={t('ui.menu')} className="fixed inset-x-0 bottom-4 z-40 flex justify-center md:hidden">
-        <ul className="relative flex rounded-full border border-border bg-popover p-1 text-popover-foreground raised">
+        <ul className="raised relative flex rounded-full border border-border bg-popover p-1 text-popover-foreground">
           <motion.li
             aria-hidden
             initial={false}
@@ -233,7 +233,7 @@ function ThemeMenu() {
       <div
         id="theme-menu"
         popover="auto"
-        className="popover fixed top-16 right-[var(--gutter)] w-[min(30rem,calc(100vw-2*var(--gutter)))] origin-top-right rounded-lg border border-border bg-popover p-2 text-popover-foreground raised"
+        className="popover raised fixed top-16 right-(--gutter) w-[min(30rem,calc(100vw-2*var(--gutter)))] origin-top-right rounded-lg border border-border bg-popover p-2 text-popover-foreground"
       >
         <div role="radiogroup" aria-label={t('theme')} className="grid grid-cols-3 gap-1 rounded-md bg-muted p-1">
           {(['light', 'dark', 'system'] as const).map((m) => (
@@ -424,7 +424,7 @@ function CommandMenu({ dialog, home, altHref, cases, blog }: { dialog: React.Ref
         setActive(0);
         setCopied(false);
       }}
-      className="command mx-auto mt-[12vh] w-[min(36rem,calc(100vw-2rem))] rounded-lg border border-border bg-popover p-0 text-popover-foreground raised"
+      className="command raised mx-auto mt-[12vh] w-[min(36rem,calc(100vw-2rem))] rounded-lg border border-border bg-popover p-0 text-popover-foreground"
     >
       <input
         autoFocus

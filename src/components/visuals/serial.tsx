@@ -123,8 +123,8 @@ export function Lifecycle() {
   return (
     <div ref={ref} role="img" aria-label={t.label} className="@container">
       <ol className="relative grid gap-3 @2xl:grid-cols-6 @2xl:gap-2 @2xl:pt-9" aria-hidden style={{ '--p': at / (t.stops.length - 1) } as React.CSSProperties}>
-        <span className="absolute top-4 bottom-4 left-4 w-px bg-border @2xl:top-[3.25rem] @2xl:right-[8.33%] @2xl:bottom-auto @2xl:left-[8.33%] @2xl:h-px @2xl:w-auto">
-          <span className="morph absolute inset-0 origin-top bg-primary [transform:scaleY(var(--p))] @2xl:origin-left @2xl:[transform:scaleX(var(--p))]" />
+        <span className="absolute top-4 bottom-4 left-4 w-px bg-border @2xl:top-13 @2xl:right-[8.33%] @2xl:bottom-auto @2xl:left-[8.33%] @2xl:h-px @2xl:w-auto">
+          <span className="morph absolute inset-0 origin-top transform-[scaleY(var(--p))] bg-primary @2xl:origin-left @2xl:transform-[scaleX(var(--p))]" />
         </span>
         {t.stops.map(([label, note], k) => {
           const reached = k <= at;
@@ -136,7 +136,7 @@ export function Lifecycle() {
                 <Icon name={STOP_ICONS[k]} size={14} play={k === at} />
               </span>
               <div className={`morph min-w-0 ${reached ? '' : 'opacity-50'}`}>
-                <p className="text-xs font-semibold [font-stretch:104%]">{label}</p>
+                <p className="text-xs font-semibold font-stretch-104%">{label}</p>
                 <p className="text-[0.6875rem] leading-tight text-muted-foreground">{note}</p>
               </div>
               {k === at && (
@@ -241,7 +241,7 @@ export function SerialHow() {
   return (
     <div ref={ref} role="img" aria-label={t.label}>
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="scan-text" title={t.invoice} active={step >= 1 && step <= SERIALS.length} className="lg:w-[13rem]">
+        <Stage icon="scan-text" title={t.invoice} active={step >= 1 && step <= SERIALS.length} className="lg:w-52">
           <p className="text-muted-foreground">{t.scanning}</p>
           <ul className="mt-2 grid gap-1">
             {SERIALS.map((sn, k) => (
@@ -253,8 +253,8 @@ export function SerialHow() {
           </ul>
         </Stage>
         <Wire state={writing ? 'live' : done ? 'done' : 'idle'} />
-        <div className={`morph rounded-md border border-primary/40 bg-primary/[0.06] p-3 lg:flex-1 ${writing || step === 7 ? 'lit' : ''}`}>
-          <p className="flex items-center gap-2 text-[0.8125rem] font-semibold leading-tight [font-stretch:104%]">
+        <div className={`morph rounded-md border border-primary/40 bg-primary/6 p-3 lg:flex-1 ${writing || step === 7 ? 'lit' : ''}`}>
+          <p className="flex items-center gap-2 text-[0.8125rem] leading-tight font-semibold font-stretch-104%">
             <Icon name="database-backup" size={14} play={writing} className="text-muted-foreground" />
             {t.transaction}
           </p>
@@ -273,7 +273,7 @@ export function SerialHow() {
           <p className={`morph mt-2 font-mono text-xs ${done ? '' : 'text-transparent'}`}>commit</p>
         </div>
         <Wire state={step === 7 ? 'live' : step > 7 ? 'done' : 'idle'} />
-        <Stage icon="calendar-days" title={t.history} active={step === 7} className="lg:w-[13rem]">
+        <Stage icon="calendar-days" title={t.history} active={step === 7} className="lg:w-52">
           <ul className="grid gap-1">
             {SERIALS.slice(0, 3).map((sn) => (
               <li key={sn} className={`morph rounded-sm px-2 py-0.5 ${done ? 'bg-secondary text-secondary-foreground' : 'bg-foreground/[0.07] text-transparent'}`}>

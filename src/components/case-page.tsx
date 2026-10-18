@@ -68,7 +68,7 @@ export function CasePage({ slug }: { slug: string }) {
         cases={cases.map((x) => ({ label: x[locale].title, href: caseHref(locale, x) }))}
         blog={blogHref(locale)}
       />
-      <main id="main" className="mx-auto max-w-6xl px-[var(--gutter)] pt-28 pb-20 sm:pt-36">
+      <main id="main" className="mx-auto max-w-6xl px-(--gutter) pt-28 pb-20 sm:pt-36">
         <Reveals />
         <a href={`${localeConfig[locale].home}#cases`} className="type-meta inline-flex items-center gap-1.5 hover:text-foreground" data-cuelume-navigate="back">
           <Icon name="arrow-left" size={14} />
@@ -78,7 +78,7 @@ export function CasePage({ slug }: { slug: string }) {
           {c.icon && <Icon name={c.icon as IconName} size={16} />}
           {text.category}
         </p>
-        <h1 className="type-display mt-3 max-w-[18ch] !text-[clamp(2.2rem,1.4rem+3.6vw,4.4rem)]" data-reveal>
+        <h1 className="type-display mt-3 max-w-[18ch] text-[clamp(2.2rem,1.4rem+3.6vw,4.4rem)]!" data-reveal>
           <Letters text={text.title} />
         </h1>
         <p className="type-lead mt-6 max-w-[56ch] text-muted-foreground" data-reveal>
@@ -181,7 +181,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {text.how.map((h) => (
             <li key={h.title} className="border-t border-border pt-4" data-icon-host>
-              <p className="flex items-center gap-2 font-semibold [font-stretch:104%]">
+              <p className="flex items-center gap-2 font-semibold font-stretch-104%">
                 <Icon name={h.icon as IconName} size={16} className="text-muted-foreground" />
                 {h.title}
               </p>

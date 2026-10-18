@@ -45,7 +45,7 @@ export const tone = {
   idle: 'border-border bg-background',
   ok: 'border-primary/50 bg-primary/10',
   bad: 'border-destructive/50 bg-destructive/10',
-  warn: 'border-[var(--attention)] bg-[color-mix(in_oklab,var(--attention)_12%,transparent)]'
+  warn: 'border-(--attention) bg-[color-mix(in_oklab,var(--attention)_12%,transparent)]'
 };
 export const delay = (on: boolean, ms: number) => ({ transitionDelay: on ? `${ms}ms` : '0ms' });
 
@@ -78,11 +78,11 @@ export function Wire({ state, back, cq }: { state: WireState; back?: boolean; cq
 export function Stage({ icon, title, active, className = '', children }: { icon: IconName; title: string; active: boolean; className?: string; children: React.ReactNode }) {
   return (
     <div className={`morph rounded-md border border-border bg-card px-3 py-2.5 text-card-foreground ${active ? 'lit' : ''} ${className}`}>
-      <p className="flex items-center gap-2 text-[0.8125rem] font-semibold leading-tight [font-stretch:104%]">
+      <p className="flex items-center gap-2 text-[0.8125rem] leading-tight font-semibold font-stretch-104%">
         <Icon name={icon} size={14} play={active} className="text-muted-foreground" />
         {title}
       </p>
-      <div className="mt-2 text-xs leading-snug">{children}</div>
+      <div className="mt-2 text-xs/snug">{children}</div>
     </div>
   );
 }
@@ -92,7 +92,7 @@ export function Tabs({ labels, s, total, on, inView }: { labels: string[]; s: nu
   return (
     <ol className={`mb-5 grid gap-2 ${labels.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`} aria-hidden>
       {labels.map((label, k) => (
-        <li key={label} className={`morph text-xs leading-tight sm:text-[0.8125rem] ${k === s ? 'text-foreground' : 'text-muted-foreground'}`}>
+        <li key={label} className={`morph text-xs/tight sm:text-[0.8125rem] ${k === s ? 'text-foreground' : 'text-muted-foreground'}`}>
           <span className="mb-2 block h-0.5 overflow-hidden rounded-full bg-border">
             {k === s && (
               <span
@@ -113,7 +113,7 @@ export function Tabs({ labels, s, total, on, inView }: { labels: string[]; s: nu
 export function Trap({ ref, icon, title, verdict, shown, children }: { ref: React.Ref<HTMLDivElement>; icon: IconName; title: string; verdict: string; shown: boolean; children: React.ReactNode }) {
   return (
     <div ref={ref} className="flex flex-col rounded-lg border border-border bg-card p-4 text-card-foreground" data-icon-host>
-      <p className="flex items-center gap-2 text-[0.9375rem] font-semibold [font-stretch:104%]">
+      <p className="flex items-center gap-2 text-[0.9375rem] font-semibold font-stretch-104%">
         <Icon name={icon} size={16} className="text-muted-foreground" />
         {title}
       </p>
@@ -121,7 +121,7 @@ export function Trap({ ref, icon, title, verdict, shown, children }: { ref: Reac
         {children}
       </div>
       <p className="morph mt-4 flex items-start gap-2 text-[0.8125rem] leading-snug" style={{ opacity: shown ? 1 : 0 }}>
-        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--attention)]" />
+        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-(--attention)" />
         {verdict}
       </p>
     </div>
@@ -159,7 +159,7 @@ export function Log({ lines, shown }: { lines: [string, string, boolean?][]; sho
       {lines.map(([time, text, warn], k) => (
         <li
           key={k}
-          className={`morph grid grid-cols-[3rem_minmax(0,1fr)] gap-2 ${k < shown ? '' : 'opacity-0'} ${warn ? 'text-[var(--attention)]' : ''}`}
+          className={`morph grid grid-cols-[3rem_minmax(0,1fr)] gap-2 ${k < shown ? '' : 'opacity-0'} ${warn ? 'text-(--attention)' : ''}`}
           style={{ transform: k < shown ? 'none' : 'translateY(4px)' }}
         >
           <span className="text-muted-foreground">{time}</span>
@@ -186,7 +186,7 @@ export function Pains({ items }: { items: string[] }) {
 
 export function Phone({ className = '', children }: { className?: string; children: React.ReactNode }) {
   return (
-    <div className={`w-full max-w-[15rem] rounded-[1.6rem] border border-border bg-background p-2 shadow-[var(--shadow)] ${className}`}>
+    <div className={`w-full max-w-60 rounded-[1.6rem] border border-border bg-background p-2 shadow-(--shadow) ${className}`}>
       <span className="mx-auto mb-2 block h-1 w-10 rounded-full bg-border" />
       <div className="rounded-[1.1rem] border border-border bg-card p-3 text-card-foreground">{children}</div>
     </div>
@@ -197,7 +197,7 @@ export function Phone({ className = '', children }: { className?: string; childr
 export function Window({ title, icon, lit, ghost, className = '', children }: { title: string; icon?: IconName; lit?: boolean; ghost?: boolean; className?: string; children: React.ReactNode }) {
   return (
     <div className={`morph rounded-md border p-2.5 text-card-foreground @md:p-3 ${ghost ? 'border-dashed border-border opacity-55' : 'border-border bg-card'} ${lit ? 'lit' : ''} ${className}`}>
-      <p className="flex items-center gap-1.5 text-[0.6875rem] font-semibold leading-tight [font-stretch:104%] @xl:text-[0.8125rem]">
+      <p className="flex items-center gap-1.5 text-[0.6875rem] leading-tight font-semibold font-stretch-104% @xl:text-[0.8125rem]">
         <span className="mr-1 flex gap-1">
           {[0, 1, 2].map((d) => (
             <span key={d} className="size-1 rounded-full bg-border @md:size-1.5" />

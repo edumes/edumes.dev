@@ -49,7 +49,7 @@ export function StackTrace() {
 
   return (
     <figure ref={ref} className="mt-14 sm:mt-20">
-      <div className="grid overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-[var(--shadow)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      <div className="grid overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-(--shadow) md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="border-b border-border p-5 sm:p-6 md:border-r md:border-b-0">
           <p className="type-meta">{t('app')}</p>
           <h2 className="type-heading mt-1">{t('form')}</h2>
@@ -119,7 +119,7 @@ export function StackTrace() {
                 </span>
                 <div className={`transition-opacity duration-300 ${state === 'pending' ? 'opacity-45' : 'opacity-100'}`}>
                   <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <p className="flex items-center gap-2 font-semibold [font-stretch:104%]">
+                    <p className="flex items-center gap-2 font-semibold font-stretch-104%">
                       {/* Each hop's glyph plays as the request reaches it; the integration keeps turning once it runs in the background. */}
                       <Icon name={ICONS[i]} size={16} play={state === 'active'} loop={i === n - 1 && step === n ? 3200 : undefined} className="text-muted-foreground" />
                       {s.layer}

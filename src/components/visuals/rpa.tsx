@@ -147,7 +147,7 @@ const useCopy = defineCopy({
   }
 });
 
-const color = { idle: 'text-muted-foreground', queued: '', running: 'text-foreground', done: 'text-foreground', needs: 'text-[var(--attention)]' };
+const color = { idle: 'text-muted-foreground', queued: '', running: 'text-foreground', done: 'text-foreground', needs: 'text-(--attention)' };
 type Run = keyof typeof color;
 // Reset, then each station in turn: the order goes down, the robot runs, events come up. The third needs a person.
 const FLEET = [700, 800, 1300, 1300, 1300, 900, 2600];
@@ -194,7 +194,7 @@ export function Fleet() {
                   <p className="truncate font-mono text-[0.625rem] @md:text-xs">{st === 'idle' ? '—' : r}</p>
                   <span className="mt-2 block h-1 overflow-hidden rounded-full bg-border">
                     <span
-                      className={`block h-full ${st === 'needs' ? 'bg-[var(--attention)]' : 'bg-primary'}`}
+                      className={`block h-full ${st === 'needs' ? 'bg-(--attention)' : 'bg-primary'}`}
                       style={{ width, transition: st === 'running' ? 'width 1200ms linear' : 'none' }}
                     />
                   </span>
@@ -319,12 +319,12 @@ function AgentFlow() {
     <div ref={ref} role="img" aria-label={t.label}>
       <Tabs labels={t.tabs} s={s} total={AGENT[s].reduce((a, x) => a + x[0], 0)} on={on} inView={inView} />
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <div className="lg:flex-[3]">
+        <div className="lg:flex-3">
           <p className="type-meta mb-2">{t.workstation}</p>
           <div className={group}>
-            <Stage icon="bot" title={t.robot} active={active === 0} className={`lg:flex-1 ${robot === 'needs' ? 'border-[var(--attention)]!' : ''}`}>
+            <Stage icon="bot" title={t.robot} active={active === 0} className={`lg:flex-1 ${robot === 'needs' ? 'border-(--attention)!' : ''}`}>
               <p className="truncate font-mono">{ROBOT_OUT[robot]}</p>
-              <p className={`mt-1 ${robot === 'needs' ? 'text-[var(--attention)]' : 'text-muted-foreground'}`}>{t.robotStates[robot]}</p>
+              <p className={`mt-1 ${robot === 'needs' ? 'text-(--attention)' : 'text-muted-foreground'}`}>{t.robotStates[robot]}</p>
             </Stage>
             {wire(0)}
             <Stage icon="cpu" title={t.agent} active={active === 1} className="lg:flex-1">
@@ -334,7 +334,7 @@ function AgentFlow() {
             <Stage icon="hard-drive-upload" title={t.queue} active={active === 2} className="lg:flex-1">
               <span className="flex h-2 gap-1">
                 {Array.from({ length: queued }, (_, k) => (
-                  <span key={k} className="size-2 rounded-[2px] bg-[var(--attention)]" />
+                  <span key={k} className="size-2 rounded-xs bg-(--attention)" />
                 ))}
               </span>
               <p className="mt-1 text-muted-foreground">{t.resends}</p>
@@ -342,11 +342,11 @@ function AgentFlow() {
           </div>
         </div>
         <div className="lg:flex lg:items-center lg:pt-7">{wire(2)}</div>
-        <div className="lg:flex-[2]">
+        <div className="lg:flex-2">
           <p className="type-meta mb-2">{t.server}</p>
           <div className={group}>
             <Stage icon="layout-panel-top" title={t.panel} active={active === 3} className={`lg:flex-1 ${panel === 'offline' ? 'border-destructive/60!' : ''}`}>
-              <p className={panel === 'needs' ? 'text-[var(--attention)]' : panel === 'offline' ? 'text-destructive' : ''}>{t.panelStates[panel]}</p>
+              <p className={panel === 'needs' ? 'text-(--attention)' : panel === 'offline' ? 'text-destructive' : ''}>{t.panelStates[panel]}</p>
             </Stage>
             {wire(3)}
             <Stage icon="database-backup" title="PostgreSQL" active={active === 4} className="lg:flex-1">
@@ -379,7 +379,7 @@ function TripleRead() {
     <div ref={ref} role="img" aria-label={t.label}>
       <Tabs labels={t.tabs} s={s} total={READS.totals[s]} on={on} inView={inView} />
       <div className="flex flex-col lg:flex-row lg:items-center" aria-hidden>
-        <div className="rounded-md border border-border bg-card p-4 text-card-foreground lg:w-[17rem] lg:flex-none">
+        <div className="rounded-md border border-border bg-card p-4 text-card-foreground lg:w-68 lg:flex-none">
           <p className="text-[0.8125rem] font-semibold">{t.form}</p>
           <div className="mt-3 grid gap-2">
             <Line w="w-3/4" />
@@ -391,7 +391,7 @@ function TripleRead() {
                 <div key={label}>
                   <div
                     className={`morph flex items-center justify-between gap-3 rounded-sm border px-2.5 py-1.5 text-[0.8125rem] ${
-                      odd ? tone.bad : read ? 'border-primary/60 bg-primary/[0.06]' : 'border-border'
+                      odd ? tone.bad : read ? 'border-primary/60 bg-primary/6' : 'border-border'
                     } ${p === k + 1 && !odd ? 'lit' : ''}`}
                   >
                     <span className="flex items-center">
@@ -407,7 +407,7 @@ function TripleRead() {
           </div>
         </div>
         <Wire state={p >= 4 ? 'done' : p >= 1 ? 'live' : 'idle'} />
-        <Stage icon="scan-text" title={t.agree} active={p === 4} className="lg:w-[10rem]">
+        <Stage icon="scan-text" title={t.agree} active={p === 4} className="lg:w-40">
           <p className={p >= 4 ? (agree ? '' : 'text-destructive') : 'text-muted-foreground'}>{p < 4 ? t.cents : agree ? t.match : t.differs}</p>
         </Stage>
         <Wire state={p >= 5 ? (agree ? 'done' : 'blocked') : 'idle'} />

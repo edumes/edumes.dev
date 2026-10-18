@@ -129,8 +129,8 @@ export function Checklist() {
   return (
     <div ref={ref} role="img" aria-label={t.label} className="@container">
       <div className="flex flex-col gap-3 @xl:flex-row @xl:items-stretch" aria-hidden>
-        <div className={`morph rounded-md border border-border bg-card p-3 text-card-foreground @xl:w-[12rem] @xl:flex-none ${p === 0 ? 'lit' : ''}`}>
-          <p className="flex items-center justify-between gap-2 text-xs font-semibold [font-stretch:104%]">
+        <div className={`morph rounded-md border border-border bg-card p-3 text-card-foreground @xl:w-48 @xl:flex-none ${p === 0 ? 'lit' : ''}`}>
+          <p className="flex items-center justify-between gap-2 text-xs font-semibold font-stretch-104%">
             {failed ? 'NF-e 1203' : 'NF-e 1201'}
             <span className="rounded-sm bg-secondary px-1.5 py-0.5 font-mono text-[0.625rem] font-normal text-secondary-foreground">XML</span>
           </p>
@@ -142,7 +142,7 @@ export function Checklist() {
             {t.items.map((label, k) => {
               const done = p > k;
               return (
-                <li key={label} className={`morph flex items-center justify-between gap-3 rounded-sm px-1.5 py-0.5 text-[0.6875rem] @md:text-xs ${p === k + 1 ? 'bg-primary/[0.06]' : ''}`}>
+                <li key={label} className={`morph flex items-center justify-between gap-3 rounded-sm px-1.5 py-0.5 text-[0.6875rem] @md:text-xs ${p === k + 1 ? 'bg-primary/6' : ''}`}>
                   <span className={done ? '' : 'text-muted-foreground'}>{label}</span>
                   <span className={`morph rounded-sm px-1.5 py-0.5 font-mono text-[0.625rem] ${done ? MARK_LOOK[marks[k]] : 'text-transparent'}`}>{marks[k]}</span>
                 </li>
@@ -266,7 +266,7 @@ export function InvoiceHow() {
               return (
                 <span
                   key={k}
-                  className={`morph size-2.5 rounded-[2px] ${!run ? 'bg-border' : bad ? 'bg-destructive' : k === 9 ? 'bg-muted-foreground/40' : 'bg-primary'}`}
+                  className={`morph size-2.5 rounded-xs ${!run ? 'bg-border' : bad ? 'bg-destructive' : k === 9 ? 'bg-muted-foreground/40' : 'bg-primary'}`}
                   style={{ transitionDelay: run && p === 3 ? `${k * 90}ms` : '0ms' }}
                 />
               );
@@ -275,8 +275,8 @@ export function InvoiceHow() {
           <p className="mt-1.5 text-muted-foreground">{t.marks}</p>
         </Stage>
         <Wire state={cancelled ? 'idle' : wire(4)} />
-        <Stage icon="circle-check" title={t.outcome} active={p === 4} className={`lg:flex-[1.2] ${failed && p >= 4 ? 'border-[var(--attention)]!' : ''}`}>
-          <p className={`morph ${cancelled || p < 4 ? 'text-transparent' : failed ? 'text-[var(--attention)]' : ''}`}>{failed ? t.flagged : t.approved}</p>
+        <Stage icon="circle-check" title={t.outcome} active={p === 4} className={`lg:flex-[1.2] ${failed && p >= 4 ? 'border-(--attention)!' : ''}`}>
+          <p className={`morph ${cancelled || p < 4 ? 'text-transparent' : failed ? 'text-(--attention)' : ''}`}>{failed ? t.flagged : t.approved}</p>
         </Stage>
       </div>
     </div>

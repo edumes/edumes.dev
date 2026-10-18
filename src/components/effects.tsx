@@ -115,7 +115,7 @@ export function RippleGrid() {
     <canvas
       ref={ref}
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 -z-[1] h-[min(60rem,100svh)] w-full [mask-image:var(--fade)]"
+      className="pointer-events-none absolute inset-x-0 top-0 z-[-1] h-[min(60rem,100svh)] w-full mask-(--fade)"
     />
   );
 }
@@ -284,7 +284,7 @@ export function SineRibbons({ seed = 0, className = '' }: { seed?: number; class
     };
   }, [seed]);
 
-  return <canvas ref={ref} aria-hidden className={`ribbons block h-[140px] w-full sm:h-[200px] ${className}`} />;
+  return <canvas ref={ref} aria-hidden className={`ribbons block h-35 w-full sm:h-50 ${className}`} />;
 }
 
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';

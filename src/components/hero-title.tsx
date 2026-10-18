@@ -49,7 +49,7 @@ export function HeroTitle({ heading }: { heading: string }) {
           origin is pushed 1em behind the text, so rotateX rolls the next one up from below like a reel. */}
       <span
         aria-hidden
-        className="-my-[0.25em] grid overflow-hidden py-[0.25em] [mask-image:linear-gradient(transparent,#000_0.15em,#000_calc(100%_-_0.15em),transparent)] [perspective:60em]"
+        className="my-[-0.25em] grid overflow-hidden mask-[linear-gradient(transparent,#000_0.15em,#000_calc(100%-0.15em),transparent)] py-[0.25em] perspective-[60em]"
       >
         {titles.map((title) => (
           <span key={title} className="invisible [grid-area:1/1]">
@@ -63,7 +63,7 @@ export function HeroTitle({ heading }: { heading: string }) {
             animate={{ rotateX: 0, opacity: 1 }}
             exit={{ rotateX: 80, opacity: 0 }}
             transition={{ type: 'spring', bounce: 0, duration: 0.9 }}
-            className="flex flex-col justify-start [grid-area:1/1] [backface-visibility:hidden] [transform-origin:50%_50%_-1em]"
+            className="flex origin-[50%_50%_-1em] flex-col justify-start [grid-area:1/1] backface-hidden"
           >
             {titles[current]}
           </motion.span>

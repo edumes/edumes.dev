@@ -123,7 +123,7 @@ const useCopy = defineCopy({
 type Scan = 'accepted' | 'repeated' | 'mismatch';
 const SCANS: [string, Scan][] = [['7891000100103', 'accepted'], ['7891000100103', 'repeated'], ['7891000999999', 'mismatch']];
 const SCAN_LOOK: Record<Scan, string> = { accepted: tone.ok, repeated: 'border-border bg-muted text-muted-foreground', mismatch: tone.bad };
-const PART_DOT = ['bg-primary', 'bg-[var(--attention)]', 'bg-muted-foreground/30'];
+const PART_DOT = ['bg-primary', 'bg-(--attention)', 'bg-muted-foreground/30'];
 const BARS = [2, 1, 1, 3, 1, 2, 1, 1, 2, 3, 1, 1, 2, 1, 3, 1, 2, 1, 1, 2, 1, 3, 1, 1, 2];
 
 function Barcode({ scanning }: { scanning: boolean }) {
@@ -153,8 +153,8 @@ export function Scanner() {
   return (
     <div ref={ref} role="img" aria-label={t.label} className="@container">
       <div className="flex flex-col items-center gap-4 @md:flex-row @md:items-center @md:justify-center @xl:gap-8" aria-hidden>
-        <Phone className="@md:w-[14rem] @md:flex-none">
-          <p className="flex items-baseline justify-between gap-2 text-xs font-semibold [font-stretch:104%]">
+        <Phone className="@md:w-56 @md:flex-none">
+          <p className="flex items-baseline justify-between gap-2 text-xs font-semibold font-stretch-104%">
             {t.order}
             <span className="font-normal text-muted-foreground">{t.partOf}</span>
           </p>
@@ -173,13 +173,13 @@ export function Scanner() {
               </li>
             ))}
           </ul>
-          <p className={`morph mt-2 flex items-center gap-1.5 text-[0.625rem] text-[var(--attention)] ${shown === 3 ? '' : 'opacity-0'}`}>
-            <span className="size-1.5 rounded-full bg-[var(--attention)]" />
+          <p className={`morph mt-2 flex items-center gap-1.5 text-[0.625rem] text-(--attention) ${shown === 3 ? '' : 'opacity-0'}`}>
+            <span className="size-1.5 rounded-full bg-(--attention)" />
             {t.recorded}
           </p>
         </Phone>
-        <div className="w-full max-w-[15rem] rounded-md border border-border bg-card p-3 text-card-foreground @md:w-auto @md:min-w-[11rem]">
-          <p className="text-xs font-semibold [font-stretch:104%]">{t.partsTitle}</p>
+        <div className="w-full max-w-60 rounded-md border border-border bg-card p-3 text-card-foreground @md:w-auto @md:min-w-44">
+          <p className="text-xs font-semibold font-stretch-104%">{t.partsTitle}</p>
           <ul className="mt-2 grid gap-1.5 text-xs">
             {t.parts.map(([part, state], k) => (
               <li key={part} className="flex items-center justify-between gap-3">
@@ -236,7 +236,7 @@ function TooBig() {
           </div>
         ))}
       </div>
-      <p className={`morph mt-2 text-xs ${step >= 2 ? 'text-[var(--attention)]' : 'text-transparent'}`}>{t.outOfOrder}</p>
+      <p className={`morph mt-2 text-xs ${step >= 2 ? 'text-(--attention)' : 'text-transparent'}`}>{t.outOfOrder}</p>
     </Trap>
   );
 }
@@ -287,7 +287,7 @@ function Resume() {
     <div ref={ref} role="img" aria-label={t.label}>
       <Tabs labels={t.tabs} s={s} total={RESUME.totals[s]} on={on} inView={inView} />
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="smartphone-nfc" title={t.order} active={p === 0} className="lg:w-[12rem]">
+        <Stage icon="smartphone-nfc" title={t.order} active={p === 0} className="lg:w-48">
           <p className={`morph rounded-sm border px-2 py-1 ${STATE_LOOK[s]}`}>{t.states[s]}</p>
         </Stage>
         <Wire state={p === 1 ? 'live' : p > 1 ? 'done' : 'idle'} />
@@ -303,7 +303,7 @@ function Resume() {
           </ul>
         </div>
         <Wire state={p === 2 ? 'live' : p > 2 ? 'done' : 'idle'} />
-        <ul className="grid gap-1.5 lg:w-[14rem]">
+        <ul className="grid gap-1.5 lg:w-56">
           {t.answers.map((a, k) => (
             <li key={a} className={`morph rounded-md border px-3 py-2 text-[0.8125rem] ${p >= 2 && k === s ? `${tone.ok} ${p === 2 ? 'lit' : ''}` : 'border-border bg-card text-muted-foreground'}`}>
               {a}
