@@ -216,6 +216,17 @@
         ],
         "body": "Shows in real time how much you've earned today, from your salary and working hours.",
         "href": "https://github.com/edumes/salariocontado"
+      },
+      {
+        "name": "Chatbot Assistant",
+        "icon": "message-circle-more",
+        "stack": [
+          "Laravel",
+          "Livewire",
+          "MySQL"
+        ],
+        "body": "A chat with login where every conversation is saved and can be picked up again from the sidebar, with a typing indicator while the reply comes in.",
+        "href": "https://github.com/edumes/chatbot-ai"
       }
     ]
   },

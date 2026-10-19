@@ -45,6 +45,7 @@ import { LeafyGreenIcon } from './leafy-green';
 import { LinkedinIcon } from './linkedin';
 import { LoaderCircleIcon } from './loader-circle';
 import { MapPinIcon } from './map-pin';
+import { MessageCircleMoreIcon } from './message-circle-more';
 import { MoonIcon } from './moon';
 import { PaletteIcon } from './palette';
 import { PickaxeIcon } from './pickaxe';
@@ -121,6 +122,7 @@ export const icons = {
   'linkedin': LinkedinIcon,
   'loader-circle': LoaderCircleIcon,
   'map-pin': MapPinIcon,
+  'message-circle-more': MessageCircleMoreIcon,
   'moon': MoonIcon,
   'palette': PaletteIcon,
   'pickaxe': PickaxeIcon,

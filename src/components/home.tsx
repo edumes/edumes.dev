@@ -1,8 +1,8 @@
 import { Fragment } from 'react';
 import {
   siAndroid, siDocker, siExpo, siExpress, siFastapi, siFastify, siFfmpeg, siGit, siGo, siJest, siKnexdotjs, siLaravel,
-  siMui, siMysql, siNestjs, siNextdotjs, siNodedotjs, siPhp, siPostgresql, siPrisma, siPuppeteer, siPython, siQt, siReact,
-  siRedis, siShadcnui, siSqlalchemy, siTailwindcss, siTypeorm, siTypescript, siVite
+  siLivewire, siMui, siMysql, siNestjs, siNextdotjs, siNodedotjs, siPhp, siPostgresql, siPrisma, siPuppeteer, siPython, siQt,
+  siReact, siRedis, siShadcnui, siSqlalchemy, siTailwindcss, siTypeorm, siTypescript, siVite
 } from 'simple-icons';
 import { useLocale, useMessages, useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
@@ -377,7 +377,7 @@ const logos: Record<string, { path: string }> = {
   Vite: siVite, 'Tailwind CSS': siTailwindcss, 'shadcn/ui': siShadcnui, 'Material UI': siMui, Expo: siExpo,
   PostgreSQL: siPostgresql, MySQL: siMysql, Redis: siRedis, TypeORM: siTypeorm, Prisma: siPrisma, Knex: siKnexdotjs,
   SQLAlchemy: siSqlalchemy, Puppeteer: siPuppeteer, Docker: siDocker, Git: siGit, Jest: siJest, Android: siAndroid,
-  Go: siGo, ffmpeg: siFfmpeg, PyQt6: siQt
+  Go: siGo, ffmpeg: siFfmpeg, PyQt6: siQt, Livewire: siLivewire
 };
 const glyphs: Record<string, IconName> = {
   Playwright: 'cursor-click', pywinauto: 'bot', 'PDF e Excel': 'file-chart-line', 'PDF and Excel': 'file-chart-line',

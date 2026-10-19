@@ -216,6 +216,17 @@
         ],
         "body": "Mostra em tempo real quanto você já ganhou hoje, a partir do salário e do horário de trabalho.",
         "href": "https://github.com/edumes/salariocontado"
+      },
+      {
+        "name": "Chatbot Assistant",
+        "icon": "message-circle-more",
+        "stack": [
+          "Laravel",
+          "Livewire",
+          "MySQL"
+        ],
+        "body": "Chat com login em que cada conversa fica salva e pode ser retomada pela lista lateral, com indicador de digitação enquanto a resposta chega.",
+        "href": "https://github.com/edumes/chatbot-ai"
       }
     ]
   },

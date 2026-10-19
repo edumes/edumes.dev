@@ -20,7 +20,16 @@ const useCopy = defineCopy({
     deepDrill: { iron: 'ferro', copper: 'cobre', energy: 'energia' },
     ytRadio: { live: 'AO VIVO', cycle: (n: number) => `ciclo ${n} de 8, sem repetir` },
     segmentor: { source: 'podcast.mp4 · um quadro por minuto' },
-    salario: { earned: 'Você já ganhou hoje', workday: '64% do expediente' }
+    salario: { earned: 'Você já ganhou hoje', workday: '64% do expediente' },
+    chatbot: {
+      chats: 'Conversas',
+      chat: 'Nova conversa',
+      greeting: 'Olá! Como posso ajudar hoje?',
+      suggestions: ['Em que você pode me ajudar?', 'Pode me dar uma dica rápida?'],
+      typing: 'digitando… (~3s)',
+      reply: 'Estou aqui para ajudar! O que você gostaria de saber?',
+      input: 'Digite sua mensagem…'
+    }
   },
   en: {
     aurora: { balance: 'DEBIT 1,250,000.00 = CREDIT ✓' },
@@ -31,7 +40,16 @@ const useCopy = defineCopy({
     deepDrill: { iron: 'iron', copper: 'copper', energy: 'energy' },
     ytRadio: { live: 'LIVE', cycle: (n) => `cycle ${n} of 8, no repeats` },
     segmentor: { source: 'podcast.mp4 · one frame per minute' },
-    salario: { earned: "You've earned today", workday: '64% of the workday' }
+    salario: { earned: "You've earned today", workday: '64% of the workday' },
+    chatbot: {
+      chats: 'Chats',
+      chat: 'New chat',
+      greeting: 'Hello! How can I help you today?',
+      suggestions: ['What can you help me with?', 'Can you give me a quick tip?'],
+      typing: 'typing… (~3s)',
+      reply: "I'm here to help! What would you like to know?",
+      input: 'Type your message…'
+    }
   }
 });
 
@@ -344,6 +362,55 @@ function SalarioContado() {
   );
 }
 
+// The open chat in the saved list: a suggestion picked, the typing indicator, then one of the app's fixed replies.
+// Every chat is listed as "New chat" plus its date, the way the app lists them.
+const CHAT = [700, 700, 600, 1600, 2600];
+const DATES = ['22/06 21:29', '21/06 18:04', '16/06 09:12'];
+function ChatbotAssistant() {
+  const t = useCopy().chatbot;
+  const { ref, step } = useLoop(CHAT);
+  const slot = 'morph col-start-1 row-start-1';
+  const bot = 'w-fit max-w-[95%] rounded-md rounded-bl-none border border-border bg-background px-2 py-1';
+  return (
+    <div ref={ref} className={`${box} grid grid-cols-[2fr_3fr] gap-3 text-[0.625rem] leading-snug`}>
+      <div className="grid content-start gap-1">
+        <p className="text-[0.5625rem] text-muted-foreground">{t.chats}</p>
+        {DATES.map((d, k) => (
+          <p key={d} className={`rounded-sm border px-1.5 py-0.5 ${k ? 'border-border bg-background' : 'border-primary/60 bg-primary/10'}`}>
+            <span className="block truncate">{t.chat}</span>
+            <span className="block font-mono text-[0.5625rem] text-muted-foreground tabular-nums">{d}</span>
+          </p>
+        ))}
+      </div>
+      <div className="flex min-w-0 flex-col justify-end gap-1.5">
+        <p className={bot}>{t.greeting}</p>
+        <div className="grid">
+          <p className={`${slot} flex gap-1 overflow-hidden whitespace-nowrap ${step <= 1 ? '' : 'opacity-0'}`}>
+            {t.suggestions.map((s, k) => (
+              <span key={s} className={`morph rounded-sm border px-1.5 py-0.5 ${k === 0 && step === 1 ? 'lit border-primary' : 'border-border text-muted-foreground'}`}>
+                {s}
+              </span>
+            ))}
+          </p>
+          <p className={`${slot} ml-auto max-w-[95%] rounded-md rounded-br-none bg-primary px-2 py-1 text-primary-foreground ${step >= 2 ? '' : 'opacity-0'}`}>{t.suggestions[0]}</p>
+        </div>
+        <div className="grid">
+          <p className={`${slot} flex items-center gap-1 self-start text-muted-foreground ${step === 3 ? '' : 'opacity-0'}`}>
+            {[0, 150, 300].map((ms) => (
+              <span key={ms} className="size-1 rounded-full bg-primary motion-safe:animate-pulse" style={{ animationDelay: `${ms}ms` }} />
+            ))}
+            <span className="ml-1">{t.typing}</span>
+          </p>
+          <p className={`${slot} ${bot} ${step >= 4 ? '' : 'opacity-0'}`} style={{ transform: step >= 4 ? 'none' : 'translateY(4px)' }}>
+            {t.reply}
+          </p>
+        </div>
+        <p className="rounded-sm border border-border px-2 py-1 text-muted-foreground">{t.input}</p>
+      </div>
+    </div>
+  );
+}
+
 const SCENES: Record<string, Scene> = {
   'Aurora Mainframe Banking': Aurora,
   LoreForge,
@@ -353,7 +420,8 @@ const SCENES: Record<string, Scene> = {
   'Deep Drill': DeepDrill,
   'YT Radio Stream': YtRadio,
   Segmentor,
-  'Salário Contado': SalarioContado
+  'Salário Contado': SalarioContado,
+  'Chatbot Assistant': ChatbotAssistant
 };
 
 // The scene for a project on the home page, by its name (the same in both languages).
