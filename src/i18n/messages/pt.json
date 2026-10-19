@@ -198,6 +198,17 @@
         "body": "Transmissão contínua para uma live do YouTube a partir de uma pasta de clipes, embaralhados sem repetir até fechar o ciclo."
       },
       {
+        "name": "Segmentor",
+        "icon": "clap",
+        "stack": [
+          "Python",
+          "PyQt6",
+          "ffmpeg"
+        ],
+        "body": "App desktop que mostra um quadro por minuto de um vídeo longo e corta os minutos escolhidos, em horizontal ou vertical 9:16, com o encoder de hardware da máquina (VideoToolbox ou NVENC).",
+        "href": "https://github.com/edumes/Segmentor"
+      },
+      {
         "name": "Salário Contado",
         "icon": "circle-dollar-sign",
         "stack": [

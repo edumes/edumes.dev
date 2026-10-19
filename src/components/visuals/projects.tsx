@@ -19,6 +19,7 @@ const useCopy = defineCopy({
     document: { file: 'contrato.pdf · p. 2', question: 'Qual o prazo de pagamento?', answer: '30 dias após a entrega.' },
     deepDrill: { iron: 'ferro', copper: 'cobre', energy: 'energia' },
     ytRadio: { live: 'AO VIVO', cycle: (n: number) => `ciclo ${n} de 8, sem repetir` },
+    segmentor: { source: 'podcast.mp4 · um quadro por minuto' },
     salario: { earned: 'Você já ganhou hoje', workday: '64% do expediente' }
   },
   en: {
@@ -29,6 +30,7 @@ const useCopy = defineCopy({
     document: { file: 'contract.pdf · p. 2', question: "What's the payment term?", answer: '30 days after delivery.' },
     deepDrill: { iron: 'iron', copper: 'copper', energy: 'energy' },
     ytRadio: { live: 'LIVE', cycle: (n) => `cycle ${n} of 8, no repeats` },
+    segmentor: { source: 'podcast.mp4 · one frame per minute' },
     salario: { earned: "You've earned today", workday: '64% of the workday' }
   }
 });
@@ -259,6 +261,58 @@ function YtRadio() {
   );
 }
 
+// One frame per minute of a long video, two minutes picked (one wide, one cropped to 9:16 around the center), then
+// ffmpeg cutting each into its own file, named the way the app names them.
+const CUT = [600, 800, 800, 1100, 1100, 2200];
+const PICKS = [
+  { minute: 1, vertical: false, at: 1 },
+  { minute: 3, vertical: true, at: 2 }
+];
+function Segmentor() {
+  const t = useCopy().segmentor;
+  const { ref, step, on } = useLoop(CUT);
+  return (
+    <div ref={ref} className={`${box} flex flex-col justify-between`}>
+      <p className="text-[0.625rem] text-muted-foreground">{t.source}</p>
+      <ul className="grid grid-cols-4 gap-2">
+        {[0, 1, 2, 3].map((m) => {
+          const pick = PICKS.find((p) => p.minute === m);
+          const picked = pick && step >= pick.at;
+          return (
+            <li key={m}>
+              <span className={`morph relative block aspect-video overflow-hidden rounded-sm border bg-muted-foreground/20 ${!picked ? 'border-border' : pick.vertical ? 'border-(--attention)' : 'lit border-primary'}`}>
+                <span className="absolute top-1/2 left-1/2 size-2 -translate-1/2 rounded-full bg-muted-foreground/50" />
+                {pick?.vertical && (
+                  <span
+                    className={`morph absolute inset-y-0 left-1/2 w-[32%] -translate-x-1/2 border-x border-(--attention) shadow-[0_0_0_99px_color-mix(in_oklab,var(--card)_60%,transparent)] ${picked ? '' : 'opacity-0'}`}
+                  />
+                )}
+              </span>
+              <span className="mt-0.5 block text-center font-mono text-[0.5625rem] text-muted-foreground tabular-nums">0{m}:00</span>
+            </li>
+          );
+        })}
+      </ul>
+      <ul className="grid gap-1">
+        {PICKS.map((p, k) => {
+          const cutting = on && step === 3 + k;
+          const done = step > 3 + k;
+          return (
+            <li key={p.minute} className={`morph flex items-center gap-2 font-mono text-[0.625rem] ${step >= p.at ? '' : 'opacity-0'} ${done ? '' : 'text-muted-foreground'}`}>
+              <span className="truncate">
+                podcast_segment_{p.minute + 1}_{p.vertical ? 'vertical' : 'default'}.mp4
+              </span>
+              <span className="h-1 min-w-6 flex-1 overflow-hidden rounded-full bg-border">
+                <span key={cutting ? 'cut' : 'rest'} className="block h-full bg-primary" style={cutting ? { animation: `fill ${CUT[3 + k]}ms linear forwards` } : { width: done ? '100%' : 0 }} />
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 // How much of today's pay is already earned, counting up live.
 const PER_SECOND = 0.0126; // a made-up salary spread over the working hours
 function SalarioContado() {
@@ -298,6 +352,7 @@ const SCENES: Record<string, Scene> = {
   'Document Assistant': DocumentAssistant,
   'Deep Drill': DeepDrill,
   'YT Radio Stream': YtRadio,
+  Segmentor,
   'Salário Contado': SalarioContado
 };
 

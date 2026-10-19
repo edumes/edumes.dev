@@ -12,6 +12,7 @@ import { CalendarDaysIcon } from './calendar-days';
 import { CheckIcon } from './check';
 import { CircleCheckIcon } from './circle-check';
 import { CircleDollarSignIcon } from './circle-dollar-sign';
+import { ClapIcon } from './clap';
 import { ClipboardCheckIcon } from './clipboard-check';
 import { CloudCogIcon } from './cloud-cog';
 import { CloudUploadIcon } from './cloud-upload';
@@ -87,6 +88,7 @@ export const icons = {
   'check': CheckIcon,
   'circle-check': CircleCheckIcon,
   'circle-dollar-sign': CircleDollarSignIcon,
+  'clap': ClapIcon,
   'clipboard-check': ClipboardCheckIcon,
   'cloud-cog': CloudCogIcon,
   'cloud-upload': CloudUploadIcon,
