@@ -195,7 +195,8 @@
           "ffmpeg",
           "Docker"
         ],
-        "body": "Transmissão contínua para uma live do YouTube a partir de uma pasta de clipes, embaralhados sem repetir até fechar o ciclo."
+        "body": "Transmissão contínua para uma live do YouTube a partir de uma pasta de clipes, embaralhados sem repetir até fechar o ciclo, reencodados com ffmpeg e enviados por RTMPS. Clipes novos entram sem reiniciar.",
+        "href": "https://github.com/edumes/yt-radio-stream"
       },
       {
         "name": "Segmentor",

@@ -195,7 +195,8 @@
           "ffmpeg",
           "Docker"
         ],
-        "body": "A continuous YouTube live stream from a folder of clips, shuffled without repeats until the cycle ends."
+        "body": "A continuous YouTube live stream from a folder of clips, shuffled without repeats until the cycle ends, re-encoded with ffmpeg and sent over RTMPS. New clips are picked up without a restart.",
+        "href": "https://github.com/edumes/yt-radio-stream"
       },
       {
         "name": "Segmentor",
