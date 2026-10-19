@@ -98,7 +98,7 @@ const mdx: MDXComponents = {
   h2: (props) => <h2 className="type-heading mt-14 mb-4" {...props} />,
   h3: (props) => <h3 className="mt-10 mb-3 font-semibold font-stretch-104%" {...props} />,
   p: (props) => <p className="my-5" {...props} />,
-  a: (props) => <a className="text-link underline underline-offset-4" {...props} />,
+  a: (props) => <a className="text-link underline underline-offset-4" {...(/^https?:/.test(props.href ?? '') && { target: '_blank', rel: 'noopener noreferrer' })} {...props} />,
   ul: (props) => <ul className="my-5 list-disc space-y-2 pl-6 marker:text-muted-foreground" {...props} />,
   ol: (props) => <ol className="my-5 list-decimal space-y-2 pl-6 marker:text-muted-foreground" {...props} />,
   blockquote: (props) => <blockquote className="my-6 border-l-2 border-border pl-5 text-muted-foreground" {...props} />,
@@ -114,6 +114,7 @@ function Source({ path, label }: { path: string; label: string }) {
   return (
     <a
       href={`${profile.repo}/tree/main/${path}`}
+      target="_blank" rel="noopener noreferrer"
       className="pressable my-6 flex items-center gap-3 rounded-lg border border-border px-4 py-3 hover:bg-muted"
       data-cuelume-tap
       data-icon-host
