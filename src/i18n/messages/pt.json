@@ -122,7 +122,11 @@
     "results": "Resultado",
     "more": "Mais casos",
     "empty": "Os estudos de caso estão sendo revisados e entram aqui em breve.",
-    "disclaimer": "Ilustrações conceituais com dados fictícios. Não representam a infraestrutura real."
+    "disclaimer": "Ilustrações conceituais com dados fictícios. Não representam a infraestrutura real.",
+    "details": "Detalhes técnicos",
+    "decisions": "Decisões",
+    "incident": "Um problema real",
+    "limits": "Limites e próximos passos"
   },
   "projects": {
     "title": "Outros projetos",

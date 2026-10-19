@@ -48,9 +48,9 @@ const useCopy = defineCopy({
       answers: ['Continuar a parte de onde parou', 'Recomeçar a parte', 'Abrir a próxima parte']
     },
     tests: {
-      label: 'Ilustração: cerca de 40 testes cobrem as regras e as telas.',
+      label: 'Ilustração: cerca de 50 testes cobrem as regras e as telas.',
       names: ['chave duplicada', 'chave inválida', 'parte fora de ordem', 'coleta parcial divergente', 'setor repetido', 'confirmação final do pedido'],
-      passing: '≈40 testes passando'
+      passing: '≈50 testes passando'
     },
     result: {
       label: 'Antes, um erro de bipagem aparecia no cliente; depois, aparece na hora, fica registrado e o pedido é retomado de onde parou.',
@@ -104,9 +104,9 @@ const useCopy = defineCopy({
       answers: ['Continue the part where it stopped', 'Restart the part', 'Open the next part']
     },
     tests: {
-      label: 'Illustration: about 40 tests cover the rules and the screens.',
+      label: 'Illustration: about 50 tests cover the rules and the screens.',
       names: ['duplicate key', 'invalid key', 'part out of order', 'partial mismatched collection', 'repeated sector', 'final order confirmation'],
-      passing: '≈40 tests passing'
+      passing: '≈50 tests passing'
     },
     result: {
       label: 'Before, a scanning mistake showed up at the customer; after, it shows up on the spot, gets recorded and the order resumes where it stopped.',

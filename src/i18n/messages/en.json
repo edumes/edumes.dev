@@ -122,7 +122,11 @@
     "results": "Outcome",
     "more": "More cases",
     "empty": "The case studies are under review and will be here soon.",
-    "disclaimer": "Conceptual illustrations with made-up data. They do not depict the real infrastructure."
+    "disclaimer": "Conceptual illustrations with made-up data. They do not depict the real infrastructure.",
+    "details": "Technical details",
+    "decisions": "Decisions",
+    "incident": "A real problem",
+    "limits": "Limits and next steps"
   },
   "projects": {
     "title": "Other projects",

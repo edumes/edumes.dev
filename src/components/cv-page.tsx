@@ -37,10 +37,10 @@ export function CvPage() {
             <a href={`mailto:${profile.email}`}>{profile.email}</a>
           </li>
           <li>
-            <a href={profile.linkedin}>{bareUrl(profile.linkedin)}</a>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">{bareUrl(profile.linkedin)}</a>
           </li>
           <li>
-            <a href={profile.github}>{bareUrl(profile.github)}</a>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer">{bareUrl(profile.github)}</a>
           </li>
           <li>
             <a href={profile.url}>{bareUrl(profile.url)}</a>

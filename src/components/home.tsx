@@ -136,7 +136,7 @@ export function Home() {
               {t('hero.primary')}
               <Icon name="arrow-down" size={16} loop={5000} />
             </a>
-            <a href={profile.github} className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
               <Icon name="github" size={16} />
               GitHub
             </a>
@@ -247,7 +247,7 @@ export function Home() {
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
                   <Stack items={p.stack} />
                   {p.href && (
-                    <a href={p.href} className="inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-link underline-offset-4 hover:underline" data-cuelume-tap>
+                    <a href={p.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-link underline-offset-4 hover:underline" data-cuelume-tap>
                       <Icon name="github" size={16} />
                       {t('projects.code')}
                     </a>
@@ -348,11 +348,11 @@ export function Home() {
           </a>
           <div className="mt-8 flex flex-wrap gap-3">
             <CopyEmail className={`${button} border border-border hover:bg-muted`} />
-            <a href={profile.linkedin} className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
               <Icon name="linkedin" size={16} />
               LinkedIn
             </a>
-            <a href={profile.github} className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className={`${button} border border-border hover:bg-muted`} data-cuelume-tap>
               <Icon name="github" size={16} />
               GitHub
             </a>
@@ -422,7 +422,7 @@ export function Footer() {
         )}
         {[profile.github, profile.linkedin].map((url) => (
           <li key={url}>
-            <a href={url} className="hover:text-foreground">
+            <a href={url} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
               {bareUrl(url)}
             </a>
           </li>
