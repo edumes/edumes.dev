@@ -157,7 +157,8 @@
           "Next.js",
           "TypeScript"
         ],
-        "body": "Treino de digitação sincronizado com a letra da música que está tocando."
+        "body": "Treino de digitação sincronizado com a letra da música que está tocando: busca a letra sincronizada, toca o vídeo ao fundo e mede velocidade e precisão linha a linha.",
+        "href": "https://github.com/edumes/lyric-type"
       },
       {
         "name": "My Garden",
