@@ -299,6 +299,24 @@ main:has(> #top)::after {
   }
 }
 
+/* A closed <details class="disclosure"> grows to its height where the browser can animate to `auto`; elsewhere,
+   and under reduced motion, it simply opens. */
+@media (prefers-reduced-motion: no-preference) {
+  .disclosure {
+    interpolate-size: allow-keywords;
+  }
+  .disclosure::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 450ms cubic-bezier(0.22, 1, 0.36, 1),
+      content-visibility 450ms allow-discrete;
+  }
+  .disclosure[open]::details-content {
+    block-size: auto;
+  }
+}
+
 /* Native popovers that materialize from their trigger and reverse mid-flight. */
 .popover {
   inset: auto;

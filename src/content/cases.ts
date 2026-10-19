@@ -11,6 +11,15 @@ type CaseText = {
   problem: string;
   how: { icon: string; title: string; body: string }[];
   outcome: string;
+  // The depth layer: the role line under the summary, and the closed "technical details" block at the end.
+  // ponytail: optional while the cases are rolled out one by one; required once every case has it.
+  role?: string;
+  facts?: string[];
+  details?: {
+    decisions: { title: string; body: string }[];
+    incident: { title: string; body: string };
+    limits: string[];
+  };
 };
 // `id` keys the case's visuals; each locale has its own slug.
 export type CaseStudy = { id: string; featured?: boolean; icon?: string; stack: string[]; draft?: boolean } & Record<Locale, CaseText>;

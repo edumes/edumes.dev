@@ -84,6 +84,12 @@ export function CasePage({ slug }: { slug: string }) {
         <p className="type-lead mt-6 max-w-[56ch] text-muted-foreground" data-reveal>
           <Words text={text.summary} />
         </p>
+        {text.role && (
+          <div className="mt-6 max-w-[60ch] border-s-2 border-border ps-4">
+            <p className="text-[0.9375rem]">{text.role}</p>
+            {text.facts && <p className="type-meta mt-1">{text.facts.join(' · ')}</p>}
+          </div>
+        )}
         <div className="mt-8">
           <Stack items={c.stack} />
         </div>
@@ -201,6 +207,51 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
           <Words text={text.outcome} />
         </p>
       </Part>
+
+      {text.details && <Details d={text.details} />}
     </>
+  );
+}
+
+const cards = 'mt-4 grid gap-x-10 gap-y-8 sm:grid-cols-2';
+const sub = 'type-meta mt-14 first:mt-8';
+
+// The depth layer, closed by default so the page stays short: decisions, one real problem, limits and next steps.
+function Details({ d }: { d: NonNullable<CaseStudy[Locale]['details']> }) {
+  const t = useTranslations('cases');
+  return (
+    <details className="disclosure group mt-20 border-t border-border pt-6 sm:mt-28">
+      <summary className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden" data-icon-host>
+        <h2 className="type-heading flex items-center gap-2.5">
+          <Icon name="cog" size={20} className="text-muted-foreground" />
+          {t('details')}
+        </h2>
+        <Icon name="arrow-down" size={18} still className="ms-auto text-muted-foreground transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none" />
+      </summary>
+      <div className="pb-2">
+        <h3 className={sub}>{t('decisions')}</h3>
+        <ul className={cards}>
+          {d.decisions.map((x) => (
+            <li key={x.title} className="border-t border-border pt-4">
+              <p className="font-semibold font-stretch-104%">{x.title}</p>
+              <p className="mt-1.5 text-[0.9375rem] text-muted-foreground">{x.body}</p>
+            </li>
+          ))}
+        </ul>
+        <h3 className={sub}>{t('incident')}</h3>
+        <div className="mt-4 max-w-[62ch] border-t border-border pt-4">
+          <p className="font-semibold font-stretch-104%">{d.incident.title}</p>
+          <p className="mt-1.5 text-[0.9375rem] text-muted-foreground">{d.incident.body}</p>
+        </div>
+        <h3 className={sub}>{t('limits')}</h3>
+        <ul className="mt-4 grid max-w-[62ch] gap-3 text-[0.9375rem] text-muted-foreground">
+          {d.limits.map((x) => (
+            <li key={x} className="border-t border-border pt-3">
+              {x}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </details>
   );
 }

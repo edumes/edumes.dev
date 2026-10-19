@@ -106,8 +106,8 @@
       "slug": "separacao-pedidos",
       "category": "Mobile",
       "title": "Separar e conferir pedidos no depósito sem perder o fio",
-      "summary": "Um app de celular para separadores e conferentes bipar produtos, dividir pedidos em partes e retomar o trabalho de onde parou.",
-      "problem": "Separadores e conferentes bipam produtos com o celular no meio do depósito, e o app precisa saber exatamente onde cada pedido parou.",
+      "summary": "Um app de celular para separadores e coletores bipar produtos, dividir pedidos em partes e retomar o trabalho de onde parou.",
+      "problem": "Separadores e coletores bipam produtos com o celular no meio do depósito, e o app precisa saber exatamente onde cada pedido parou.",
       "how": [
         {
           "icon": "workflow",
@@ -116,7 +116,7 @@
         },
         {
           "icon": "clipboard-check",
-          "title": "Cerca de 40 testes",
+          "title": "Cerca de 50 testes",
           "body": "Chaves duplicadas, partes fora de ordem, coleta divergente, setor repetido e confirmação final."
         },
         {
@@ -130,14 +130,49 @@
           "body": "Todo mundo trabalha sempre com a mesma regra."
         }
       ],
-      "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente."
+      "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente.",
+      "role": "App criado do zero em 2024. Em 2026, o fluxo foi reescrito para pedidos divididos em partes, com as regras fora das telas e cobertas por testes.",
+      "facts": [
+        "três funções",
+        "dois modos de leitura",
+        "cerca de 50 testes"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Câmera e leitor, uma regra só",
+            "body": "Só muda a forma de ler. As regras saíram das telas para módulos puros, então as duas versões da tela não divergem na regra."
+          },
+          {
+            "title": "Recomeçar não apaga na hora",
+            "body": "O processo antigo só é substituído quando o novo é finalizado. Quem desiste no meio de um recomeço não perde o que existia."
+          },
+          {
+            "title": "Item divergente não conta",
+            "body": "A quantidade que o coletor precisa conferir ignora o que saiu divergente na separação. Senão a conta nunca fecharia."
+          },
+          {
+            "title": "Só as últimas 50 leituras na tela",
+            "body": "O lote completo fica fora do estado da tela, para o app continuar leve em celulares simples."
+          }
+        ],
+        "incident": {
+          "title": "Versões antigas em campo",
+          "body": "Quando os pedidos passaram a ser divididos em partes, quem ainda estava numa versão antiga do app continuava bipando com a regra velha. A atualização deixou de ser opcional: ao entrar, o app compara a própria versão com a publicada e só deixa trabalhar depois de atualizar, com o botão levando direto ao instalador da versão nova."
+        },
+        "limits": [
+          "A parte em andamento só existe na memória do celular até ser finalizada: fechar o app perde a parte. Próximo passo: guardar a parte no aparelho.",
+          "Recomeçar apaga e grava em duas chamadas, não numa transação. Próximo passo: uma rota única que substitui a parte de uma vez.",
+          "As telas de câmera e de leitor ainda são duplicadas, mesmo com as regras compartilhadas. Próximo passo: uma tela só, com a forma de leitura trocável."
+        ]
+      }
     },
     "en": {
       "slug": "order-picking",
       "category": "Mobile",
       "title": "Picking and checking orders on the warehouse floor without losing track",
-      "summary": "A phone app for pickers and checkers to scan products, split orders into parts and resume work where it stopped.",
-      "problem": "Pickers and checkers scan products with their phones in the middle of the warehouse, and the app has to know exactly where each order stopped.",
+      "summary": "A phone app for pickers and collectors to scan products, split orders into parts and resume work where it stopped.",
+      "problem": "Pickers and collectors scan products with their phones in the middle of the warehouse, and the app has to know exactly where each order stopped.",
       "how": [
         {
           "icon": "workflow",
@@ -146,7 +181,7 @@
         },
         {
           "icon": "clipboard-check",
-          "title": "About 40 tests",
+          "title": "About 50 tests",
           "body": "Duplicate keys, parts out of order, mismatched collection, repeated sector and final confirmation."
         },
         {
@@ -160,7 +195,42 @@
           "body": "Everyone always works with the same rules."
         }
       ],
-      "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer."
+      "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer.",
+      "role": "App built from scratch in 2024. In 2026 the flow was rewritten for orders split into parts, with the rules moved out of the screens and covered by tests.",
+      "facts": [
+        "three roles",
+        "two scanning modes",
+        "about 50 tests"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Camera and scanner, one set of rules",
+            "body": "Only the way of reading changes. The rules moved out of the screens into pure modules, so the two versions of the screen cannot drift apart on the rules."
+          },
+          {
+            "title": "Restarting does not delete right away",
+            "body": "The old process is only replaced when the new one is finished. Someone who gives up halfway through a restart loses nothing."
+          },
+          {
+            "title": "A mismatched item does not count",
+            "body": "The quantity the collector has to check ignores what came out mismatched in picking. Otherwise the count would never close."
+          },
+          {
+            "title": "Only the last 50 scans on screen",
+            "body": "The full batch lives outside the screen state, so the app stays light on basic phones."
+          }
+        ],
+        "incident": {
+          "title": "Old versions in the field",
+          "body": "When orders started being split into parts, anyone still on an old version of the app kept scanning with the old rules. Updating stopped being optional: on entry, the app compares its own version with the published one and only lets people work after updating, with the button going straight to the new installer."
+        },
+        "limits": [
+          "The part in progress only lives in the phone’s memory until it is finished: closing the app loses it. Next step: keep the part on the device.",
+          "Restarting deletes and saves in two calls, not in one transaction. Next step: a single route that replaces the part at once.",
+          "The camera and scanner screens are still duplicated, even with shared rules. Next step: one screen with a swappable way of reading."
+        ]
+      }
     }
   },
   {
