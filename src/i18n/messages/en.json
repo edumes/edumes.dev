@@ -198,6 +198,17 @@
         "body": "A continuous YouTube live stream from a folder of clips, shuffled without repeats until the cycle ends."
       },
       {
+        "name": "Segmentor",
+        "icon": "clap",
+        "stack": [
+          "Python",
+          "PyQt6",
+          "ffmpeg"
+        ],
+        "body": "Desktop app that shows one frame per minute of a long video and cuts the minutes you pick, wide or vertical 9:16, with the machine's hardware encoder (VideoToolbox or NVENC).",
+        "href": "https://github.com/edumes/Segmentor"
+      },
+      {
         "name": "Salário Contado",
         "icon": "circle-dollar-sign",
         "stack": [
