@@ -157,7 +157,8 @@
           "Next.js",
           "TypeScript"
         ],
-        "body": "Typing practice synced to the lyrics of the song that is playing."
+        "body": "Typing practice synced to the lyrics of the song that is playing: it finds the synced lyrics, plays the video behind the screen and scores speed and accuracy line by line.",
+        "href": "https://github.com/edumes/lyric-type"
       },
       {
         "name": "My Garden",
