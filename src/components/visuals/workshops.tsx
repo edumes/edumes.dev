@@ -12,9 +12,9 @@ const useCopy = defineCopy({
     shop: (name: string) => `Oficina ${name}`,
     window: (name: string) => `Oficina ${name}`,
     scope: {
-      label: 'Ilustração: três oficinas no mesmo sistema; quem entra por uma oficina vê só as ordens de serviço dela, e as outras ficam fechadas.',
-      session: 'Sessão',
-      noAccess: 'sem acesso'
+      label: 'Ilustração: três oficinas no mesmo sistema, cada uma com o próprio estoque e as próprias ordens de serviço.',
+      session: 'Oficina',
+      stock: (n: number) => `estoque: ${n} pneus`
     },
     leak: {
       title: 'Uma vendo a outra',
@@ -43,7 +43,7 @@ const useCopy = defineCopy({
       label:
         'Antes, dados num sistema antigo e diferenças de estoque sem aparecer; depois, todas as oficinas no mesmo sistema, cada uma com seus dados, e a contagem aponta as diferenças.',
       before: ['Dados num sistema antigo, com outra estrutura', 'Diferenças de estoque sem aparecer'],
-      ownData: '✓ só os seus dados',
+      ownData: '✓ dados por oficina',
       stockCount: 'Contagem de estoque',
       gaps: '⚠ 2 diferenças apontadas'
     }
@@ -53,9 +53,9 @@ const useCopy = defineCopy({
     shop: (name) => `${name} workshop`,
     window: (name) => name,
     scope: {
-      label: 'Illustration: three workshops on the same system; whoever signs in at one workshop sees only its work orders, and the others stay closed.',
-      session: 'Session',
-      noAccess: 'no access'
+      label: 'Illustration: three workshops on the same system, each with its own stock and its own work orders.',
+      session: 'Workshop',
+      stock: (n) => `stock: ${n} tires`
     },
     leak: {
       title: 'Seeing the others',
@@ -84,7 +84,7 @@ const useCopy = defineCopy({
       label:
         'Before, data in an old system and stock gaps nobody saw; after, every workshop on the same system with its own data, and the count points out the gaps.',
       before: ['Data in an old system with a different structure', 'Stock gaps nobody saw'],
-      ownData: '✓ only its own data',
+      ownData: '✓ data per workshop',
       stockCount: 'Stock count',
       gaps: '⚠ 2 gaps pointed out'
     }
@@ -96,9 +96,10 @@ const ORDERS: [string, string][][] = [
   [['OS 87', '175/70 R14'], ['OS 88', '195/60 R15']],
   [['OS 140', '205/55 R16'], ['OS 141', '185/65 R15']]
 ];
+const STOCK_TIRES = [42, 27, 35];
 const SCOPE = [1900, 1900, 1900];
 
-// The same system for every workshop, and each one signed in sees only its own work orders.
+// The same system for every workshop, each with its own stock and work orders, one in focus at a time.
 export function Workshops() {
   const c = useCopy();
   const t = c.scope;
@@ -118,16 +119,16 @@ export function Workshops() {
             const mine = k === step;
             return (
               <li key={shop} className="flex">
-                <Window title={c.window(shop)} icon="wrench" lit={mine} ghost={!mine} className="flex-1">
+                <Window title={c.window(shop)} icon="wrench" lit={mine} className="flex-1">
                   <ul className="grid gap-1">
                     {ORDERS[k].map(([os, size]) => (
-                      <li key={os} className={`morph rounded-sm border px-1.5 py-1 text-[0.625rem] leading-tight @md:text-xs ${mine ? 'border-border bg-background' : skeleton}`}>
+                      <li key={os} className="rounded-sm border border-border bg-background px-1.5 py-1 text-[0.625rem] leading-tight @md:text-xs">
                         <span className="font-semibold">{os}</span>
-                        <span className={`block font-mono @xl:ml-1.5 @xl:inline ${mine ? 'text-muted-foreground' : ''}`}>{size}</span>
+                        <span className="block font-mono text-muted-foreground @xl:ml-1.5 @xl:inline">{size}</span>
                       </li>
                     ))}
                   </ul>
-                  <p className={`morph mt-1.5 text-[0.625rem] text-muted-foreground @md:text-xs ${mine ? 'opacity-0' : ''}`}>{t.noAccess}</p>
+                  <p className="mt-1.5 text-[0.625rem] text-muted-foreground @md:text-xs">{t.stock(STOCK_TIRES[k])}</p>
                 </Window>
               </li>
             );

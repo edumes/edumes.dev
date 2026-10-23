@@ -38,7 +38,7 @@
         }
       ],
       "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente.",
-      "role": "App criado do zero em 2024. Em 2026, o fluxo foi reescrito para pedidos divididos em partes, com as regras fora das telas e cobertas por testes.",
+      "role": "App criado do zero em 2024, com a arquitetura, a publicação das versões e a revisão de código. Em 2026, o fluxo foi reescrito para pedidos divididos em partes, com as regras fora das telas e cobertas por testes.",
       "facts": [
         "três funções",
         "dois modos de leitura",
@@ -103,7 +103,7 @@
         }
       ],
       "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer.",
-      "role": "App built from scratch in 2024. In 2026 the flow was rewritten for orders split into parts, with the rules moved out of the screens and covered by tests.",
+      "role": "App built from scratch in 2024, including its architecture, releases and code review. In 2026 the flow was rewritten for orders split into parts, with the rules moved out of the screens and covered by tests.",
       "facts": [
         "three roles",
         "two scanning modes",
@@ -159,7 +159,7 @@
       "category": "Automação",
       "title": "Robôs que operam sistemas sem API, e um painel para comandá-los",
       "summary": "Uma plataforma multiempresa para distribuir, agendar e acompanhar robôs em estações Windows. Trabalhei na evolução do painel, da API e do agente, conectando a execução das automações ao acompanhamento da rotina fiscal e contábil.",
-      "role": "Atuação full stack na evolução de uma base existente: filas por estação, pendências por empresa e competência, distribuição de versões, permissões por departamento e integração de novos robôs.",
+      "role": "Atuação full stack na evolução de uma base existente, da arquitetura multiempresa à operação em produção, com contato direto com o cliente e revisão de código: filas por estação, pendências por empresa e competência, distribuição de versões, permissões por departamento e integração de novos robôs.",
       "facts": [
         "Painel React e TypeScript",
         "API e agente em Python",
@@ -307,7 +307,7 @@
       "category": "Automation",
       "title": "Robots that drive systems with no API, and a panel to command them",
       "summary": "A multi-tenant platform to distribute, schedule and monitor robots on Windows workstations. I worked on the web panel, API and agent, connecting automation execution with the tracking of recurring tax and accounting work.",
-      "role": "Full-stack work on an existing platform: workstation queues, pending work by company and reporting period, release distribution, department permissions and new robot integrations.",
+      "role": "Full-stack work on an existing platform, from the multi-tenant architecture to running it in production, working directly with the client and reviewing code: workstation queues, pending work by company and reporting period, release distribution, department permissions and new robot integrations.",
       "facts": [
         "React and TypeScript panel",
         "Python API and agent",
@@ -460,7 +460,9 @@
       "Node.js",
       "Express",
       "TypeScript",
-      "PostgreSQL"
+      "Knex",
+      "PostgreSQL",
+      "Puppeteer"
     ],
     "pt": {
       "slug": "rastreio-equipamentos",
@@ -470,32 +472,67 @@
       "problem": "A empresa compra, vende e conserta terminais de pagamento, e cada aparelho precisa bater com as notas de entrada e com o ERP.",
       "how": [
         {
-          "icon": "scan-text",
-          "title": "O serial é a identidade",
-          "body": "Entrada, venda, troca, manutenção e garantia viram movimentações do mesmo aparelho."
+          "icon": "hand-coins",
+          "title": "Venda e manutenções",
+          "body": "Venda com vários aparelhos, chave ativa, valor unitário e romaneio, e rotinas de manutenção interna e externa."
         },
         {
-          "icon": "database-backup",
-          "title": "Transações explícitas",
-          "body": "Registrar seriais, salvar uma venda ou excluir uma manutenção mexem em várias tabelas de uma vez."
+          "icon": "badge-alert",
+          "title": "Cancelar não apaga",
+          "body": "A exclusão vira uma movimentação cancelada no histórico do aparelho, com quem excluiu e por quê."
         },
         {
           "icon": "receipt-text",
-          "title": "Notas de entrada",
-          "body": "Importadas ou digitadas, com cancelamento e status próprio."
+          "title": "Nota manual com trava",
+          "body": "Só cancela se nenhum aparelho dela foi vendido ou entrou em manutenção."
         },
         {
-          "icon": "refresh-cw",
-          "title": "ERP e leitor",
-          "body": "Produtos sincronizados com o ERP em nuvem e seriais cadastrados em lote pelo código de barras."
+          "icon": "scan-text",
+          "title": "Leitura em sequência",
+          "body": "Na venda, o leitor bipa um aparelho atrás do outro sem fechar a janela."
         },
         {
           "icon": "file-chart-line",
-          "title": "Relatórios",
-          "body": "Venda, manutenção e rastreio por número de série."
+          "title": "Relatórios em PDF",
+          "body": "Venda, equipamentos, manutenção e rastreio por serial, gerados no servidor."
         }
       ],
-      "outcome": "Dá para responder onde está e por onde passou cada aparelho sem planilha paralela."
+      "outcome": "Dá para responder onde está e por onde passou cada aparelho sem planilha paralela.",
+      "role": "Entrada num sistema já em produção para conduzir a segunda fase, chamado a chamado: a arquitetura das rotinas novas, a publicação em produção e a revisão de código. A base e a sincronização com o ERP vieram da fase anterior.",
+      "facts": [
+        "dezenas de chamados em dois meses",
+        "dez tipos de movimentação",
+        "quatro relatórios em PDF"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Excluir não apaga a história",
+            "body": "Excluir uma manutenção grava um registro de exclusão com uma cópia legível do que foi excluído (empresa, fabricante, serial e cliente, não só IDs), e a movimentação do aparelho vira cancelada. O histórico continua contando a verdade, e o registro continua legível mesmo se o cadastro mudar depois."
+          },
+          {
+            "title": "Nota manual só cancela se nada dela andou",
+            "body": "Antes de cancelar, as linhas dos aparelhos ficam travadas (FOR UPDATE), e o cancelamento é recusado se algum já foi vendido ou entrou em manutenção. A justificativa é obrigatória, e quem, quando e por quê ficam gravados."
+          },
+          {
+            "title": "Leitura contínua na venda",
+            "body": "Depois de confirmar um aparelho, a janela limpa e espera o próximo, em vez de fechar. Cadastrar um lote vira bipar em sequência."
+          },
+          {
+            "title": "PDF a partir de HTML, no servidor",
+            "body": "Os relatórios são templates HTML renderizados com Puppeteer, com o mesmo layout na tela e no papel."
+          }
+        ],
+        "incident": {
+          "title": "Manutenções antigas sem elo com o histórico",
+          "body": "As manutenções antigas não tinham o identificador de transação que liga a manutenção às movimentações do aparelho, porque ele foi criado depois. Excluir uma delas não achava o histórico para atualizar. A correção procura as movimentações pelo motivo e pelos seriais da manutenção, grava o identificador nelas e só então registra a exclusão, tudo na mesma transação."
+        },
+        "limits": [
+          "Achar as movimentações antigas é uma heurística: motivo e serial, a mais recente.",
+          "Manutenção interna e externa repetem a mesma lógica em dois lugares.",
+          "O sistema não tem testes automatizados. Próximo passo: cobrir com testes as transações de cancelamento e exclusão."
+        ]
+      }
     },
     "en": {
       "slug": "equipment-tracking",
@@ -505,32 +542,67 @@
       "problem": "The company buys, sells and repairs payment terminals, and every device has to match the purchase invoices and the ERP.",
       "how": [
         {
-          "icon": "scan-text",
-          "title": "The serial is the identity",
-          "body": "Receiving, sale, swap, repair and warranty become movements of the same device."
+          "icon": "hand-coins",
+          "title": "Sales and repairs",
+          "body": "Sales of several devices with an active key, unit price and packing list, plus internal and external repair routines."
         },
         {
-          "icon": "database-backup",
-          "title": "Explicit transactions",
-          "body": "Registering serials, saving a sale or deleting a repair touch several tables at once."
+          "icon": "badge-alert",
+          "title": "Cancelling keeps the history",
+          "body": "A deletion becomes a cancelled movement in the device's history, with who deleted it and why."
         },
         {
           "icon": "receipt-text",
-          "title": "Purchase invoices",
-          "body": "Imported or typed in, with cancellation and their own status."
+          "title": "Manual invoices with a lock",
+          "body": "One can only be cancelled if none of its devices was sold or sent to repair."
         },
         {
-          "icon": "refresh-cw",
-          "title": "ERP and scanner",
-          "body": "Products synced with the cloud ERP and serials registered in bulk from the barcode."
+          "icon": "scan-text",
+          "title": "Scanning in sequence",
+          "body": "In a sale, the scanner reads one device after another without closing the dialog."
         },
         {
           "icon": "file-chart-line",
-          "title": "Reports",
-          "body": "Sales, repairs and tracking by serial number."
+          "title": "PDF reports",
+          "body": "Sales, equipment, repairs and tracking by serial, rendered on the server."
         }
       ],
-      "outcome": "Where each device is and where it has been can be answered without a side spreadsheet."
+      "outcome": "Where each device is and where it has been can be answered without a side spreadsheet.",
+      "role": "Joined a system already in production to lead its second phase, ticket by ticket: the architecture of the new routines, production releases and code review. The foundation and the ERP sync came from the earlier phase.",
+      "facts": [
+        "dozens of tickets in two months",
+        "ten movement types",
+        "four PDF reports"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Deleting keeps the history",
+            "body": "Deleting a repair writes a deletion record with a readable copy of what was deleted (company, manufacturer, serial and customer, not just IDs), and the device's movement becomes cancelled. The history keeps telling the truth, and the record stays readable even if the master data changes later."
+          },
+          {
+            "title": "A manual invoice only cancels if nothing on it moved",
+            "body": "Before cancelling, the device rows are locked (FOR UPDATE), and the cancellation is refused if any device was already sold or sent to repair. A reason is required, and who, when and why are stored."
+          },
+          {
+            "title": "Continuous scanning in a sale",
+            "body": "After a device is confirmed, the dialog clears and waits for the next one instead of closing. Registering a batch becomes scanning in sequence."
+          },
+          {
+            "title": "PDF from HTML, on the server",
+            "body": "Reports are HTML templates rendered with Puppeteer, with the same layout on screen and on paper."
+          }
+        ],
+        "incident": {
+          "title": "Old repairs with no link to the history",
+          "body": "Older repairs had no transaction id linking the repair to the device's movements, because the id came later. Deleting one of them could not find the history to update. The fix finds the movements by the repair's reason and serials, writes the id onto them and only then logs the deletion, all in the same transaction."
+        },
+        "limits": [
+          "Finding the old movements is a heuristic: reason and serial, the most recent one.",
+          "Internal and external repairs repeat the same logic in two places.",
+          "The system has no automated tests. Next step: cover the cancellation and deletion transactions with tests."
+        ]
+      }
     }
   },
   {
@@ -990,12 +1062,12 @@
         {
           "icon": "badge-alert",
           "title": "Exceções primeiro",
-          "body": "Cancelamento e descarte encerram antes de qualquer conferência."
+          "body": "Cancelamento e remessa encerram antes do checklist."
         },
         {
           "icon": "clipboard-check",
           "title": "Checklist",
-          "body": "Cerca de dez itens, e cada um grava se passou, falhou ou foi pulado."
+          "body": "Doze itens, e cada um grava se passou, falhou ou foi pulado. Nota já lançada à mão é descartada, sem virar inconsistência."
         },
         {
           "icon": "file-check",
@@ -1003,12 +1075,50 @@
           "body": "A nota sai com o motivo para quem vai tratar, não só com um status."
         },
         {
-          "icon": "wrench",
-          "title": "Regras de casos reais",
-          "body": "Como saldo de pedido e fornecedor validado pelo emitente da nota."
+          "icon": "users",
+          "title": "Aprovação por alçadas",
+          "body": "Individual ou em lote, com prazo mínimo de vencimento, reprovação automática fora do prazo e e-mail diário com o que espera aprovação."
         }
       ],
-      "outcome": "A triagem passou a acontecer na entrada, e o time fiscal só olha o que falhou, já com o motivo."
+      "outcome": "A triagem passou a acontecer na entrada, e o time fiscal só olha o que falhou, já com o motivo.",
+      "role": "O validador e o fluxo de aprovação que vem depois dele, dentro de um sistema grande mantido por várias pessoas: a arquitetura dessas partes e a sustentação delas em produção.",
+      "facts": [
+        "doze itens no checklist",
+        "cinco destinos finais",
+        "centenas de testes"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Pulado não é reprovado",
+            "body": "Uma etapa que depende de outra que falhou fica pulada. Sem pedido de compra ou contrato identificado, as etapas que dependem dele nem consultam o ERP."
+          },
+          {
+            "title": "Um motivo em vez de seis",
+            "body": "Os motivos são gravados em cascata: quem trata a nota vê a causa raiz, não a lista de tudo o que ela derrubou. A regra vale em duas camadas, de propósito, e um teste cobre a segunda."
+          },
+          {
+            "title": "Saldo desconhecido não reprova",
+            "body": "Se a integração não devolve dados suficientes para calcular o saldo, a validação fica pulada com o motivo registrado. Indisponibilidade não é saldo insuficiente."
+          },
+          {
+            "title": "Duplicidade é descarte, não problema",
+            "body": "Uma nota que já foi lançada à mão é descartada, sem ir para a fila de inconsistências. Uma nota reenviada com o XML corrigido passa de novo pelo fluxo inteiro."
+          },
+          {
+            "title": "Depois do checklist, a aprovação",
+            "body": "Aprovação por alçadas, individual ou em lote, com prazo mínimo de vencimento; reprovação automática fora do prazo e e-mail diário com o que espera aprovação."
+          }
+        ],
+        "incident": {
+          "title": "Saldo calculado com o preço errado",
+          "body": "O saldo do pedido era calculado com o preço unitário, e não com o preço que forma o total, e itens sem preço ficavam de fora da conta. O saldo saía menor do que o real, e notas que o pedido comportava eram reprovadas. A correção usa o preço líquido, arredonda para centavos e, se algum item não tem preço, pula a validação com o motivo, em vez de reprovar."
+        },
+        "limits": [
+          "Documento de transporte ainda não segue o fluxo automático.",
+          "O saldo custa uma chamada por item do pedido, por isso é calculado só para a referência escolhida."
+        ]
+      }
     },
     "en": {
       "slug": "invoice-checklist",
@@ -1025,12 +1135,12 @@
         {
           "icon": "badge-alert",
           "title": "Exceptions first",
-          "body": "Cancellations and discards stop before any check runs."
+          "body": "Cancellations and shipment-only invoices end before the checklist."
         },
         {
           "icon": "clipboard-check",
           "title": "Checklist",
-          "body": "About ten items, each recording whether it passed, failed or was skipped."
+          "body": "Twelve items, each recording whether it passed, failed or was skipped. An invoice already posted by hand is discarded, not flagged."
         },
         {
           "icon": "file-check",
@@ -1038,12 +1148,50 @@
           "body": "Each invoice leaves with the reason for whoever handles it, not just a status."
         },
         {
-          "icon": "wrench",
-          "title": "Rules from real cases",
-          "body": "Such as order balance and supplier validated by the invoice issuer."
+          "icon": "users",
+          "title": "Approval by level",
+          "body": "One by one or in bulk, with a minimum time to due date, automatic rejection outside it and a daily e-mail with what is waiting."
         }
       ],
-      "outcome": "Triage now happens on arrival, and the tax team only looks at what failed, reason included."
+      "outcome": "Triage now happens on arrival, and the tax team only looks at what failed, reason included.",
+      "role": "The validator and the approval flow that follows it, inside a large system maintained by several people: the architecture of those parts and keeping them running in production.",
+      "facts": [
+        "twelve checklist items",
+        "five final destinations",
+        "hundreds of tests"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Skipped is not failed",
+            "body": "A step that depends on one that failed is skipped. With no purchase order or contract found, the steps that depend on it don't even call the ERP."
+          },
+          {
+            "title": "One reason instead of six",
+            "body": "Reasons are stored as a cascade: whoever handles the invoice sees the root cause, not a list of everything it knocked over. The rule holds in two layers on purpose, and a test covers the second."
+          },
+          {
+            "title": "An unknown balance doesn't fail",
+            "body": "If the integration doesn't return enough data to compute the balance, the check is skipped with the reason stored. Being unavailable is not the same as not having enough balance."
+          },
+          {
+            "title": "A duplicate is discarded, not flagged",
+            "body": "An invoice already posted by hand is discarded without going to the issues queue. An invoice sent again with a corrected XML goes through the whole flow again."
+          },
+          {
+            "title": "After the checklist, approval",
+            "body": "Approval by level, one by one or in bulk, with a minimum time to due date; automatic rejection outside it and a daily e-mail with what is waiting for approval."
+          }
+        ],
+        "incident": {
+          "title": "Balance computed with the wrong price",
+          "body": "The order balance was computed from the unit price, not the price that makes up the total, and items with no price were left out. The balance came out lower than it was, and invoices the order could cover were rejected. The fix uses the net price, rounds to cents and, if an item has no price, skips the check with the reason instead of rejecting."
+        },
+        "limits": [
+          "Transport documents don't follow the automatic flow yet.",
+          "The balance costs one call per order item, so it is only computed for the chosen reference."
+        ]
+      }
     }
   },
   {
@@ -1061,13 +1209,13 @@
       "slug": "gestao-oficinas",
       "category": "Sistemas de gestão",
       "title": "Ordens de serviço e estoque para uma rede de oficinas",
-      "summary": "Cada oficina vê só o que é dela, e a contagem de estoque aponta onde o número não bate.",
+      "summary": "Cada oficina com o próprio estoque e as próprias ordens de serviço, e a contagem de estoque aponta onde o número não bate.",
       "problem": "Uma rede de oficinas de pneus precisava de ordens de serviço e estoque por unidade, com a equipe de campo no celular e dados vindos de um sistema antigo.",
       "how": [
         {
-          "icon": "shield-check",
-          "title": "Escopo por oficina",
-          "body": "Cada unidade vê apenas as próprias ordens de serviço."
+          "icon": "layers",
+          "title": "Dados por oficina",
+          "body": "Estoque e ordens de serviço separados por unidade."
         },
         {
           "icon": "search",
@@ -1090,19 +1238,45 @@
           "body": "Tabelas do sistema antigo levadas para a nova estrutura, com as sequências reajustadas."
         }
       ],
-      "outcome": "As oficinas passaram a trabalhar no mesmo sistema, cada uma com seus dados, e as diferenças de estoque aparecem na contagem."
+      "outcome": "As oficinas passaram a trabalhar no mesmo sistema, cada uma com seus dados, e as diferenças de estoque aparecem na contagem.",
+      "role": "Desenvolvimento principal no primeiro semestre de 2024, sobre uma base de CRUD já existente: a arquitetura do domínio de pneus e oficinas, o app Android, a migração do sistema antigo e o deploy, com contato direto com o cliente e revisão de código.",
+      "facts": [
+        "cerca de dez tabelas migradas",
+        "um app Android",
+        "relatórios de estoque e de OS"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Contagem como registro, não como sobrescrita",
+            "body": "Cada contagem é gravada com a sequência do dia, por medida e por oficina, e a diferença aparece contra o esperado."
+          },
+          {
+            "title": "Migração por script, tabela por tabela",
+            "body": "As sequências são reajustadas no fim, para os cadastros novos não colidirem com os IDs que vieram do sistema antigo."
+          }
+        ],
+        "incident": {
+          "title": "Divergências que não existiam",
+          "body": "A tela de contagem comparava o que foi contado com apenas a primeira página do estoque e mostrava divergências que não existiam. A correção carregou o estoque inteiro."
+        },
+        "limits": [
+          "O filtro por oficina fica no app, e o servidor recebe a oficina pela requisição. Próximo passo: prender a oficina ao usuário logado, no servidor.",
+          "A comparação da contagem carrega tudo no navegador. O certo seria fazer no servidor."
+        ]
+      }
     },
     "en": {
       "slug": "workshop-management",
       "category": "Business systems",
       "title": "Work orders and stock for a network of workshops",
-      "summary": "Each workshop sees only its own data, and stock counts point out where the numbers don't match.",
+      "summary": "Each workshop with its own stock and work orders, and stock counts point out where the numbers don't match.",
       "problem": "A network of tire workshops needed work orders and stock per location, with a field team on their phones and data coming from an old system.",
       "how": [
         {
-          "icon": "shield-check",
-          "title": "Per-workshop scope",
-          "body": "Each location sees only its own work orders."
+          "icon": "layers",
+          "title": "Data per workshop",
+          "body": "Stock and work orders kept separate for each location."
         },
         {
           "icon": "search",
@@ -1125,7 +1299,33 @@
           "body": "The old system's tables moved to the new structure, with sequences reset."
         }
       ],
-      "outcome": "The workshops now work in the same system, each with its own data, and stock differences show up in the count."
+      "outcome": "The workshops now work in the same system, each with its own data, and stock differences show up in the count.",
+      "role": "Lead development in the first half of 2024, on an existing CRUD foundation: the architecture of the tire and workshop domain, the Android app, the migration from the old system and the deploy, working directly with the client and reviewing code.",
+      "facts": [
+        "about ten tables migrated",
+        "one Android app",
+        "stock and work order reports"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Counts are records, not overwrites",
+            "body": "Each count is stored with the day's sequence, per size and per workshop, and the gap shows against what was expected."
+          },
+          {
+            "title": "Migration by script, table by table",
+            "body": "Sequences are reset at the end, so new records don't collide with the IDs that came from the old system."
+          }
+        ],
+        "incident": {
+          "title": "Gaps that didn't exist",
+          "body": "The count screen compared what was counted with only the first page of stock and showed gaps that didn't exist. The fix loaded the whole stock."
+        },
+        "limits": [
+          "The workshop filter lives in the app, and the server takes the workshop from the request. Next step: tie the workshop to the signed-in user, on the server.",
+          "The count comparison loads everything in the browser. It belongs on the server."
+        ]
+      }
     }
   },
   {
@@ -1136,78 +1336,137 @@
       "React",
       "Node.js",
       "Express",
+      "Fastify",
       "PostgreSQL",
       "Omie API"
     ],
     "pt": {
       "slug": "financeiro-erp",
       "category": "Integrações",
-      "title": "Contas a pagar sincronizadas com um ERP em nuvem",
-      "summary": "Um painel financeiro para várias empresas de um grupo, com títulos agrupados por nota e sincronização com o ERP.",
-      "problem": "O financeiro de várias empresas de um grupo lançava contas num ERP em nuvem, com cadastros espalhados e uma API com limites e lentidão.",
+      "title": "Contas a pagar e pedidos de venda num ERP em nuvem",
+      "summary": "Um painel financeiro para várias empresas de um grupo e um coletor de pedidos de venda, dois sistemas integrados a um ERP em nuvem.",
+      "problem": "O financeiro de várias empresas de um grupo lançava contas num ERP em nuvem, com cadastros espalhados e uma API com limites e lentidão. Em outro sistema, os pedidos de venda precisavam ser criados e editados direto no ERP.",
       "how": [
         {
           "icon": "refresh-cw",
-          "title": "Sincronização por empresa",
-          "body": "Categorias, contas bancárias, clientes, fornecedores, ordens de serviço e contratos."
-        },
-        {
-          "icon": "layers",
-          "title": "Lotes de 50",
-          "body": "Consultas ao ERP em lotes, com pausa entre eles, para respeitar os limites da API."
+          "title": "Uma camada para o ERP",
+          "body": "Todas as chamadas à API do ERP passam por uma camada só, por empresa."
         },
         {
           "icon": "receipt-text",
-          "title": "Agrupados por nota",
-          "body": "Baixa e estorno de títulos refletidos no ERP."
+          "title": "Lançamento em lote",
+          "body": "Contas a pagar lançadas em lote na API do ERP, com desconto, em vez de uma chamada por conta."
         },
         {
           "icon": "shield-check",
           "title": "Sem duplicidade",
-          "body": "Checagem antes da baixa, e exclusão de agrupamento só com justificativa registrada."
+          "body": "Antes da baixa, o painel confere se um registro igual já existe no ERP."
         },
         {
-          "icon": "file-chart-line",
-          "title": "Painéis",
-          "body": "Recebimentos e saídas de contas a pagar."
+          "icon": "badge-alert",
+          "title": "Excluir exige motivo",
+          "body": "A exclusão de um agrupamento pede justificativa e fica numa tela de registro."
+        },
+        {
+          "icon": "hand-coins",
+          "title": "Pedidos de venda",
+          "body": "No coletor, pedidos criados e editados direto no ERP, e documentos gerados de modelos .docx por empresa, em PDF e por e-mail."
         }
       ],
-      "outcome": "Os lançamentos passaram a nascer no painel e chegar ao ERP sem retrabalho, com registro de quem excluiu o quê e por quê."
+      "outcome": "Os lançamentos passaram a nascer no painel e chegar ao ERP sem retrabalho, com registro de quem excluiu o quê e por quê. No coletor, os pedidos nascem no ERP e os documentos saem prontos do modelo de cada empresa.",
+      "role": "Parte de uma equipe num painel financeiro para várias empresas de um grupo, com a integração com o ERP e o que protege o lançamento; e, num segundo sistema, os pedidos de venda criados e editados direto no ERP. Nessas partes: a arquitetura, o contato com o cliente, a publicação em produção e a revisão de código.",
+      "facts": [
+        "dois sistemas",
+        "várias empresas por sistema",
+        "documentos de modelos por empresa"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Lançamento em lote",
+            "body": "As contas a pagar vão para a API do ERP em lote, em vez de uma chamada por conta, o que pesa menos numa API lenta e com limite."
+          },
+          {
+            "title": "Excluir exige motivo",
+            "body": "A exclusão de um agrupamento pede justificativa e fica numa tela de registro, com quem excluiu, quando e por quê."
+          },
+          {
+            "title": "Documento de modelo editável",
+            "body": "Pedidos e comprovantes saem de modelos .docx por empresa, convertidos em PDF e enviados por e-mail. Quem ajusta o layout não precisa de desenvolvedor."
+          }
+        ],
+        "incident": {
+          "title": "Tempo limite que virava duplicata",
+          "body": "As chamadas ao ERP estouravam o tempo limite com o ERP ainda processando, e a nova tentativa criava o mesmo agrupamento duas vezes. A correção aumentou o tempo limite e passou a checar se um registro igual já existe antes de gravar."
+        },
+        "limits": [
+          "A checagem de duplicidade compara o registro inteiro, então um campo diferente deixa a duplicata passar. Próximo passo: uma chave de idempotência por agrupamento."
+        ]
+      }
     },
     "en": {
       "slug": "finance-erp",
       "category": "Integrations",
-      "title": "Accounts payable in sync with a cloud ERP",
-      "summary": "A finance panel for several companies in a group, with bills grouped by invoice and synced with the ERP.",
-      "problem": "The finance team of several companies in one group posted bills in a cloud ERP, with scattered master data and a slow, rate-limited API.",
+      "title": "Accounts payable and sales orders in a cloud ERP",
+      "summary": "A finance panel for several companies in a group and a sales order collector, two systems integrated with a cloud ERP.",
+      "problem": "The finance team of several companies in one group posted bills in a cloud ERP, with scattered master data and a slow, rate-limited API. In another system, sales orders had to be created and edited straight in the ERP.",
       "how": [
         {
           "icon": "refresh-cw",
-          "title": "Per-company sync",
-          "body": "Categories, bank accounts, customers, suppliers, work orders and contracts."
-        },
-        {
-          "icon": "layers",
-          "title": "Batches of 50",
-          "body": "ERP queries in batches with a pause between them, to respect the API limits."
+          "title": "One layer for the ERP",
+          "body": "Every call to the ERP's API goes through a single layer, per company."
         },
         {
           "icon": "receipt-text",
-          "title": "Grouped by invoice",
-          "body": "Settling and reversing bills is reflected in the ERP."
+          "title": "Batch posting",
+          "body": "Bills posted in batches through the ERP's API, with discounts, instead of one call per bill."
         },
         {
           "icon": "shield-check",
           "title": "No duplicates",
-          "body": "A check before settling, and group deletion only with a recorded justification."
+          "body": "Before settling, the panel checks whether a matching record already exists in the ERP."
         },
         {
-          "icon": "file-chart-line",
-          "title": "Dashboards",
-          "body": "Incoming payments and outgoing payables."
+          "icon": "badge-alert",
+          "title": "Deleting takes a reason",
+          "body": "Deleting a group asks for a reason and lands on a log screen."
+        },
+        {
+          "icon": "hand-coins",
+          "title": "Sales orders",
+          "body": "In the collector, orders are created and edited straight in the ERP, and documents are generated from each company's .docx templates, as PDF and by e-mail."
         }
       ],
-      "outcome": "Entries now start in the panel and reach the ERP without rework, with a record of who deleted what and why."
+      "outcome": "Entries now start in the panel and reach the ERP without rework, with a record of who deleted what and why. In the collector, orders start in the ERP and documents come out ready from each company's template.",
+      "role": "Part of a team on a finance panel for several companies in a group, owning the ERP integration and what protects each posting; and, in a second system, the sales orders created and edited straight in the ERP. In those parts: the architecture, working with the client, production releases and code review.",
+      "facts": [
+        "two systems",
+        "several companies per system",
+        "documents from per-company templates"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Batch posting",
+            "body": "Bills go to the ERP's API in batches instead of one call per bill, which weighs less on a slow, rate-limited API."
+          },
+          {
+            "title": "Deleting takes a reason",
+            "body": "Deleting a group asks for a reason and lands on a log screen with who deleted it, when and why."
+          },
+          {
+            "title": "Editable document templates",
+            "body": "Orders and receipts come from each company's .docx templates, converted to PDF and sent by e-mail. Changing the layout doesn't need a developer."
+          }
+        ],
+        "incident": {
+          "title": "A timeout that became a duplicate",
+          "body": "Calls to the ERP hit the timeout while the ERP was still processing, and the retry created the same group twice. The fix raised the timeout and added a check for a matching record before writing."
+        },
+        "limits": [
+          "The duplicate check compares the whole record, so one different field lets a duplicate through. Next step: an idempotency key per group."
+        ]
+      }
     }
   }
 ]

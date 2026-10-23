@@ -1,7 +1,9 @@
 'use client';
 
+import { Fragment } from 'react';
 import { defineCopy } from '@/i18n/copy';
-import { BeforeAfter, Log, Pains, skeleton, Stage, tone, Trap, Traps, useLoop, Window, Wire } from './shared';
+import type { IconName } from '../icon';
+import { BeforeAfter, Log, Pains, scenarios, skeleton, Stage, Tabs, tone, Trap, Traps, useLoop, Window, Wire, type WireState } from './shared';
 
 // Finance and cloud ERP case visuals. Every value on screen is made up; each one loops on its own while visible.
 
@@ -37,15 +39,14 @@ const useCopy = defineCopy({
       rows: [['Empresa A', 'Combustível'], ['Empresa B', 'Combustiveis'], ['Empresa C', 'Despesas gerais']] as [string, string][]
     },
     how: {
-      label: 'Ilustração: a sincronização de cada empresa com o ERP vai em lotes de 50, com uma pausa entre eles, e o uso da API fica sempre abaixo do limite.',
-      panel: 'Painel · Empresa A',
-      entities: ['Categorias', 'Contas bancárias', 'Clientes', 'Fornecedores', 'Ordens de serviço', 'Contratos'],
-      batches: 'Lotes de 50',
-      done: '✓ 200 registros, nenhum 429',
-      pausing: 'pausa antes do próximo lote…',
-      sending: 'enviando…',
-      erp: 'ERP em nuvem',
-      synced: '✓ sincronizado'
+      label:
+        'Ilustração: no painel financeiro, um título agrupado passa pela checagem de duplicidade antes da baixa no ERP, e excluir um agrupamento exige motivo e fica registrado; no coletor, um pedido de venda é criado no ERP e vira um PDF a partir do modelo da empresa, enviado por e-mail.',
+      tabs: ['Painel financeiro', 'Coletor de pedidos'],
+      // [stage, what it shows], one list per scenario, in the order of HOW_ICONS.
+      flows: [
+        [['Título agrupado', 'NF 1234 · 3 títulos'], ['Checagem', '✓ nenhum igual no ERP'], ['ERP em nuvem', '✓ baixado'], ['Exclusão', 'só com motivo, e fica registrada']],
+        [['Pedido de venda', 'PV 0815 · 3 itens'], ['ERP em nuvem', '✓ criado e editado no ERP'], ['Modelo .docx', 'modelo da Empresa A'], ['PDF', '✓ enviado por e-mail']]
+      ] as [string, string][][]
     },
     result: {
       label:
@@ -90,15 +91,13 @@ const useCopy = defineCopy({
       rows: [['Company A', 'Fuel'], ['Company B', 'Fuels'], ['Company C', 'General expenses']]
     },
     how: {
-      label: 'Illustration: each company’s sync with the ERP goes in batches of 50 with a pause between them, and API usage always stays under the limit.',
-      panel: 'Panel · Company A',
-      entities: ['Categories', 'Bank accounts', 'Customers', 'Suppliers', 'Work orders', 'Contracts'],
-      batches: 'Batches of 50',
-      done: '✓ 200 records, no 429',
-      pausing: 'pausing before the next batch…',
-      sending: 'sending…',
-      erp: 'Cloud ERP',
-      synced: '✓ in sync'
+      label:
+        'Illustration: in the finance panel, a grouped bill goes through a duplicate check before it is settled in the ERP, and deleting a group takes a reason and is logged; in the collector, a sales order is created in the ERP and becomes a PDF from the company’s template, sent by e-mail.',
+      tabs: ['Finance panel', 'Order collector'],
+      flows: [
+        [['Grouped bill', 'Invoice 1234 · 3 bills'], ['Check', '✓ no match in the ERP'], ['Cloud ERP', '✓ settled'], ['Deletion', 'only with a reason, and logged']],
+        [['Sales order', 'SO 0815 · 3 items'], ['Cloud ERP', '✓ created and edited in the ERP'], ['.docx template', "Company A's template"], ['PDF', '✓ sent by e-mail']]
+      ]
     },
     result: {
       label:
@@ -227,59 +226,36 @@ export function FinanceTraps() {
   );
 }
 
-// How it works: the per-company sync goes to the ERP in batches of 50 with a pause between them, so the API's limit
-// is never reached. Steps: reset, then batch and pause in turn, then hold.
-const BATCH = [600, 700, 500, 700, 500, 700, 500, 700, 2400];
+// How it works, in two scenarios. The finance panel: a grouped bill is checked for a duplicate before it is settled in
+// the ERP, and deleting a group takes a reason. The collector: a sales order goes to the ERP and comes back as a PDF
+// from the company's template. Phases: one per stage, then hold.
+const HOW = scenarios([
+  [[0, 700], [1, 900], [2, 900], [3, 1100], [4, 2200]],
+  [[0, 700], [1, 900], [2, 900], [3, 1100], [4, 2200]]
+]);
+const HOW_ICONS: IconName[][] = [
+  ['receipt-text', 'shield-check', 'cloud-cog', 'badge-alert'],
+  ['hand-coins', 'cloud-cog', 'file-text', 'send']
+];
 
 export function FinanceHow() {
   const t = useCopy().how;
-  const { ref, step } = useLoop(BATCH);
-  const sending = step % 2 === 1 && step < 8;
-  const pausing = step % 2 === 0 && step > 0 && step < 8;
-  const done = step === 8;
+  const { ref, step, on, inView } = useLoop(HOW.durations, 4);
+  const { s, p } = HOW.steps[step];
+  const wire = (from: number): WireState => (p < from ? 'idle' : p === from ? 'live' : 'done');
 
   return (
     <div ref={ref} role="img" aria-label={t.label}>
+      <Tabs labels={t.tabs} s={s} total={HOW.totals[s]} on={on} inView={inView} />
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="wallet" title={t.panel} active={step === 0} className="lg:w-52">
-          <ul className="flex flex-wrap gap-1">
-            {t.entities.map((e) => (
-              <li key={e} className="rounded-sm bg-secondary px-1.5 py-0.5 text-secondary-foreground">
-                {e}
-              </li>
-            ))}
-          </ul>
-        </Stage>
-        <Wire key={sending ? `l${step}` : 'w'} state={sending ? 'live' : step > 0 ? 'done' : 'idle'} />
-        <div className={`morph flex gap-3 rounded-md border border-border bg-card p-3 text-card-foreground lg:flex-1 ${sending ? 'lit' : ''}`}>
-          <div className="flex-1">
-            <p className="text-[0.8125rem] font-semibold font-stretch-104%">{t.batches}</p>
-            <ul className="mt-2 grid grid-cols-4 gap-1.5">
-              {[0, 1, 2, 3].map((k) => {
-                const state = step > 2 * k + 1 ? 'done' : step === 2 * k + 1 ? 'live' : 'idle';
-                return (
-                  <li key={k} className={`morph rounded-sm border py-1.5 text-center font-mono text-xs ${state === 'done' ? tone.ok : state === 'live' ? `${tone.ok} lit` : 'border-dashed border-border text-muted-foreground'}`}>
-                    50
-                  </li>
-                );
-              })}
-            </ul>
-            <p className={`morph mt-2 text-xs ${pausing ? 'text-foreground' : done ? 'text-foreground' : 'text-muted-foreground'}`}>
-              {done ? t.done : pausing ? t.pausing : t.sending}
-            </p>
-          </div>
-          <div className="flex w-10 flex-col items-center">
-            <span className="relative block h-full min-h-20 w-3 overflow-hidden rounded-full bg-border">
-              <span className="absolute inset-x-0 top-[15%] border-t border-dashed border-destructive" />
-              <span className="absolute inset-x-0 bottom-0 bg-primary transition-[height] duration-500 ease-out" style={{ height: sending ? '70%' : '12%' }} />
-            </span>
-            <span className="mt-1 text-[0.625rem] leading-tight text-muted-foreground">API</span>
-          </div>
-        </div>
-        <Wire key={step === 7 ? 'erp7' : 'erp'} state={step === 7 ? 'live' : done ? 'done' : 'idle'} />
-        <Stage icon="cloud-cog" title={t.erp} active={step === 7 || done} className="lg:w-40">
-          <p className={done ? '' : 'text-muted-foreground'}>{done ? t.synced : '—'}</p>
-        </Stage>
+        {t.flows[s].map(([title, body], k) => (
+          <Fragment key={title}>
+            {k > 0 && <Wire state={wire(k)} />}
+            <Stage icon={HOW_ICONS[s][k]} title={title} active={p === k} className="lg:flex-1">
+              <p className={`morph ${p >= k ? '' : 'text-transparent'}`}>{body}</p>
+            </Stage>
+          </Fragment>
+        ))}
       </div>
     </div>
   );

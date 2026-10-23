@@ -12,13 +12,14 @@ const useCopy = defineCopy({
   pt: {
     lifecycle: {
       label:
-        'Ilustração: o número de série de um terminal passa por entrada, estoque, venda, manutenção, devolução e garantia, e cada passagem vira histórico do mesmo aparelho.',
+        'Ilustração: o número de série de um terminal passa por entrada, estoque, venda, manutenção, devolução e garantia, e cada passagem vira histórico do mesmo aparelho. Uma manutenção lançada em dobro foi excluída: ela continua no histórico como cancelada, com a exclusão registrada.',
       // [stop, note], in the order of STOP_ICONS.
       stops: [
         ['Entrada', '03/02, nota 1234'],
         ['Estoque', '03/02'],
         ['Venda', '10/02, chave ativa'],
         ['Manutenção', '02/05, bateria'],
+        ['Cancelada', '03/05, exclusão registrada'],
         ['Devolvido', '15/05'],
         ['Garantia', 'até 10/02/27']
       ] as [string, string][]
@@ -42,13 +43,13 @@ const useCopy = defineCopy({
     },
     how: {
       label:
-        'Ilustração: os seriais de uma nota de entrada são lidos em sequência pelo código de barras e gravados em seriais, movimentações e estoque numa só transação; cada aparelho ganha o primeiro registro no histórico.',
-      invoice: 'Nota 1234: 5 terminais',
-      scanning: 'leitura contínua do código de barras',
-      transaction: 'Uma transação explícita',
-      tables: ['Seriais', 'Movimentações', 'Estoque'],
+        'Ilustração: numa venda, os terminais são bipados um atrás do outro sem fechar a janela, e venda, movimentações e estoque são gravados numa só transação; cada aparelho ganha a venda no histórico.',
+      sale: 'Venda 0815: 5 terminais',
+      scanning: 'leitura em sequência, sem fechar a janela',
+      transaction: 'Uma transação',
+      tables: ['Venda', 'Movimentações', 'Estoque'],
       history: 'Histórico de cada aparelho',
-      received: 'entrada pela nota 1234',
+      received: 'vendido na venda 0815',
       more: '+ 2 aparelhos'
     },
     result: {
@@ -56,18 +57,19 @@ const useCopy = defineCopy({
       // One per serial in SHEET.
       sheet: ['Estoque', 'Vendido?', '?'],
       found: 'Com o cliente, em garantia até 10/02/27',
-      history: ['10/02 venda, chave ativa', '02/05 manutenção interna', '15/05 devolvido ao cliente']
+      history: ['10/02 venda, chave ativa', '02/05 manutenção interna', '03/05 manutenção cancelada', '15/05 devolvido ao cliente']
     }
   },
   en: {
     lifecycle: {
       label:
-        'Illustration: a terminal’s serial number goes through receiving, stock, sale, repair, return and warranty, and each stop becomes history of the same device.',
+        'Illustration: a terminal’s serial number goes through receiving, stock, sale, repair, return and warranty, and each stop becomes history of the same device. A repair entered twice was deleted: it stays in the history as cancelled, with the deletion logged.',
       stops: [
         ['Receiving', 'Feb 3, invoice 1234'],
         ['Stock', 'Feb 3'],
         ['Sale', 'Feb 10, key active'],
         ['Repair', 'May 2, battery'],
+        ['Cancelled', 'May 3, deletion logged'],
         ['Returned', 'May 15'],
         ['Warranty', 'until Feb 10, 2027']
       ]
@@ -91,27 +93,29 @@ const useCopy = defineCopy({
     },
     how: {
       label:
-        'Illustration: the serials on a purchase invoice are read one after another from the barcode and written to serials, movements and stock in one transaction; each device gets its first history entry.',
-      invoice: 'Invoice 1234: 5 terminals',
-      scanning: 'continuous barcode scanning',
-      transaction: 'One explicit transaction',
-      tables: ['Serials', 'Movements', 'Stock'],
+        'Illustration: in a sale, terminals are scanned one after another without closing the dialog, and the sale, movements and stock are written in one transaction; each device gets the sale in its history.',
+      sale: 'Sale 0815: 5 terminals',
+      scanning: 'scanned in sequence, dialog stays open',
+      transaction: 'One transaction',
+      tables: ['Sale', 'Movements', 'Stock'],
       history: "Each device's history",
-      received: 'received on invoice 1234',
+      received: 'sold on sale 0815',
       more: '+ 2 devices'
     },
     result: {
       label: 'Before, a side spreadsheet with conflicting rows; after, one search by serial tells where the device is and where it has been.',
       sheet: ['In stock', 'Sold?', '?'],
       found: 'With the customer, under warranty until Feb 10, 2027',
-      history: ['Feb 10 sale, key active', 'May 2 internal repair', 'May 15 returned to the customer']
+      history: ['Feb 10 sale, key active', 'May 2 internal repair', 'May 3 repair cancelled', 'May 15 returned to the customer']
     }
   }
 });
 
 const SN = 'SN 0042-7781';
-const STOP_ICONS: IconName[] = ['receipt-text', 'boxes', 'hand-coins', 'wrench', 'truck', 'shield-check'];
-const LIFE = [900, 900, 900, 900, 900, 900, 2600];
+const STOP_ICONS: IconName[] = ['receipt-text', 'boxes', 'hand-coins', 'wrench', 'badge-alert', 'truck', 'shield-check'];
+// The stop for the deleted repair: it stays on the timeline, marked as cancelled.
+const CANCELLED = 4;
+const LIFE = [900, 900, 900, 900, 900, 900, 900, 2600];
 
 // One device's life: the serial travels from receiving to warranty, and every stop becomes part of its history.
 export function Lifecycle() {
@@ -122,17 +126,16 @@ export function Lifecycle() {
 
   return (
     <div ref={ref} role="img" aria-label={t.label} className="@container">
-      <ol className="relative grid gap-3 @2xl:grid-cols-6 @2xl:gap-2 @2xl:pt-9" aria-hidden style={{ '--p': at / (t.stops.length - 1) } as React.CSSProperties}>
-        <span className="absolute top-4 bottom-4 left-4 w-px bg-border @2xl:top-13 @2xl:right-[8.33%] @2xl:bottom-auto @2xl:left-[8.33%] @2xl:h-px @2xl:w-auto">
+      <ol className="relative grid gap-3 @2xl:grid-cols-7 @2xl:gap-2 @2xl:pt-9" aria-hidden style={{ '--p': at / (t.stops.length - 1) } as React.CSSProperties}>
+        <span className="absolute top-4 bottom-4 left-4 w-px bg-border @2xl:top-13 @2xl:right-[7.14%] @2xl:bottom-auto @2xl:left-[7.14%] @2xl:h-px @2xl:w-auto">
           <span className="morph absolute inset-0 origin-top transform-[scaleY(var(--p))] bg-primary @2xl:origin-left @2xl:transform-[scaleX(var(--p))]" />
         </span>
         {t.stops.map(([label, note], k) => {
           const reached = k <= at;
+          const look = !reached ? 'border-border bg-card text-muted-foreground' : k === CANCELLED ? `${tone.warn} text-foreground` : 'border-primary bg-card text-foreground';
           return (
             <li key={label} className="relative flex items-center gap-3 @2xl:flex-col @2xl:gap-2 @2xl:text-center">
-              <span
-                className={`morph relative grid size-8 shrink-0 place-items-center rounded-full border ${reached ? 'border-primary bg-card text-foreground' : 'border-border bg-card text-muted-foreground'} ${k === at ? 'lit' : ''}`}
-              >
+              <span className={`morph relative grid size-8 shrink-0 place-items-center rounded-full border ${look} ${k === at ? 'lit' : ''}`}>
                 <Icon name={STOP_ICONS[k]} size={14} play={k === at} />
               </span>
               <div className={`morph min-w-0 ${reached ? '' : 'opacity-50'}`}>
@@ -226,8 +229,8 @@ export function SerialTraps() {
   );
 }
 
-// How it works: serials scanned in bulk from a purchase invoice, written to several tables in one transaction, and
-// each device's history starts. Steps: reset, five scans, writes, commit, hold.
+// How it works: a sale's terminals scanned one after another in the same dialog, written to several tables in one
+// transaction, and the sale lands in each device's history. Steps: reset, five scans, writes, commit, hold.
 const SERIALS = ['0042-7781', '0042-7782', '0042-7783', '0042-7784', '0042-7785'];
 const BULK = [700, 350, 350, 350, 350, 350, 900, 900, 2400];
 
@@ -241,7 +244,7 @@ export function SerialHow() {
   return (
     <div ref={ref} role="img" aria-label={t.label}>
       <div className="flex flex-col lg:flex-row lg:items-stretch" aria-hidden>
-        <Stage icon="scan-text" title={t.invoice} active={step >= 1 && step <= SERIALS.length} className="lg:w-52">
+        <Stage icon="scan-text" title={t.sale} active={step >= 1 && step <= SERIALS.length} className="lg:w-52">
           <p className="text-muted-foreground">{t.scanning}</p>
           <ul className="mt-2 grid gap-1">
             {SERIALS.map((sn, k) => (

@@ -36,8 +36,8 @@ const useCopy = defineCopy({
     },
     how: {
       label:
-        'Ilustração: a nota chega por webhook ou em lote, é classificada, passa pelas exceções e pelo checklist e sai aprovada ou com o motivo; uma nota cancelada encerra nas exceções.',
-      tabs: ['Passa no checklist', 'Falha com motivo', 'Nota cancelada'],
+        'Ilustração: a nota chega por webhook ou em lote, é classificada, passa pelas exceções e pelo checklist e sai pronta para aprovação, com o motivo ou descartada; uma nota cancelada encerra nas exceções, e a que passa segue para a aprovação por alçada.',
+      tabs: ['Passa e é aprovada', 'Falha com motivo', 'Nota cancelada', 'Já lançada à mão'],
       intake: 'Entrada',
       batch: 'lote, base64',
       classification: 'Classificação',
@@ -47,7 +47,10 @@ const useCopy = defineCopy({
       marks: 'passou, falhou ou pulado',
       outcome: 'Resultado',
       flagged: 'Inconsistente: saldo insuficiente',
-      approved: '✓ Aprovada'
+      ready: '✓ Pronta para aprovação',
+      discarded: 'Descartada: já lançada à mão',
+      approval: 'Aprovação',
+      approvedBy: '✓ aprovada na alçada'
     },
     result: {
       label: 'Antes, toda nota era conferida à mão; depois, a triagem acontece na entrada e o time fiscal só recebe o que falhou, com o motivo.',
@@ -84,8 +87,8 @@ const useCopy = defineCopy({
     },
     how: {
       label:
-        'Illustration: the invoice arrives by webhook or in a batch, gets classified, goes through exceptions and the checklist and leaves approved or with a reason; a cancelled invoice stops at the exceptions.',
-      tabs: ['Passes the checklist', 'Fails with a reason', 'Cancelled invoice'],
+        'Illustration: the invoice arrives by webhook or in a batch, gets classified, goes through exceptions and the checklist and leaves ready for approval, with a reason or discarded; a cancelled invoice stops at the exceptions, and one that passes goes on to approval by level.',
+      tabs: ['Passes and is approved', 'Fails with a reason', 'Cancelled invoice', 'Already posted by hand'],
       intake: 'Intake',
       batch: 'batch, base64',
       classification: 'Classification',
@@ -95,7 +98,10 @@ const useCopy = defineCopy({
       marks: 'passed, failed or skipped',
       outcome: 'Outcome',
       flagged: 'Flagged: not enough balance',
-      approved: '✓ Approved'
+      ready: '✓ Ready for approval',
+      discarded: 'Discarded: already posted by hand',
+      approval: 'Approval',
+      approvedBy: '✓ approved at its level'
     },
     result: {
       label: 'Before, every invoice was checked by hand; after, triage happens on arrival and the tax team only gets what failed, reason included.',
@@ -226,20 +232,25 @@ export function InvoiceTraps() {
   );
 }
 
-// How it works: intake, classification, exceptions, checklist, outcome, in three scenarios.
-// Phases: 0 intake, 1 classification, 2 exceptions, 3 checklist, 4 outcome, 5 hold. A cancelled invoice stops at 2.
+// How it works: intake, classification, exceptions, checklist, outcome and approval, in four scenarios.
+// Phases: 0 intake, 1 classification, 2 exceptions, 3 checklist, 4 outcome, 5 approval, 6 hold. A cancelled invoice
+// stops at 2; a flagged or discarded one stops at 4, and only an invoice that passes goes on to approval.
 const FLOW = scenarios([
-  [[0, 600], [1, 700], [2, 700], [3, 1100], [4, 800], [5, 2000]],
-  [[0, 600], [1, 700], [2, 700], [3, 1100], [4, 800], [5, 2000]],
-  [[0, 600], [1, 700], [2, 1000], [5, 2200]]
+  [[0, 600], [1, 700], [2, 700], [3, 1300], [4, 800], [5, 900], [6, 2000]],
+  [[0, 600], [1, 700], [2, 700], [3, 1300], [4, 800], [6, 2200]],
+  [[0, 600], [1, 700], [2, 1000], [6, 2200]],
+  [[0, 600], [1, 700], [2, 700], [3, 1300], [4, 800], [6, 2200]]
 ]);
+// The checklist has twelve items; the duplicate check is the second.
+const ITEMS = 12;
 
 export function InvoiceHow() {
   const t = useCopy().how;
-  const { ref, step, on, inView } = useLoop(FLOW.durations, 5);
+  const { ref, step, on, inView } = useLoop(FLOW.durations, 6);
   const { s, p } = FLOW.steps[step];
   const cancelled = s === 2;
   const failed = s === 1;
+  const discarded = s === 3;
   const wire = (from: number): WireState => (p < from ? 'idle' : p === from ? 'live' : 'done');
 
   return (
@@ -260,14 +271,15 @@ export function InvoiceHow() {
         <Wire state={cancelled ? (p >= 2 ? 'blocked' : 'idle') : wire(3)} />
         <Stage icon="clipboard-check" title="Checklist" active={p === 3} className="lg:flex-[1.3]">
           <span className="flex gap-1">
-            {Array.from({ length: 10 }, (_, k) => {
+            {Array.from({ length: ITEMS }, (_, k) => {
               const bad = failed && k === 6;
+              const duplicate = discarded && k === 1;
               const run = !cancelled && p >= 3;
               return (
                 <span
                   key={k}
-                  className={`morph size-2.5 rounded-xs ${!run ? 'bg-border' : bad ? 'bg-destructive' : k === 9 ? 'bg-muted-foreground/40' : 'bg-primary'}`}
-                  style={{ transitionDelay: run && p === 3 ? `${k * 90}ms` : '0ms' }}
+                  className={`morph size-2.5 rounded-xs ${!run ? 'bg-border' : bad ? 'bg-destructive' : duplicate ? 'bg-muted-foreground' : k === ITEMS - 1 ? 'bg-muted-foreground/40' : 'bg-primary'}`}
+                  style={{ transitionDelay: run && p === 3 ? `${k * 75}ms` : '0ms' }}
                 />
               );
             })}
@@ -276,7 +288,13 @@ export function InvoiceHow() {
         </Stage>
         <Wire state={cancelled ? 'idle' : wire(4)} />
         <Stage icon="circle-check" title={t.outcome} active={p === 4} className={`lg:flex-[1.2] ${failed && p >= 4 ? 'border-(--attention)!' : ''}`}>
-          <p className={`morph ${cancelled || p < 4 ? 'text-transparent' : failed ? 'text-(--attention)' : ''}`}>{failed ? t.flagged : t.approved}</p>
+          <p className={`morph ${cancelled || p < 4 ? 'text-transparent' : failed ? 'text-(--attention)' : discarded ? 'text-muted-foreground' : ''}`}>
+            {failed ? t.flagged : discarded ? t.discarded : t.ready}
+          </p>
+        </Stage>
+        <Wire state={s === 0 ? wire(5) : 'idle'} />
+        <Stage icon="users" title={t.approval} active={p === 5} className="lg:flex-1">
+          <p className={`morph ${s === 0 && p >= 5 ? '' : 'text-transparent'}`}>{t.approvedBy}</p>
         </Stage>
       </div>
     </div>
