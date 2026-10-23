@@ -14,9 +14,9 @@
     "pt": {
       "slug": "authsales",
       "category": "Produto próprio",
-      "title": "AuthSales, uma base para vários sistemas",
-      "summary": "Meu projeto pessoal: uma plataforma comercial SaaS que também serve de fundação para sistemas de outros domínios, como comercial, hospitalar e ERP.",
-      "problem": "Construir sozinho uma plataforma multiempresa que servisse de base para outros sistemas, sem cair em nenhuma destas três armadilhas.",
+      "title": "AuthSales, gestão comercial sobre uma base reutilizável",
+      "summary": "Meu projeto pessoal, desenvolvido no repositório boilerplate: um SaaS multiempresa que conecta vendas, PDV, estoque, financeiro e serviços, com uma base que também pode ser usada em outros sistemas.",
+      "problem": "Uma venda muda o estoque, gera valores a receber e pode produzir comissão. Uma ordem de serviço acrescenta peças, técnicos e equipamentos. Construir esses módulos sozinho exigiu definir quem pode fazer cada operação, qual loja recebe seus efeitos e como desfazer uma ação sem apagar o histórico.",
       "how": [
         {
           "icon": "shield-check",
@@ -45,18 +45,187 @@
         },
         {
           "icon": "bot",
-          "title": "Extensões e agentes",
-          "body": "SDK declarativo e versionado, e agentes de IA locais cujo diff o sistema valida."
+          "title": "Extensões com contrato",
+          "body": "SDK declarativo e versionado para contribuições, comandos e eventos, com validação na fronteira."
         }
       ],
-      "outcome": "Mais de cem serviços migraram sem mudar nenhuma assinatura pública, e cada sistema novo já nasce com autenticação, permissões, auditoria e temas."
+      "story": [
+        {
+          "id": "foundation",
+          "title": "Produto e base reutilizável",
+          "paragraphs": [
+            "AuthSales é a aplicação de gestão comercial que desenvolvo no monorepo boilerplate. Ela reúne a rotina de uma empresa que vende produtos, presta serviços, administra estoque e acompanha o financeiro. No mesmo repositório, mantenho o motor reutilizável que sustenta essas operações: autenticação, autorização, contexto da conta e da loja, CRUD, auditoria e processamento assíncrono.",
+            "Essa divisão aparece nos pacotes. Backend, frontend e tipos têm contratos próprios para que outro sistema use a infraestrutura e implemente seu domínio. Os módulos comerciais continuam sendo código da aplicação. O exemplo de consumidor independente exercita os pontos públicos dos pacotes, em vez de importar arquivos internos do monorepo. Isso permite trabalhar na base sem obrigar cada consumidor a acompanhar sua organização de pastas.",
+            "Dentro do produto, sistema e cadastros formam a fundação da conta. Comercial, financeiro, ordens de serviço e Service Desk têm disponibilidade e acesso controlados pelo catálogo de módulos. A dependência técnica de uma projeção financeira não obriga o cliente a contratar as telas do financeiro: uma OS pode manter seus recebíveis internamente e continuar útil como módulo independente.",
+            "Considere uma loja que negocia um orçamento, confirma a venda e recebe parte do valor. O estoque registra a saída e o restante fica a receber. Se o cliente devolver um item, o sistema precisa ajustar a dívida, a mercadoria e a liberação de comissão, mantendo a origem de cada efeito. Os valores e cenários usados nos exemplos deste case são fictícios."
+          ]
+        },
+        {
+          "id": "registry-access",
+          "title": "Cadastros, lojas e acesso",
+          "paragraphs": [
+            "Clientes, fornecedores, colaboradores e transportadoras são cadastros usados pelos documentos comerciais. Produtos e serviços acrescentam unidades, variações, preços e classificações. Formas de pagamento, categorias e centros de custo dão contexto aos lançamentos financeiros. Um cadastro pode ser compartilhado na conta e ter sua utilização vinculada apenas a determinadas lojas.",
+            "Essa diferença evita tratar multiempresa como um filtro de tela. O cliente pode existir na conta e ainda não estar disponível para uma venda na loja ativa; um produto pode ter o mesmo cadastro e saldos distintos em cada unidade. O servidor verifica tanto a propriedade do registro quanto sua disponibilidade no contexto do documento. Relações escolhidas em seletores passam pela mesma regra ao salvar.",
+            "OperationContext carrega o ator, a conta, a loja e as demais informações resolvidas para aquela operação. Cada recurso declara uma política de Data Scope, negada por padrão. O predicado autorizado acompanha leitura, busca, exportação e escrita. Um identificador conhecido ou um companyId enviado pelo navegador não substitui essa autoridade, e um registro de outra conta responde como não encontrado.",
+            "Também há diferença entre poder abrir uma tela e poder executar uma exceção. Ver uma venda não concede permissão para alterar preço, atribuir outro vendedor ou autorizar crédito. Consultar um chamado não concede acesso irrestrito aos dados do cliente e do usuário relacionados. A interface reflete essas capacidades; o serviço continua responsável por exigi-las quando o comando chega por outro caminho."
+          ]
+        },
+        {
+          "id": "commercial",
+          "title": "Orçamentos e vendas",
+          "paragraphs": [
+            "O orçamento reúne cliente, produtos, serviços, descontos, frete e condições de pagamento. Orçamentos e vendas compartilham um motor de documentos comerciais que centraliza cálculo, parcelas, histórico, compartilhamento e PDF. Cada documento declara seus campos, catálogos de situação e particularidades. Assim, uma correção no cálculo não precisa ser repetida em telas de produtos e serviços.",
+            "O backend calcula os totais e confere as condições: quantidades positivas, descontos dentro do valor permitido e parcelas cuja soma fecha exatamente com o documento. Na conversão, as condições negociadas acompanham a nova venda. Se o orçamento previa pagamento trinta dias após a emissão e a venda acontece semanas depois, a política padrão desloca os vencimentos pela diferença entre as datas, preservando inclusive intervalos editados manualmente.",
+            "A preparação da conversão abre um rascunho revisável. A confirmação relê e bloqueia o orçamento na transação que cria a venda ou a OS, persiste o vínculo com a origem, registra o histórico e agenda o evento. A configuração que oferece a ação de converter é distinta daquela que identifica a situação de destino do orçamento convertido. O vínculo persistido e as restrições de unicidade impedem duas confirmações concorrentes de criar destinos duplicados.",
+            "Na venda, o código de situação DONE define a efetivação econômica. Nomes e cores personalizados continuam sendo apresentação. O adaptador da venda planeja estoque, recebíveis e comissão; os serviços responsáveis executam os efeitos na unidade de trabalho do documento. Uma falha no financeiro também desfaz os efeitos de estoque daquela tentativa. Sair da situação efetiva passa pela reversão correspondente.",
+            "A devolução considera o que ainda é devido e o que já foi recebido. Em uma venda de R$ 120 com R$ 50 recebidos e R$ 70 em aberto, uma devolução elegível de R$ 100 pode compensar os R$ 70 pendentes e gerar uma obrigação de reembolso de R$ 30. A compensação reduz a dívida sem inventar uma entrada ou saída bancária; o pagamento do reembolso tem seu próprio registro. Devoluções concorrentes são serializadas pela venda de origem para não usar duas vezes o mesmo valor recebido."
+          ]
+        },
+        {
+          "id": "pos",
+          "title": "PDV e fechamento de caixa",
+          "paragraphs": [
+            "O PDV concentra a venda de balcão: seleção dos itens, vendedor, descontos, pagamentos e recibo, dentro de um caixa aberto. Ele usa os serviços comerciais e financeiros da plataforma. Alterar preço, conceder desconto e atribuir outro vendedor dependem de capacidades específicas, e os preços e totais da prévia são conferidos pelo servidor.",
+            "O checkout coordena venda, estoque, títulos, recebimentos e movimentos do caixa na mesma transação. A chave de idempotência identifica a intenção: repetir a mesma operação devolve seu resultado persistido; reutilizar a chave com outro conteúdo gera conflito. Se a comunicação cair depois do commit, a repetição não cria uma segunda venda. O recibo descreve os pagamentos internos registrados, sem afirmar que houve processamento externo de cartão ou PIX.",
+            "O limite de crédito usa o saldo ainda aberto do cliente na conta e na loja. Considere um limite de R$ 500, R$ 450 já utilizados e uma nova venda de R$ 100 com R$ 80 recebidos no checkout: os R$ 20 restantes levam a exposição a R$ 470. O serviço bloqueia o cliente e revalida a conta depois dos recebimentos daquela transação. Se for necessário exceder o limite, a política pode exigir a capacidade de autorizar crédito e uma justificativa auditada.",
+            "No fechamento, a contagem pode ser cega: as respostas públicas de um caixa aberto omitem o saldo esperado e seus movimentos. Quando a contagem é informada, o servidor calcula a comparação por forma de pagamento. Uma divergência pode exigir confirmação e, conforme a política da conta, autorização específica. A confirmação é vinculada à contagem, ao ator, à loja e aos movimentos considerados; um movimento ocorrido depois da prévia exige nova conferência.",
+            "Com abertura de R$ 100, venda de R$ 50 e retirada de R$ 20, o esperado é R$ 130. Uma contagem de R$ 125 registra uma falta de R$ 5 e fecha com R$ 125. O snapshot do fechamento preserva totais, formas de pagamento, operador, política e eventual aprovador. Caixa fechado é terminal no fluxo atual, e vendas ou estornos não podem acrescentar movimentos depois dele. As formas de pagamento representam o caixa consolidado, incluindo os recebimentos internos classificados como dinheiro, PIX ou cartão."
+          ]
+        },
+        {
+          "id": "purchasing",
+          "title": "Compras e formação de custo",
+          "paragraphs": [
+            "O fluxo de compras reúne cotações de fornecedores e documentos de aquisição, com produtos, serviços, situações e obrigações a pagar. A situação aplicada determina os efeitos da compra. Confirmar uma entrada coordena o estoque e o financeiro; um documento ainda sem efeito não deve aumentar o saldo disponível nem aparecer como dinheiro já desembolsado.",
+            "O custo cadastral segue uma regra da conta: manter o valor, adotar o custo da última compra ou calcular a média ponderada. Com dez unidades a R$ 10 e uma entrada de dez unidades a R$ 14, a média é R$ 12, enquanto a regra da última compra chega a R$ 14. O cálculo usa o estoque anterior à entrada e a mesma aritmética decimal empregada na prévia.",
+            "Quando a regra é manter o custo e existe divergência relevante, o operador pode revisar os produtos e escolher o tratamento para aquela compra. A prévia contém valores protegidos: o serviço exige a permissão de ver custo antes de expô-los. A confirmação é assinada e vinculada ao comando, ao contexto e aos números apresentados. Uma mudança nas condições invalida a decisão anterior, em vez de aplicar silenciosamente uma escolha feita para outra situação.",
+            "Entrada, atualização de custo, obrigações e auditoria usam a transação do documento. O cancelamento compensa os lançamentos da compra, mas não restaura um custo cadastral antigo: outras compras podem ter atualizado esse valor depois. O movimento histórico guarda sua origem e seu custo; o cadastro representa o valor corrente. Essa separação impede que um cancelamento tardio reescreva a formação de custo posterior."
+          ]
+        },
+        {
+          "id": "stock",
+          "title": "Estoque, transferências e inventário",
+          "paragraphs": [
+            "O estoque mantém um livro de entradas, saídas e reversões por loja. Um produto simples tem saldo no seu próprio agrupamento; um produto com variações tem saldo por SKU. Unidades de venda e de estoque podem ser diferentes, então a conversão acontece antes de comparar disponibilidade ou gravar o movimento. Cada linha preserva a origem que explica sua participação no saldo.",
+            "A política de saída sem disponibilidade pode permitir, bloquear ou exigir confirmação. O servidor agrega as demandas do mesmo produto ou SKU e considera saldo físico e reservas. Na confirmação com aviso, apresenta o déficit e o saldo projetado e exige aceitação vinculada àquela operação. A decisão é revalidada sob bloqueio; um saldo enviado pelo navegador não serve como prova de disponibilidade. A aceitação e os movimentos são auditados na mesma transação.",
+            "Uma transferência exige autorização nas duas lojas e grava o par de movimentos junto. Se uma caixa equivale a dez unidades e a origem tem doze unidades, transferir duas caixas exige vinte e é recusado. Na efetivação, quantidade convertida e custo ficam congelados. Cancelar produz os movimentos opostos ao par original, mantendo as vendas que ocorreram depois. A transferência não cria conta a pagar ou a receber, porque a mercadoria continua pertencendo à mesma conta.",
+            "O inventário tem três etapas: rascunho, contado e concluído. Na contagem, o sistema captura o saldo, a unidade e o custo e calcula a diferença para a quantidade encontrada. Se o saldo era dez e a contagem encontrou oito, a diferença fica em menos dois. Se uma venda de duas unidades ocorre antes da conclusão, o saldo chega a oito; aplicar a diferença registrada leva a seis, preservando tanto a venda quanto a divergência física.",
+            "A captura usa uma leitura consistente na transação, inclusive para produtos que ainda não têm uma linha de saldo. Concluir transforma diferenças não nulas em movimentos; repetir o comando não lança tudo novamente. Reabrir um inventário concluído compensa os movimentos da conclusão anterior e exige um motivo. Um ajuste manual continua sendo outra operação: nele, o operador informa quanto acrescentar ou retirar, enquanto no inventário informa quanto encontrou."
+          ]
+        },
+        {
+          "id": "finance",
+          "title": "Financeiro e ciclo dos títulos",
+          "paragraphs": [
+            "O financeiro organiza contas a pagar e a receber, parcelas, contas bancárias, caixas, formas de pagamento, categorias e centros de custo. O título representa uma obrigação com valor, origem, competência e vencimento. As baixas formam um histórico separado do dinheiro aplicado à obrigação. Relatórios de caixa e competência respondem a perguntas diferentes e usam essas fontes de acordo com seu significado.",
+            "Um título de R$ 120 pode receber R$ 50 e continuar com R$ 70 em aberto. Juros, multa e desconto pertencem à baixa: aplicar R$ 50 de principal com R$ 5 de desconto movimenta R$ 45 e reduz o principal pendente em R$ 50. O cálculo usa centavos exatos; os ajustes não reescrevem o valor original da obrigação. A sugestão de encargos pode ser revisada pelo operador antes da confirmação.",
+            "A baixa bloqueia o título antes de calcular o saldo e atualiza a conta bancária na mesma unidade de trabalho. Duas requisições que tentem aplicar R$ 70 a um título de R$ 100 não podem consumir o mesmo saldo disponível. A chave de idempotência e o conteúdo normalizado identificam a operação; repetir a chave com outro valor é conflito. O status pago ou parcialmente pago é uma projeção dos eventos persistidos.",
+            "Reabrir desfaz os recebimentos por eventos de estorno e devolve o saldo em aberto. Cancelar declara que a obrigação deixou de ser devida. Um título manual ainda com dinheiro aplicado exige primeiro a reabertura; um título gerado por venda, compra ou OS conserva a autoridade do documento de origem sobre seu cancelamento. Permitir a baixa no financeiro não transfere essa autoridade.",
+            "Cada parcela materializada tem seu próprio título e histórico. Um plano com liquidações não pode ser reconstruído apagando o que já aconteceu. Os lançamentos gerados passam por FinancialPostingService e mantêm chaves de origem, inclusive a identificação da parcela. Isso permite reencontrar o mesmo título em uma sincronização e preservar descrições e eventos históricos, em vez de criar outra obrigação por causa de uma repetição."
+          ]
+        },
+        {
+          "id": "service-orders",
+          "title": "Ordens de serviço e equipamentos",
+          "paragraphs": [
+            "A OS organiza o atendimento técnico com cliente, equipamentos, peças, serviços, técnicos e condições de pagamento. Pode nascer de um orçamento e seguir um catálogo de situações definido pela conta. Cada situação declara se permite edição, reserva ou movimenta peças e gera financeiro. Uma etapa visual como aguardando peça pode ter uma consequência diferente daquela de serviço concluído, conforme a configuração explícita.",
+            "O motor interpreta as ações da situação ao executar a transição e calcula a diferença entre o estado anterior e o novo. Os efeitos de peças e recebíveis usam os serviços canônicos de estoque e financeiro. A permissão e a disponibilidade dos recursos são verificadas no servidor. A tela de alteração recebe a descrição dos efeitos, incluindo os recebimentos que precisariam ser revertidos, antes de executar o comando.",
+            "O histórico de equipamentos deriva das ocorrências nas OS do cliente e da loja autorizada. Um número de série normalizado ajuda a agrupar grafias equivalentes; sem série, nome, marca e modelo formam a identificação. O cliente participa dessa identidade: o mesmo texto de série em dois clientes não basta para unir seus históricos. Selecionar uma sugestão copia os dados para a nova ocorrência e preserva os textos das anteriores, incluindo ordens canceladas.",
+            "O relatório de envelhecimento distingue o tempo desde a abertura e o tempo na situação atual. Uma OS aberta há doze dias e movida hoje para uma nova etapa tem doze dias de abertura e zero naquela situação. O cálculo lê o histórico da transição, com fallback explícito para a abertura, em vez de usar a última edição genérica do registro. Quando uma ordem contém vários equipamentos, seus totais de peças e serviços continuam sendo totais da OS, sem ratear custos que os itens não identificam por equipamento."
+          ]
+        },
+        {
+          "id": "contracts",
+          "title": "Contratos, cobrança e renovação",
+          "paragraphs": [
+            "Contratos mantêm vigência, situação, regras de recorrência, geração de cobrança e encerramento. A configuração define quando produzir um ciclo e seus efeitos, como uma venda ou um recebível. Suspender uma cobrança, encerrar o contrato e renovar sua vigência são decisões distintas; o processamento não deduz uma delas apenas porque chegou uma data.",
+            "Os ciclos usam eventos persistidos na outbox e um identificador por contrato e sequência. Ao executar, o worker relê e bloqueia o contrato, compara o vencimento e a sequência esperados e consulta a situação atual. Um evento agendado antes de uma alteração não pode cobrar conforme a versão antiga. Uma nova entrega do mesmo evento encontra o ciclo processado, e as chaves de origem dos seus documentos impedem duplicação.",
+            "A renovação preserva o início histórico e calcula o novo término a partir do término anterior. A aritmética de meses trata datas civis e o último dia do mês: em um ano não bissexto, um fim em 31 de janeiro pode avançar para 28 de fevereiro. O agendamento considera o dia comercial e o fuso da loja. O evento automático usa a identidade do sistema, para que a trilha não atribua uma renovação futura a alguém que apenas editou o contrato meses antes.",
+            "Se um worker ficou parado, o evento durável ainda existe para ser processado. A execução continua verificando elegibilidade e pode encontrar um contrato suspenso, encerrado ou já renovado. Os testes do ciclo precisam conferir os documentos e títulos gerados, o ponteiro da próxima cobrança e o comportamento da repetição. A existência desse fluxo interno não significa que haja um gateway cobrando o cliente externamente."
+          ]
+        },
+        {
+          "id": "commissions",
+          "title": "Comissões de vendedores e técnicos",
+          "paragraphs": [
+            "Vendas e OS compartilham um livro de comissões por item e beneficiário. A venda considera seu vendedor; a OS considera seus técnicos. O lançamento congela a base líquida, o percentual, a origem desse percentual e a regra de liberação. Desconto do documento é distribuído entre as linhas; frete e outros acréscimos ficam fora da base comissionável. Alterar um cadastro depois não recalcula o passado.",
+            "A comissão pode ser liberada na geração financeira, na quitação da primeira ou da última parcela, ou proporcionalmente ao principal recebido. Nessa última regra, uma base de R$ 100 com comissão de 10% gera R$ 10; se metade do principal elegível foi recebida, R$ 5 ficam liberados. Estornar o recebimento devolve essa parcela a pendente. Compensar uma dívida por devolução não conta como dinheiro recebido.",
+            "O efeito de reconciliação roda na transação do documento e registra créditos e reversões com chaves únicas por origem, linha, beneficiário e ciclo. A liberação é derivada das baixas, evitando manter um segundo saldo que poderia ficar desatualizado. Em uma OS com vários técnicos, a base é dividida por uma regra determinística que distribui os centavos restantes. Até a ausência de percentual utilizável fica congelada como política, para que um cadastro futuro não crie comissão retroativa.",
+            "Um orçamento convertido não pode produzir comissão simultânea por dois destinos legados. A decisão usa bloqueio por orçamento ao reconciliar os documentos. Os relatórios agrupam por beneficiário, documento, produto ou serviço, respeitam conta, loja e moeda e oferecem exportação. O módulo acompanha o direito e sua liberação; o pagamento da comissão e a folha salarial permanecem fora desse controle."
+          ]
+        },
+        {
+          "id": "service-desk",
+          "title": "Service Desk e histórico do atendimento",
+          "paragraphs": [
+            "O Service Desk organiza chamados, responsáveis, categorias, canais, comentários e campos personalizados. Um chamado pode vincular um cliente disponível na loja ou registrar um solicitante manual. Canal e direção são informações separadas: telefone descreve o meio; entrada ou saída descreve quem iniciou o contato. A central apresenta indicadores e chamados dentro do escopo autorizado.",
+            "A conta cria nomes e cores de situação associados aos comportamentos aberto, em andamento, aguardando cliente, resolvido e fechado. Mudar entre duas situações do mesmo comportamento também gera histórico, sem inventar um novo início ou uma nova resolução. Uma situação já referenciada por chamados ou histórico conserva seu comportamento. As ações de iniciar, resolver e reabrir continuam tendo destinos definidos.",
+            "A transição recebe o estado esperado e falha com conflito se outro operador já alterou o chamado. Criação e mudanças acrescentam eventos imutáveis na mesma transação. O contato do solicitante é um snapshot: editar outro campo não troca silenciosamente o destinatário porque o cadastro do cliente mudou. Notas internas e observações do histórico permanecem internas; uma resposta pública depois da resolução exige reabrir o chamado.",
+            "Editar o chamado não concede todas as permissões sobre seus comentários. O serviço bloqueia o pai e os comentários persistidos antes de classificar o que foi criado, alterado ou removido e exigir a capacidade correspondente. O resumo da central usa uma seleção explícita de campos, evitando que relações completas tragam dados de outros recursos. Os testes de concorrência observam a disputa pelos registros e conferem que a transição e a edição não deixam conteúdo público indevido após o fechamento."
+          ]
+        },
+        {
+          "id": "shared-platform",
+          "title": "Telas compartilhadas e extensões",
+          "paragraphs": [
+            "Formulários, tabelas, filtros, seletores e ações são compostos por metadados e contratos compartilhados. Cada módulo registra seus campos e acrescenta interfaces para as operações que exigem mais contexto, como converter um orçamento, fechar um caixa ou contar estoque. A infraestrutura comum trata estado, apresentação e execução dos contratos; as decisões comerciais continuam no domínio que as possui.",
+            "Importação, exportação, PDF, e-mail, tradução e temas têm caminhos comuns. Ajuda contextual, dicas, checklists e tours usam programas declarados e filtrados pelos módulos e permissões da sessão. O mesmo usuário pode receber orientações diferentes em duas contas ou lojas porque o contexto autorizado mudou. A interface não precisa manter uma segunda cópia das regras de acesso para decidir quais ações oferecer.",
+            "O SDK de extensões declara manifestos versionados, contribuições, comandos e eventos. Seus validadores conferem identificadores, dependências, configuração e conteúdo. Publicar um evento usa a unidade de trabalho e a outbox existentes; conta e ator vêm do contexto do servidor. O contrato não autoriza carregar código arbitrário nem transforma uma declaração de extensão em um runtime completo.",
+            "A evolução do CRUD preservou as assinaturas públicas de mais de cem serviços enquanto separava leitura, política de campos e escopo. Para investigar um comando comercial, a auditoria relaciona ator, transição e efeitos planejados com os registros realmente alterados em estoque e financeiro. Uma repetição sem efeito não cria outra evidência de sucesso. Testes de domínio, integração com PostgreSQL e jornadas de navegador verificam essas fronteiras; essa infraestrutura não substitui a execução e a análise dos cenários de cada entrega."
+          ]
+        }
+      ],
+      "outcome": "O AuthSales reúne a operação comercial e seus efeitos em estoque, financeiro e serviços sobre uma infraestrutura compartilhada. A base pode ser usada por outros sistemas, e a evolução do CRUD preservou as assinaturas públicas de mais de cem serviços.",
+      "role": "Responsável pela arquitetura e pelo desenvolvimento full stack: API, interface, modelagem de dados, regras de negócio e infraestrutura de validação.",
+      "facts": [
+        "SaaS multiempresa e multiloja",
+        "módulos opcionais",
+        "base publicada em pacotes"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Uma transação para os efeitos do documento",
+            "body": "CrudUnitOfWork coordena gravação, auditoria, idempotência e outbox. Adaptadores de vendas, compras e OS planejam os efeitos; estoque e financeiro continuam donos dos seus lançamentos. Uma falha desfaz o conjunto."
+          },
+          {
+            "title": "Autorização dentro da regra de negócio",
+            "body": "OperationContext e Data Scope resolvem conta, loja e ator no servidor. Comandos sensíveis revalidam a autorização e o estado sob bloqueio, alcançando também chamadas que não passam pela tela."
+          },
+          {
+            "title": "Histórico por compensação",
+            "body": "Baixas, movimentos de estoque e comissões preservam os fatos originais. Estornar ou cancelar acrescenta registros relacionados à origem, permitindo reconstruir o que aconteceu e reconhecer uma repetição."
+          },
+          {
+            "title": "Dinheiro, quantidade e tempo com semântica",
+            "body": "Cálculos financeiros usam decimais e centavos exatos; quantidades respeitam unidades e conversões. Instantes, dias civis, horários locais e durações têm contratos distintos, para que vencimentos e recorrências não mudem com o fuso do processo."
+          },
+          {
+            "title": "Trabalho assíncrono depois do commit",
+            "body": "Eventos persistidos na outbox conduzem efeitos posteriores e ciclos agendados. Filas de e-mail e PDF usam a infraestrutura existente. Cada consumidor precisa reconhecer reentregas; uma fila, sozinha, não garante execução única."
+          },
+          {
+            "title": "Validação além da resposta HTTP",
+            "body": "O repositório tem testes de domínio, integração com PostgreSQL e jornadas Playwright. O critério inclui saldo, título, histórico e isolamento persistidos, além da resposta da API. Cenários de concorrência verificam o que acontece quando dois comandos disputam o mesmo registro."
+          }
+        ],
+        "incident": {
+          "title": "Cancelar pela situação deixava o recebível aberto",
+          "body": "O diálogo de mudança de situação gravava por um caminho diferente daquele usado na edição do documento. Ao cancelar uma venda por ali, o recebível podia continuar aberto. A correção arquitetural fez esses comandos passarem pela mesma unidade de trabalho e pela mesma fronteira de lançamento, com bloqueio do documento, efeitos transacionais e auditoria dos registros realmente alterados."
+        },
+        "limits": [
+          "O catálogo atual inclui comercial, financeiro, ordens de serviço e Service Desk. Fiscal está em pré-emissão, sem transmissão validada; projetos, treinamento, indústria, manutenção, facilities, qualidade, salão e gestão documental ficam fora do lançamento atual.",
+          "A infraestrutura para integrações externas e o SDK descrevem contratos. Não representam, por si, conectores bancários, cobrança por gateway ou emissão fiscal em operação.",
+          "O controle de comissões calcula e acompanha direitos e liberações; o pagamento de comissões e a folha salarial ficam fora desse módulo."
+        ]
+      }
     },
     "en": {
       "slug": "authsales",
       "category": "Own product",
-      "title": "AuthSales, one foundation for several systems",
-      "summary": "My personal project: a commercial SaaS platform that also serves as the foundation for systems in other domains, such as sales, healthcare and ERP.",
-      "problem": "Building a multi-company platform alone that could be the foundation for other systems, without falling into any of these three traps.",
+      "title": "AuthSales, business management on a reusable foundation",
+      "summary": "My personal project, developed in the boilerplate repository: a multi-company SaaS connecting sales, POS, inventory, finance and services, with a foundation that other systems can also use.",
+      "problem": "A sale changes stock, creates receivables and may earn commission. A service order adds parts, technicians and equipment. Building these modules alone meant defining who can perform each operation, which store owns its effects and how to undo an action while preserving its history.",
       "how": [
         {
           "icon": "shield-check",
@@ -85,11 +254,180 @@
         },
         {
           "icon": "bot",
-          "title": "Extensions and agents",
-          "body": "A declarative, versioned SDK, and local AI agents whose diffs the system validates."
+          "title": "Extensions with a contract",
+          "body": "A declarative, versioned SDK for contributions, commands and events, with validation at the boundary."
         }
       ],
-      "outcome": "Over a hundred services moved without changing a single public signature, and every new system starts with authentication, permissions, audit and themes."
+      "story": [
+        {
+          "id": "foundation",
+          "title": "Product and reusable foundation",
+          "paragraphs": [
+            "AuthSales is the business management application I develop in the boilerplate monorepo. It covers a company that sells products, provides services, manages stock and tracks finances. The same repository holds the reusable engine behind those operations: authentication, authorization, account and store context, CRUD, audit and asynchronous processing.",
+            "That separation carries through to the packages. Backend, frontend and shared types have their own contracts so another system can use the infrastructure and implement its domain. The business modules remain application code. The standalone consumer example exercises public package entrypoints instead of importing internal monorepo files. This lets the foundation change without forcing every consumer to follow its folder structure.",
+            "Within the product, system and registry form the account foundation. Commercial, finance, service orders and Service Desk have availability and access controlled by the module catalog. A technical dependency on a financial projection does not require the customer to subscribe to financial screens: a service order can maintain its receivables internally and remain useful as an independent module.",
+            "Consider a store that negotiates a quote, confirms the sale and receives part of the amount. Stock records the outgoing goods and the rest remains receivable. If the customer returns an item, the system must adjust debt, goods and commission release while retaining the source of each effect. Amounts and scenarios in this case study's examples are fictional."
+          ]
+        },
+        {
+          "id": "registry-access",
+          "title": "Shared records, stores and access",
+          "paragraphs": [
+            "Customers, suppliers, employees and carriers are shared records used by commercial documents. Products and services add units, variants, prices and classifications. Payment methods, categories and cost centers give financial entries context. A record can be shared within the account while being available for use only in selected stores.",
+            "This distinction keeps multi-company behavior from becoming a screen filter. A customer may exist in the account yet be unavailable for a sale in the active store; a product can share its master data while having different balances at each location. The server checks both ownership and availability in the document's context. Relations selected through pickers undergo the same checks when saved.",
+            "OperationContext carries the actor, account, store and other information resolved for that operation. Each resource declares a Data Scope policy, denied by default. Its authorized predicate accompanies reads, search, exports and writes. A known identifier or a companyId supplied by the browser cannot replace that authority, and a record from another account answers as not found.",
+            "Access to a screen also differs from permission to make an exception. Reading a sale does not grant permission to override a price, assign another seller or authorize credit. Reading a ticket does not grant unrestricted access to related customer and user data. The interface reflects those capabilities; the service still enforces them when a command arrives through another path."
+          ]
+        },
+        {
+          "id": "commercial",
+          "title": "Quotes and sales",
+          "paragraphs": [
+            "A quote brings together the customer, products, services, discounts, freight and payment terms. Quotes and sales share a commercial document engine that centralizes calculations, installments, history, sharing and PDF. Each document declares its fields, situation catalogs and specific behavior. A calculation fix therefore does not need repeating across product and service screens.",
+            "The backend calculates totals and checks the terms: positive quantities, discounts within the permitted amount, and installments whose sum matches the document exactly. Conversion carries negotiated terms into the new sale. If the quote agreed on payment thirty days after issue and the sale takes place weeks later, the default policy shifts due dates by the gap between issue dates, preserving manually edited intervals as well.",
+            "Preparing a conversion opens a draft for review. Confirmation reads and locks the quote again in the transaction that creates the sale or service order, persists its source link, records history and schedules the event. The setting that offers conversion is separate from the one identifying the converted quote's destination situation. Persisted links and uniqueness constraints prevent concurrent confirmations from creating duplicate destinations.",
+            "For a sale, the DONE situation code defines economic effectiveness. Custom names and colors remain presentation. The sale adapter plans stock, receivable and commission effects; the responsible services apply them in the document's unit of work. A financial failure also rolls back that attempt's stock effects. Leaving the effective situation goes through the corresponding reversal.",
+            "A return considers what is still owed and what has already been received. For a R$120 sale with R$50 received and R$70 outstanding, an eligible R$100 return can offset the R$70 debt and create a R$30 refund obligation. The offset reduces debt without inventing a bank inflow or outflow; paying the refund has its own record. Concurrent returns are serialized through the source sale so the same received amount cannot fund two refunds."
+          ]
+        },
+        {
+          "id": "pos",
+          "title": "POS and cash register closure",
+          "paragraphs": [
+            "POS concentrates counter sales: items, seller, discounts, payments and receipt within an open register. It uses the platform's commercial and financial services. Price overrides, discounts and assigning another seller require specific capabilities, and the server checks the preview's prices and totals.",
+            "Checkout coordinates the sale, stock, receivables, settlements and register movements in one transaction. The idempotency key identifies the intent: repeating the same operation returns its persisted result; reusing the key with different content conflicts. If communication fails after commit, a retry does not create another sale. The receipt describes internally recorded payments without claiming that a card or PIX payment was processed externally.",
+            "Credit limits use the customer's outstanding balance within the account and store. Consider a R$500 limit, R$450 already used, and a new R$100 sale with R$80 received during checkout: the remaining R$20 takes exposure to R$470. The service locks the customer and checks exposure after receipts in that transaction. If the limit must be exceeded, policy may require the credit authorization capability and an audited reason.",
+            "Closure can use a blind count: public responses for an open register omit expected balance and movements. Once a count is supplied, the server calculates the comparison by payment method. A discrepancy may require confirmation and, depending on account policy, specific approval. Confirmation is bound to the count, actor, store and movements considered; a movement after the preview requires another review.",
+            "Opening with R$100, a R$50 sale and a R$20 withdrawal gives an expected R$130. Counting R$125 records a R$5 shortage and closes at R$125. The closure snapshot preserves totals, payment methods, operator, policy and any approver. CLOSED is terminal in the current flow, and sales or reversals cannot append register movements afterward. Payment methods represent the consolidated register, including internal receipts classified as cash, PIX or card."
+          ]
+        },
+        {
+          "id": "purchasing",
+          "title": "Purchasing and cost calculation",
+          "paragraphs": [
+            "Purchasing brings together supplier quotations and acquisition documents, with products, services, situations and payables. The applied situation determines a purchase's effects. Confirming incoming goods coordinates stock and finance; a document that has not taken effect must not increase available stock or appear as money already spent.",
+            "Master cost follows an account rule: retain the value, use the latest purchase cost or calculate a weighted average. Ten units at R$10 plus ten incoming units at R$14 gives an average of R$12, while the latest-purchase rule gives R$14. The calculation uses stock before the incoming movement and the same decimal arithmetic as the preview.",
+            "When the rule retains cost and there is a significant divergence, the operator can review products and choose how to handle that purchase. Preview values are protected: the service requires cost-view permission before exposing them. Confirmation is signed and bound to the command, context and presented numbers. Changed conditions invalidate the earlier decision instead of silently applying a choice made for another situation.",
+            "Incoming stock, cost updates, obligations and audit share the document transaction. Cancellation offsets the purchase postings but does not restore an old master cost: later purchases may have updated it. Historical movements preserve their source and cost; the master record represents the current value. This separation prevents a late cancellation from rewriting subsequent cost calculation."
+          ]
+        },
+        {
+          "id": "stock",
+          "title": "Stock, transfers and inventory counts",
+          "paragraphs": [
+            "Stock keeps a ledger of incoming, outgoing and reversing movements per store. A simple product has its own balance bucket; a product with variants has a balance per SKU. Sale units can differ from stock units, so conversion happens before availability is compared or a movement is recorded. Every line retains the source explaining its contribution to the balance.",
+            "The insufficient-availability policy can allow, block or require confirmation. The server aggregates demand for the same product or SKU and considers physical balance and reservations. Warning confirmation presents the shortage and projected balance and requires acceptance bound to that operation. The decision is checked again under a lock; a balance supplied by the browser cannot prove availability. Acceptance and movements are audited in the same transaction.",
+            "A transfer requires authority in both stores and records the movement pair together. If a box equals ten units and the source holds twelve, transferring two boxes requires twenty and is refused. Completion freezes converted quantity and cost. Cancellation produces movements opposite to the original pair while retaining subsequent sales. A transfer creates no payable or receivable because the goods still belong to the same account.",
+            "Inventory counts have draft, counted and completed stages. Counting captures system balance, unit and cost and computes the difference from the quantity found. If the system held ten and the count found eight, the difference is fixed at minus two. If a sale of two occurs before completion, balance reaches eight; applying the recorded difference takes it to six, preserving both the sale and the physical discrepancy.",
+            "Capture uses a consistent transactional read, including products with no balance row yet. Completion turns nonzero differences into movements; repeating the command does not post everything again. Reopening a completed count offsets movements from the earlier completion and requires a reason. Manual adjustment remains a separate operation: the operator enters how much to add or remove, while an inventory count records how much was found."
+          ]
+        },
+        {
+          "id": "finance",
+          "title": "Finance and payment history",
+          "paragraphs": [
+            "Finance organizes payables and receivables, installments, bank accounts, cash registers, payment methods, categories and cost centers. Each financial entry represents an obligation with amount, origin, accrual date and due date. Settlements form a separate history of money applied to the obligation. Cash and accrual reports answer different questions and use these sources according to their meaning.",
+            "A R$120 receivable can receive R$50 and retain R$70 outstanding. Interest, fines and discounts belong to the settlement: applying R$50 of principal with a R$5 discount moves R$45 and reduces outstanding principal by R$50. Calculations use exact cents; adjustments do not rewrite the original obligation. The operator can review suggested charges before confirming.",
+            "Settlement locks the financial entry before calculating balance and updates the bank account in the same unit of work. Two requests trying to apply R$70 to a R$100 receivable cannot consume the same available balance. The idempotency key and normalized content identify the operation; repeating the key with another amount conflicts. Paid or partially paid status is a projection of persisted events.",
+            "Reopening undoes receipts through reversal events and restores the open balance. Cancellation declares that the obligation is no longer owed. A manual entry with active money applied must be reopened first; an entry generated by a sale, purchase or service order retains its source document's authority over cancellation. Permission to settle in Finance does not transfer that authority.",
+            "Each materialized installment has its own financial entry and history. A plan with settlements cannot be rebuilt by erasing what happened. Generated entries pass through FinancialPostingService and retain source keys, including installment identity. Synchronization can therefore find the same entry and preserve historical descriptions and events instead of creating another obligation on retry."
+          ]
+        },
+        {
+          "id": "service-orders",
+          "title": "Service orders and equipment",
+          "paragraphs": [
+            "A service order organizes technical work with customer, equipment, parts, services, technicians and payment terms. It can originate from a quote and follow an account-defined situation catalog. Each situation declares whether editing is allowed, parts are reserved or moved, and financial entries are generated. A visual stage such as waiting for parts can carry a different consequence from completed work according to explicit configuration.",
+            "The engine interprets situation actions during a transition and calculates the difference between previous and new states. Parts and receivable effects use canonical stock and finance services. The server checks permissions and resource availability. The transition screen receives an explanation of effects, including receipts that would need reversal, before executing the command.",
+            "Equipment history derives from occurrences in the customer's service orders within the authorized store. A normalized serial number groups equivalent spellings; without one, name, brand and model form the identity. The customer is part of that identity: the same serial text under two customers does not merge their histories. Choosing a suggestion copies data into the new occurrence while preserving earlier text, including cancelled orders.",
+            "The aging report distinguishes time since opening from time in the current situation. An order opened twelve days ago and moved to a new stage today has twelve opening days and zero in that situation. The calculation reads transition history with an explicit opening fallback, rather than a generic last-edit timestamp. When an order contains several pieces of equipment, parts and service totals remain order totals, without allocating costs that item rows do not identify per piece of equipment."
+          ]
+        },
+        {
+          "id": "contracts",
+          "title": "Contracts, billing and renewal",
+          "paragraphs": [
+            "Contracts maintain term, situation, recurrence rules, billing generation and termination. Configuration defines when to produce a cycle and its effects, such as a sale or receivable. Pausing billing, terminating a contract and renewing its term are distinct decisions; processing does not infer one merely because a date arrived.",
+            "Cycles use persisted outbox events and an identity per contract and sequence. On execution, the worker reads and locks the contract again, compares expected due date and sequence, and checks its current situation. An event scheduled before an edit cannot bill according to the old version. Redelivery finds an already processed cycle, and source keys on its documents prevent duplication.",
+            "Renewal preserves the historical start and calculates the new end from the previous end. Month arithmetic handles civil dates and month ends: in a non-leap year, a January 31 end can advance to February 28. Scheduling considers the store's business day and timezone. Automatic events use a system identity so the trail does not attribute a future renewal to someone who only edited the contract months earlier.",
+            "If a worker was stopped, the durable event still exists for processing. Execution continues to check eligibility and may find a suspended, terminated or already renewed contract. Cycle tests need to inspect generated documents and receivables, the next-billing pointer and retry behavior. The existence of this internal flow does not mean a gateway is charging the customer externally."
+          ]
+        },
+        {
+          "id": "commissions",
+          "title": "Seller and technician commissions",
+          "paragraphs": [
+            "Sales and service orders share a commission ledger per line and beneficiary. A sale considers its seller; a service order considers its technicians. Posting freezes the net base, percentage, percentage source and release rule. Document discount is allocated across lines; freight and other additions stay outside the commissionable base. A later master-data change does not recalculate the past.",
+            "Commission can be released on financial generation, full payment of the first or last installment, or proportionally to principal received. Under the proportional rule, a R$100 base at 10% accrues R$10; if half the eligible principal was received, R$5 is released. Reversing that receipt makes the share pending again. Offsetting debt through a return does not count as money received.",
+            "Reconciliation runs inside the document transaction and records accruals and reversals with unique keys per source, line, beneficiary and cycle. Release is derived from settlements, avoiding a second balance that could become stale. With several technicians, a deterministic rule splits the base and allocates remaining cents. Even the absence of a usable percentage is frozen as policy so a future master-data edit cannot create retroactive commission.",
+            "A converted quote cannot earn commission simultaneously through two legacy destinations. Reconciliation uses a per-quote lock when deciding between documents. Reports group by beneficiary, document, product or service, respect account, store and currency, and support export. The module tracks entitlement and release; commission payment and payroll remain outside this control."
+          ]
+        },
+        {
+          "id": "service-desk",
+          "title": "Service Desk and support history",
+          "paragraphs": [
+            "Service Desk organizes tickets, assignees, categories, channels, comments and custom fields. A ticket can link a customer available in the store or record a manual requester. Channel and direction are separate: phone describes the medium; inbound or outbound describes who initiated contact. The center presents indicators and tickets within the authorized scope.",
+            "The account creates situation names and colors mapped to open, in progress, waiting for customer, resolved and closed behaviors. Moving between situations with the same behavior still records history without inventing another start or resolution. A situation referenced by tickets or history retains its behavior. Start, resolve and reopen actions retain defined destinations.",
+            "A transition carries the expected state and conflicts if another operator already changed the ticket. Creation and changes append immutable events in the same transaction. Requester contact is a snapshot: editing another field does not silently replace the recipient because the customer record changed. Internal notes and history observations remain internal; sending a public reply after resolution requires reopening the ticket.",
+            "Permission to edit a ticket does not grant every comment permission. The service locks the parent and persisted comments before classifying created, changed or removed content and enforcing the corresponding capability. The center summary uses an explicit field selection so complete relations cannot bring data from other resources. Concurrency tests observe competition for records and check that transitions and edits cannot leave inappropriate public content after closure."
+          ]
+        },
+        {
+          "id": "shared-platform",
+          "title": "Shared screens and extensions",
+          "paragraphs": [
+            "Forms, tables, filters, pickers and actions are composed through shared metadata and contracts. Each module registers fields and adds interfaces for operations needing more context, such as converting a quote, closing a register or counting stock. Common infrastructure handles state, presentation and contract execution; commercial decisions stay in the domain that owns them.",
+            "Imports, exports, PDF, email, translation and themes share common paths. Contextual help, hints, checklists and tours use declared programs filtered by session modules and permissions. The same user can receive different guidance in two accounts or stores because the authorized context changed. The interface does not need a second copy of access rules to decide which actions to offer.",
+            "The extension SDK declares versioned manifests, contributions, commands and events. Validators check identifiers, dependencies, configuration and content. Event publication uses the existing unit of work and outbox; account and actor come from server context. The contract does not authorize loading arbitrary code or turn an extension declaration into a complete runtime.",
+            "The CRUD evolution preserved public signatures for over a hundred services while separating reads, field policy and scope. To investigate a commercial command, audit connects actor, transition and planned effects with records actually changed in stock and finance. A replay without effects creates no further success evidence. Domain tests, PostgreSQL integration tests and browser journeys check those boundaries; that infrastructure does not replace running and assessing each delivery's scenarios."
+          ]
+        }
+      ],
+      "outcome": "AuthSales brings commercial operations and their stock, financial and service effects onto shared infrastructure. Other systems can use the foundation, and the CRUD evolution preserved the public signatures of over a hundred services.",
+      "role": "Responsible for architecture and full stack development: API, interface, data modeling, business rules and validation infrastructure.",
+      "facts": [
+        "Multi-company and multi-store SaaS",
+        "optional modules",
+        "foundation published as packages"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "One transaction for the document's effects",
+            "body": "CrudUnitOfWork coordinates writes, audit, idempotency and outbox. Sale, purchase and service order adapters plan effects; stock and finance retain ownership of their postings. A failure rolls back the whole operation."
+          },
+          {
+            "title": "Authorization inside business rules",
+            "body": "OperationContext and Data Scope resolve account, store and actor on the server. Sensitive commands check authorization and state again under a lock, covering calls that do not pass through the screen."
+          },
+          {
+            "title": "History through offsetting entries",
+            "body": "Settlements, stock movements and commissions preserve the original facts. Reversing or cancelling appends records linked to their source, so the system can reconstruct what happened and recognize a replay."
+          },
+          {
+            "title": "Explicit money, quantity and time semantics",
+            "body": "Financial calculations use decimals and exact cents; quantities respect units and conversions. Instants, civil dates, local times and durations have distinct contracts, so due dates and recurrence do not change with the process timezone."
+          },
+          {
+            "title": "Asynchronous work after commit",
+            "body": "Persisted outbox events drive subsequent effects and scheduled cycles. Email and PDF queues use existing infrastructure. Each consumer must recognize redelivery; a queue alone does not guarantee a single execution."
+          },
+          {
+            "title": "Validation beyond the HTTP response",
+            "body": "The repository has domain tests, PostgreSQL integration tests and Playwright journeys. Criteria include persisted balances, financial entries, history and isolation alongside API responses. Concurrency scenarios check what happens when two commands compete for the same record."
+          }
+        ],
+        "incident": {
+          "title": "Cancelling through a situation left the receivable open",
+          "body": "The situation dialog wrote through a different path from document editing. Cancelling a sale there could leave its receivable open. The architectural fix routed these commands through the same unit of work and posting boundary, with a document lock, transactional effects and an audit of the records actually changed."
+        },
+        "limits": [
+          "The current catalog includes commercial, finance, service orders and Service Desk. Fiscal is at pre-issuance, without validated transmission; projects, training, industrial, maintenance, facilities, quality, salon and document management remain outside the current launch.",
+          "External integration infrastructure and the SDK describe contracts. They do not, by themselves, represent operational bank connectors, payment gateway billing or fiscal issuance.",
+          "Commission tracking calculates and monitors entitlements and release; commission payments and payroll remain outside this module."
+        ]
+      }
     }
   },
   {

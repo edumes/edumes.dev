@@ -46,6 +46,7 @@ export function CasePage({ slug }: { slug: string }) {
   const text = c[locale];
   const next = cases[(i + 1) % cases.length];
   const posts = getPosts().filter((p) => p.case === c.id);
+  const chapters = text.story?.filter((section) => section.id);
 
   return (
     <>
@@ -94,6 +95,27 @@ export function CasePage({ slug }: { slug: string }) {
           <Stack items={c.stack} />
         </div>
 
+        {!!chapters?.length && (
+          <nav aria-labelledby="case-contents" className="mt-12 max-w-[80ch] border-y border-border py-6">
+            <h2 id="case-contents" className="type-meta">{t('cases.contents')}</h2>
+            <ol className="mt-4 grid list-decimal gap-x-10 gap-y-3 ps-5 text-[0.9375rem] marker:text-muted-foreground sm:grid-cols-2">
+              {[
+                { id: 'problem', title: t('cases.problem') },
+                { id: 'how-it-works', title: t('cases.how') },
+                ...chapters,
+                { id: 'outcome', title: t('cases.results') },
+                ...(text.details ? [{ id: 'technical-details', title: t('cases.details') }] : [])
+              ].map((section) => (
+                <li key={section.id} className="ps-1">
+                  <a href={`#${section.id}`} className="text-muted-foreground underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-border">
+                    {section.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
         <VisualStory text={text} v={visuals[c.id]} />
 
         {posts.length > 0 && (
@@ -140,10 +162,10 @@ export function CasePage({ slug }: { slug: string }) {
 
 const figure = 'rounded-lg border border-border bg-muted/50 p-4 sm:p-6';
 
-function Part({ icon, title, children }: { icon: IconName; title: string; children: React.ReactNode }) {
+function Part({ id, icon, title, children }: { id?: string; icon: IconName; title: string; children: React.ReactNode }) {
   return (
-    <section className="mt-20 sm:mt-28">
-      <h2 className="type-heading flex items-center gap-2.5" data-icon-host>
+    <section aria-labelledby={id} className="mt-20 sm:mt-28">
+      <h2 id={id} tabIndex={id ? -1 : undefined} className="type-heading flex items-center gap-2.5" data-icon-host>
         <Icon name={icon} size={20} className="text-muted-foreground" />
         {title}
       </h2>
@@ -167,7 +189,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         </figure>
       )}
 
-      <Part icon="badge-alert" title={t('problem')}>
+      <Part id="problem" icon="badge-alert" title={t('problem')}>
         <p className="type-lead mt-4 max-w-[62ch] text-muted-foreground" data-reveal>
           <Words text={text.problem} />
         </p>
@@ -178,7 +200,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         )}
       </Part>
 
-      <Part icon="workflow" title={t('how')}>
+      <Part id="how-it-works" icon="workflow" title={t('how')}>
         {v && (
           <div className={`${figure} mt-8`}>
             <v.how />
@@ -198,7 +220,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
       </Part>
 
       {text.story?.map((section) => (
-        <Part key={section.title} icon="book-text" title={section.title}>
+        <Part key={section.title} id={section.id} icon="book-text" title={section.title}>
           <div className="mt-4 grid max-w-[68ch] gap-4 text-muted-foreground">
             {section.paragraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
@@ -207,7 +229,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         </Part>
       ))}
 
-      <Part icon="trending-up" title={t('results')}>
+      <Part id="outcome" icon="trending-up" title={t('results')}>
         {v && (
           <div className={`${figure} mt-8`}>
             <v.result />
@@ -231,7 +253,7 @@ function Details({ d }: { d: NonNullable<CaseStudy[Locale]['details']> }) {
   const t = useTranslations('cases');
   return (
     <details className="disclosure group mt-20 border-t border-border pt-6 sm:mt-28">
-      <summary className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden" data-icon-host>
+      <summary id="technical-details" className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden" data-icon-host>
         <h2 className="type-heading flex items-center gap-2.5">
           <Icon name="cog" size={20} className="text-muted-foreground" />
           {t('details')}
