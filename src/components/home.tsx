@@ -120,6 +120,7 @@ export function Home() {
         <RippleGrid />
         <Reveals />
         <section id="top" className="mx-auto max-w-6xl px-(--gutter) pt-24 pb-8 sm:pt-28">
+          <p className="type-meta mb-6 text-muted-foreground">{t('hero.intro')}</p>
           <HeroTitle heading={`${profile.name}, ${t('meta.role')}`} />
           {/* Each load starts on the phrase after the last one shown (random on a first visit), swapped in before paint
               from the hidden sizers so it never flashes phrase 0. HeroTitle picks the index up when it hydrates. */}
