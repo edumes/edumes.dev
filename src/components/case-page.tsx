@@ -85,12 +85,10 @@ export function CasePage({ slug }: { slug: string }) {
         <p className="type-lead mt-6 max-w-[56ch] text-muted-foreground" data-reveal>
           <Words text={text.summary} />
         </p>
-        {text.role && (
-          <div className="mt-6 max-w-[60ch] border-s-2 border-border ps-4">
-            <p className="text-[0.9375rem]">{text.role}</p>
-            {text.facts && <p className="type-meta mt-1">{text.facts.join(' · ')}</p>}
-          </div>
-        )}
+        <div className="mt-6 max-w-[60ch] border-s-2 border-border ps-4">
+          <p className="text-[0.9375rem]">{text.role}</p>
+          <p className="type-meta mt-1">{text.facts.join(' · ')}</p>
+        </div>
         <div className="mt-8">
           <Stack items={c.stack} />
         </div>
@@ -104,7 +102,7 @@ export function CasePage({ slug }: { slug: string }) {
                 { id: 'how-it-works', title: t('cases.how') },
                 ...chapters,
                 { id: 'outcome', title: t('cases.results') },
-                ...(text.details ? [{ id: 'technical-details', title: t('cases.details') }] : [])
+                { id: 'technical-details', title: t('cases.details') }
               ].map((section) => (
                 <li key={section.id} className="ps-1">
                   <a href={`#${section.id}`} className="text-muted-foreground underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-border">
@@ -240,7 +238,7 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         </p>
       </Part>
 
-      {text.details && <Details d={text.details} />}
+      <Details d={text.details} />
     </>
   );
 }

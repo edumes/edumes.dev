@@ -43,6 +43,7 @@
     "actions": "Actions"
   },
   "hero": {
+    "intro": "Full-stack developer · 4+ years · Node.js, React, PostgreSQL",
     "opening": "Business systems,",
     "titles": [
       "designed around the process.",
@@ -135,14 +136,6 @@
     "code": "Code on GitHub",
     "items": [
       {
-        "name": "Aurora Mainframe Banking",
-        "icon": "terminal",
-        "stack": [
-          "GnuCOBOL"
-        ],
-        "body": "A made-up bank's daily financial closing in COBOL: normalizes transactions, posts double-entry accounting, reconciles and produces batch reports."
-      },
-      {
         "name": "LoreForge",
         "icon": "book-text",
         "stack": [
@@ -181,15 +174,6 @@
         "body": "Questions about PDFs and images, with OCR running in the browser and answers that point to the source passage."
       },
       {
-        "name": "Deep Drill",
-        "icon": "pickaxe",
-        "stack": [
-          "Go",
-          "TypeScript"
-        ],
-        "body": "A browser idle mining game with refining, drills, generators, energy limits and offline gains."
-      },
-      {
         "name": "YT Radio Stream",
         "icon": "radio-tower",
         "stack": [
@@ -210,26 +194,6 @@
         ],
         "body": "Desktop app that shows one frame per minute of a long video and cuts the minutes you pick, wide or vertical 9:16, with the machine's hardware encoder (VideoToolbox or NVENC).",
         "href": "https://github.com/edumes/Segmentor"
-      },
-      {
-        "name": "Salário Contado",
-        "icon": "circle-dollar-sign",
-        "stack": [
-          "Next.js"
-        ],
-        "body": "Shows in real time how much you've earned today, from your salary and working hours.",
-        "href": "https://github.com/edumes/salariocontado"
-      },
-      {
-        "name": "Chatbot Assistant",
-        "icon": "message-circle-more",
-        "stack": [
-          "Laravel",
-          "Livewire",
-          "MySQL"
-        ],
-        "body": "A chat with login where every conversation is saved and can be picked up again from the sidebar, with a typing indicator while the reply comes in.",
-        "href": "https://github.com/edumes/chatbot-ai"
       }
     ]
   },
@@ -322,7 +286,7 @@
         "org": "NEC Brasil",
         "period": "Aug 2022 to present",
         "place": "Americana, Brazil",
-        "body": "I build and maintain web systems for clients across several industries: integrations with partner APIs such as Omie, TecnoSpeed, Vuupt and D4Sign, PDF and Excel report automation, RPA robots, and support for systems in production."
+        "body": "I own business systems for clients across 12 domains, from the data model to the interface, and stay responsible for them in production: deploys, incidents and ongoing changes. I decide the architecture of new systems, gather requirements and present deliveries directly to clients, and review my colleagues' code. The work includes integrations with partner APIs such as Omie, TecnoSpeed, Vuupt and D4Sign, PDF and Excel reports, RPA robots and a mobile order picking app."
       }
     ],
     "domainsTitle": "Systems I've built and maintained",
@@ -419,13 +383,14 @@
   "cv": {
     "place": "Americana, SP, Brazil",
     "summaryTitle": "Summary",
-    "summary": "Full-stack developer since 2022. I build complete web systems for companies: React interfaces, Node.js and Python APIs, PostgreSQL, ERP integrations, mobile apps and automations. Computer Science student.",
+    "summary": "Full-stack developer with 4+ years building and running business systems: React and Next.js front ends, Node.js, TypeScript and Python APIs, PostgreSQL, ERP and partner integrations, mobile apps and automation. I decide the architecture of new systems, work directly with clients, review code and own systems in production.",
     "bullets": [
-      "Build and maintain web systems for clients across industries with TypeScript, Node.js, React, Next.js, PHP and React Native.",
-      "Business systems for HR, finance, billing, workshops, technical support, logistics and transport, from the database to the interface.",
-      "A mobile app for barcode-based order picking and checking, with its rules covered by automated tests.",
-      "Integrations with ERPs and partner APIs such as Omie, TecnoSpeed, Vuupt and D4Sign, plus PDF and Excel report automation.",
-      "Python RPA robots and a platform to schedule and follow them on Windows workstations."
+      "Own business systems across 12 domains (HR, finance, billing, workshops, logistics, transport and more) from data model to interface, including deploys, incidents and ongoing changes in production.",
+      "Decide architecture and stack for new systems and modules; gather requirements, estimate and demo deliveries directly with clients.",
+      "Built a React Native app for barcode order picking from scratch (2024); in 2026 rewrote the flow for orders split into parts, moving the rules out of the screens into modules covered by about 50 tests.",
+      "Extended a multi-tenant platform that schedules and monitors Python robots on Windows workstations: workstation queues, release rollout, department permissions and new robot integrations.",
+      "Integrated ERPs and partner APIs (Omie, TecnoSpeed, Vuupt, D4Sign) and automated PDF and Excel reports.",
+      "Review colleagues' code and help newer developers get up to speed."
     ],
     "highlightsTitle": "Case studies",
     "languagesTitle": "Languages",

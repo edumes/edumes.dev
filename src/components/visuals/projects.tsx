@@ -1,78 +1,36 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
-import { useFormatter, useLocale } from 'next-intl';
+import { useId } from 'react';
+import { motion } from 'motion/react';
+import { useLocale } from 'next-intl';
 import { defineCopy } from '@/i18n/copy';
 import type { Locale } from '@/i18n/config';
-import { tone, useLoop } from './shared';
+import { useLoop } from './shared';
 
 // Small scenes for the personal projects on the home page. Each one loops on its own while visible.
 
 const useCopy = defineCopy({
   pt: {
-    aurora: { balance: 'DÉBITO 1.250.000,00 = CRÉDITO ✓' },
     // One per position in NOTE_AT.
     loreForge: { notes: ['Valen', 'A Torre', 'Iria', 'Missão 3', 'Mapa'] },
     lyricType: { playing: 'tocando agora', accuracy: 'precisão 98%', wpm: 'ppm' },
     myGarden: { title: 'Meu jardim', ready: (n: number) => `${n} prontas para colher` },
     document: { file: 'contrato.pdf · p. 2', question: 'Qual o prazo de pagamento?', answer: '30 dias após a entrega.' },
-    deepDrill: { iron: 'ferro', copper: 'cobre', energy: 'energia' },
     ytRadio: { live: 'AO VIVO', cycle: (n: number) => `ciclo ${n} de 8, sem repetir` },
-    segmentor: { source: 'podcast.mp4 · um quadro por minuto' },
-    salario: { earned: 'Você já ganhou hoje', workday: '64% do expediente' },
-    chatbot: {
-      chats: 'Conversas',
-      chat: 'Nova conversa',
-      greeting: 'Olá! Como posso ajudar hoje?',
-      suggestions: ['Em que você pode me ajudar?', 'Pode me dar uma dica rápida?'],
-      typing: 'digitando… (~3s)',
-      reply: 'Estou aqui para ajudar! O que você gostaria de saber?',
-      input: 'Digite sua mensagem…'
-    }
+    segmentor: { source: 'podcast.mp4 · um quadro por minuto' }
   },
   en: {
-    aurora: { balance: 'DEBIT 1,250,000.00 = CREDIT ✓' },
     loreForge: { notes: ['Valen', 'The Tower', 'Iria', 'Quest 3', 'Map'] },
     lyricType: { playing: 'now playing', accuracy: 'accuracy 98%', wpm: 'wpm' },
     myGarden: { title: 'My garden', ready: (n) => `${n} ready to harvest` },
     document: { file: 'contract.pdf · p. 2', question: "What's the payment term?", answer: '30 days after delivery.' },
-    deepDrill: { iron: 'iron', copper: 'copper', energy: 'energy' },
     ytRadio: { live: 'LIVE', cycle: (n) => `cycle ${n} of 8, no repeats` },
-    segmentor: { source: 'podcast.mp4 · one frame per minute' },
-    salario: { earned: "You've earned today", workday: '64% of the workday' },
-    chatbot: {
-      chats: 'Chats',
-      chat: 'New chat',
-      greeting: 'Hello! How can I help you today?',
-      suggestions: ['What can you help me with?', 'Can you give me a quick tip?'],
-      typing: 'typing… (~3s)',
-      reply: "I'm here to help! What would you like to know?",
-      input: 'Type your message…'
-    }
+    segmentor: { source: 'podcast.mp4 · one frame per minute' }
   }
 });
 
 type Scene = () => React.ReactElement;
 const box = 'h-full rounded-md border border-border bg-card p-3 text-card-foreground';
-
-// A COBOL daily close running step by step, ending with debits matching credits.
-const BATCH = [500, 450, 450, 450, 450, 700, 2600];
-function Aurora() {
-  const t = useCopy().aurora;
-  const { ref, step } = useLoop(BATCH);
-  const lines = ['//DAILYCLS JOB AURORA', 'STEP01 NORMALIZE ...... OK', 'STEP02 POST D/C ....... OK', 'STEP03 RECONCILE ...... OK', 'STEP04 REPORTS ........ OK'];
-  return (
-    <div ref={ref} className={`${box} font-mono text-[0.6875rem] leading-relaxed`}>
-      {lines.map((l, k) => (
-        <p key={l} className={`morph ${k < step ? '' : 'opacity-0'} ${k ? '' : 'text-muted-foreground'}`}>
-          {l}
-        </p>
-      ))}
-      <p className={`morph mt-1 w-fit rounded-sm border px-1.5 ${step >= 6 ? `${tone.ok} lit` : 'border-transparent opacity-0'}`}>{t.balance}</p>
-    </div>
-  );
-}
 
 // A Markdown vault turned into a graph of linked notes, one link lighting up at a time.
 const NOTE_AT: [number, number][] = [[18, 30], [52, 18], [82, 38], [60, 72], [24, 76]];
@@ -209,41 +167,6 @@ function DocumentAssistant() {
   );
 }
 
-// A drill going deeper through rock layers while ore piles up and energy runs low.
-const DIG = [700, 700, 700, 700, 700, 1600];
-const LAYERS = ['bg-muted-foreground/15', 'bg-muted-foreground/25', 'bg-(--attention)/25', 'bg-muted-foreground/30', 'bg-primary/25', 'bg-muted-foreground/35', 'bg-(--attention)/30', 'bg-muted-foreground/25'];
-function DeepDrill() {
-  const t = useCopy().deepDrill;
-  const { ref, step } = useLoop(DIG);
-  return (
-    <div ref={ref} className={`${box} grid grid-cols-[3rem_1fr] gap-3`}>
-      <div className="relative overflow-hidden rounded-sm border border-border">
-        <div className="morph absolute inset-x-0 top-0" style={{ transform: `translateY(-${step * 14}px)` }}>
-          {LAYERS.map((l, k) => (
-            <span key={k} className={`block h-5 ${l}`} />
-          ))}
-        </div>
-        <span className="absolute top-1/2 left-1/2 h-6 w-2 -translate-1/2 rounded-b-full bg-foreground" />
-      </div>
-      <div className="grid content-center gap-1.5 text-[0.6875rem]">
-        <p className="font-mono text-lg leading-none tabular-nums">{120 + step * 14} m</p>
-        <p className="flex justify-between">
-          <span className="text-muted-foreground">{t.iron}</span>
-          <span className="font-mono tabular-nums">{38 + step * 3}</span>
-        </p>
-        <p className="flex justify-between">
-          <span className="text-muted-foreground">{t.copper}</span>
-          <span className="font-mono tabular-nums">{12 + step}</span>
-        </p>
-        <span className="block h-1 overflow-hidden rounded-full bg-border">
-          <span className="morph block h-full bg-primary" style={{ width: `${90 - step * 13}%`, transition: 'width 600ms ease' }} />
-        </span>
-        <span className="text-muted-foreground">{t.energy}</span>
-      </div>
-    </div>
-  );
-}
-
 // A live stream walking a shuffled folder of clips, never repeating one until the cycle closes.
 const ORDER = [5, 2, 7, 1, 8, 3, 6, 4];
 const RADIO = ORDER.map(() => 1300);
@@ -331,97 +254,13 @@ function Segmentor() {
   );
 }
 
-// How much of today's pay is already earned, counting up live.
-const PER_SECOND = 0.0126; // a made-up salary spread over the working hours
-function SalarioContado() {
-  const t = useCopy().salario;
-  const format = useFormatter();
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref);
-  const calm = useReducedMotion();
-  const [earned, setEarned] = useState(187.42);
-  useEffect(() => {
-    if (!inView || calm) return;
-    const id = setInterval(() => setEarned((e) => e + PER_SECOND / 10), 100);
-    return () => clearInterval(id);
-  }, [inView, calm]);
-  return (
-    <div ref={ref} className={`${box} flex flex-col justify-between`}>
-      <p className="text-[0.6875rem] text-muted-foreground">{t.earned}</p>
-      <p className="type-title tabular-nums">{format.number(earned, { style: 'currency', currency: 'BRL', minimumFractionDigits: 4 })}</p>
-      <div>
-        <span className="block h-1 overflow-hidden rounded-full bg-border">
-          <span className="block h-full w-[64%] bg-primary" />
-        </span>
-        <p className="mt-1 flex justify-between text-[0.6875rem] text-muted-foreground">
-          <span>{t.workday}</span>
-          <span>+{format.number(PER_SECOND)}/s</span>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// The open chat in the saved list: a suggestion picked, the typing indicator, then one of the app's fixed replies.
-// Every chat is listed as "New chat" plus its date, the way the app lists them.
-const CHAT = [700, 700, 600, 1600, 2600];
-const DATES = ['22/06 21:29', '21/06 18:04', '16/06 09:12'];
-function ChatbotAssistant() {
-  const t = useCopy().chatbot;
-  const { ref, step } = useLoop(CHAT);
-  const slot = 'morph col-start-1 row-start-1';
-  const bot = 'w-fit max-w-[95%] rounded-md rounded-bl-none border border-border bg-background px-2 py-1';
-  return (
-    <div ref={ref} className={`${box} grid grid-cols-[2fr_3fr] gap-3 text-[0.625rem] leading-snug`}>
-      <div className="grid content-start gap-1">
-        <p className="text-[0.5625rem] text-muted-foreground">{t.chats}</p>
-        {DATES.map((d, k) => (
-          <p key={d} className={`rounded-sm border px-1.5 py-0.5 ${k ? 'border-border bg-background' : 'border-primary/60 bg-primary/10'}`}>
-            <span className="block truncate">{t.chat}</span>
-            <span className="block font-mono text-[0.5625rem] text-muted-foreground tabular-nums">{d}</span>
-          </p>
-        ))}
-      </div>
-      <div className="flex min-w-0 flex-col justify-end gap-1.5">
-        <p className={bot}>{t.greeting}</p>
-        <div className="grid">
-          <p className={`${slot} flex gap-1 overflow-hidden whitespace-nowrap ${step <= 1 ? '' : 'opacity-0'}`}>
-            {t.suggestions.map((s, k) => (
-              <span key={s} className={`morph rounded-sm border px-1.5 py-0.5 ${k === 0 && step === 1 ? 'lit border-primary' : 'border-border text-muted-foreground'}`}>
-                {s}
-              </span>
-            ))}
-          </p>
-          <p className={`${slot} ml-auto max-w-[95%] rounded-md rounded-br-none bg-primary px-2 py-1 text-primary-foreground ${step >= 2 ? '' : 'opacity-0'}`}>{t.suggestions[0]}</p>
-        </div>
-        <div className="grid">
-          <p className={`${slot} flex items-center gap-1 self-start text-muted-foreground ${step === 3 ? '' : 'opacity-0'}`}>
-            {[0, 150, 300].map((ms) => (
-              <span key={ms} className="size-1 rounded-full bg-primary motion-safe:animate-pulse" style={{ animationDelay: `${ms}ms` }} />
-            ))}
-            <span className="ml-1">{t.typing}</span>
-          </p>
-          <p className={`${slot} ${bot} ${step >= 4 ? '' : 'opacity-0'}`} style={{ transform: step >= 4 ? 'none' : 'translateY(4px)' }}>
-            {t.reply}
-          </p>
-        </div>
-        <p className="rounded-sm border border-border px-2 py-1 text-muted-foreground">{t.input}</p>
-      </div>
-    </div>
-  );
-}
-
 const SCENES: Record<string, Scene> = {
-  'Aurora Mainframe Banking': Aurora,
   LoreForge,
   'Lyric Type': LyricType,
   'My Garden': MyGarden,
   'Document Assistant': DocumentAssistant,
-  'Deep Drill': DeepDrill,
   'YT Radio Stream': YtRadio,
-  Segmentor,
-  'Salário Contado': SalarioContado,
-  'Chatbot Assistant': ChatbotAssistant
+  Segmentor
 };
 
 // The scene for a project on the home page, by its name (the same in both languages).

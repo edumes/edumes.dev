@@ -1,5 +1,611 @@
 [
   {
+    "id": "separacao-pedidos",
+    "featured": true,
+    "icon": "smartphone-nfc",
+    "stack": [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Jest"
+    ],
+    "pt": {
+      "slug": "separacao-pedidos",
+      "category": "Mobile",
+      "title": "Separar e conferir pedidos no depósito sem perder o fio",
+      "summary": "Um app de celular para separadores e coletores bipar produtos, dividir pedidos em partes e retomar o trabalho de onde parou.",
+      "problem": "Separadores e coletores bipam produtos com o celular no meio do depósito, e o app precisa saber exatamente onde cada pedido parou.",
+      "how": [
+        {
+          "icon": "workflow",
+          "title": "Regras em funções puras",
+          "body": "Continuar, recomeçar, abrir a próxima parte e detectar parte finalizada ficam fora das telas."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "Cerca de 50 testes",
+          "body": "Chaves duplicadas, partes fora de ordem, coleta divergente, setor repetido e confirmação final."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Toda leitura tem resultado",
+          "body": "Aceita, repetida ou divergente, e uma divergência fica visível até o fim do pedido."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Atualização obrigatória",
+          "body": "Todo mundo trabalha sempre com a mesma regra."
+        }
+      ],
+      "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente.",
+      "role": "App criado do zero em 2024, com a arquitetura, a publicação das versões e a revisão de código. Em 2026, o fluxo foi reescrito para pedidos divididos em partes, com as regras fora das telas e cobertas por testes.",
+      "facts": [
+        "três funções",
+        "dois modos de leitura",
+        "cerca de 50 testes"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Câmera e leitor, uma regra só",
+            "body": "Só muda a forma de ler. As regras saíram das telas para módulos puros, então as duas versões da tela não divergem na regra."
+          },
+          {
+            "title": "Recomeçar não apaga na hora",
+            "body": "O processo antigo só é substituído quando o novo é finalizado. Quem desiste no meio de um recomeço não perde o que existia."
+          },
+          {
+            "title": "Item divergente não conta",
+            "body": "A quantidade que o coletor precisa conferir ignora o que saiu divergente na separação. Senão a conta nunca fecharia."
+          },
+          {
+            "title": "Só as últimas 50 leituras na tela",
+            "body": "O lote completo fica fora do estado da tela, para o app continuar leve em celulares simples."
+          }
+        ],
+        "incident": {
+          "title": "Versões antigas em campo",
+          "body": "Quando os pedidos passaram a ser divididos em partes, quem ainda estava numa versão antiga do app continuava bipando com a regra velha. A atualização deixou de ser opcional: ao entrar, o app compara a própria versão com a publicada e só deixa trabalhar depois de atualizar, com o botão levando direto ao instalador da versão nova."
+        },
+        "limits": [
+          "A parte em andamento só existe na memória do celular até ser finalizada: fechar o app perde a parte. Próximo passo: guardar a parte no aparelho.",
+          "Recomeçar apaga e grava em duas chamadas, não numa transação. Próximo passo: uma rota única que substitui a parte de uma vez.",
+          "As telas de câmera e de leitor ainda são duplicadas, mesmo com as regras compartilhadas. Próximo passo: uma tela só, com a forma de leitura trocável."
+        ]
+      }
+    },
+    "en": {
+      "slug": "order-picking",
+      "category": "Mobile",
+      "title": "Picking and checking orders on the warehouse floor without losing track",
+      "summary": "A phone app for pickers and collectors to scan products, split orders into parts and resume work where it stopped.",
+      "problem": "Pickers and collectors scan products with their phones in the middle of the warehouse, and the app has to know exactly where each order stopped.",
+      "how": [
+        {
+          "icon": "workflow",
+          "title": "Rules in pure functions",
+          "body": "Continue, restart, open the next part and detect a finished part live outside the screens."
+        },
+        {
+          "icon": "clipboard-check",
+          "title": "About 50 tests",
+          "body": "Duplicate keys, parts out of order, mismatched collection, repeated sector and final confirmation."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Every scan has a result",
+          "body": "Accepted, repeated or mismatched, and a mismatch stays visible until the order is done."
+        },
+        {
+          "icon": "refresh-cw",
+          "title": "Mandatory updates",
+          "body": "Everyone always works with the same rules."
+        }
+      ],
+      "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer.",
+      "role": "App built from scratch in 2024, including its architecture, releases and code review. In 2026 the flow was rewritten for orders split into parts, with the rules moved out of the screens and covered by tests.",
+      "facts": [
+        "three roles",
+        "two scanning modes",
+        "about 50 tests"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Camera and scanner, one set of rules",
+            "body": "Only the way of reading changes. The rules moved out of the screens into pure modules, so the two versions of the screen cannot drift apart on the rules."
+          },
+          {
+            "title": "Restarting does not delete right away",
+            "body": "The old process is only replaced when the new one is finished. Someone who gives up halfway through a restart loses nothing."
+          },
+          {
+            "title": "A mismatched item does not count",
+            "body": "The quantity the collector has to check ignores what came out mismatched in picking. Otherwise the count would never close."
+          },
+          {
+            "title": "Only the last 50 scans on screen",
+            "body": "The full batch lives outside the screen state, so the app stays light on basic phones."
+          }
+        ],
+        "incident": {
+          "title": "Old versions in the field",
+          "body": "When orders started being split into parts, anyone still on an old version of the app kept scanning with the old rules. Updating stopped being optional: on entry, the app compares its own version with the published one and only lets people work after updating, with the button going straight to the new installer."
+        },
+        "limits": [
+          "The part in progress only lives in the phone’s memory until it is finished: closing the app loses it. Next step: keep the part on the device.",
+          "Restarting deletes and saves in two calls, not in one transaction. Next step: a single route that replaces the part at once.",
+          "The camera and scanner screens are still duplicated, even with shared rules. Next step: one screen with a swappable way of reading."
+        ]
+      }
+    }
+  },
+  {
+    "id": "orquestracao-rpa",
+    "featured": true,
+    "icon": "bot",
+    "stack": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "WebSocket",
+      "React",
+      "TypeScript",
+      "APScheduler",
+      "pdfplumber"
+    ],
+    "pt": {
+      "slug": "orquestracao-rpa",
+      "category": "Automação",
+      "title": "Robôs que operam sistemas sem API, e um painel para comandá-los",
+      "summary": "Uma plataforma multiempresa para distribuir, agendar e acompanhar robôs em estações Windows. Trabalhei na evolução do painel, da API e do agente, conectando a execução das automações ao acompanhamento da rotina fiscal e contábil.",
+      "role": "Atuação full stack na evolução de uma base existente, da arquitetura multiempresa à operação em produção, com contato direto com o cliente e revisão de código: filas por estação, pendências por empresa e competência, distribuição de versões, permissões por departamento e integração de novos robôs.",
+      "facts": [
+        "Painel React e TypeScript",
+        "API e agente em Python",
+        "Execução em estações Windows"
+      ],
+      "problem": "As automações acessam portais e sistemas contábeis desktop sem API, usando a tela, o mouse e o teclado da estação. A operação envolve vários clientes, cada um com suas empresas, credenciais e máquinas. Era preciso coordenar quem roda, onde, em qual versão e para qual competência, sem abrir portas de entrada na rede do cliente. Também era necessário mostrar o que ficou pendente: uma conexão perdida, uma divergência fiscal e um robô com defeito exigem tratamentos diferentes.",
+      "how": [
+        {
+          "icon": "plug-zap",
+          "title": "A estação inicia a conexão",
+          "body": "O agente Windows abre um WebSocket para o painel, recebe ordens e devolve eventos. Sinais de vida informam a disponibilidade da máquina; ao reconectar, agente e servidor conferem o que continuou rodando."
+        },
+        {
+          "icon": "database-backup",
+          "title": "Uma fila por estação",
+          "body": "O painel mantém as ordens no PostgreSQL e libera um robô por vez em cada máquina, porque eles compartilham mouse e teclado. Estações diferentes trabalham em paralelo; tela bloqueada ou sessão desconectada seguram a fila."
+        },
+        {
+          "icon": "calendar-days",
+          "title": "Da agenda ao lote",
+          "body": "Um disparo cria um grupo com uma execução por empresa. A agenda usa fuso horário e pode seguir todas as empresas elegíveis, uma seleção fixa ou uma fila de empresas cuja composição é consultada a cada ocorrência."
+        },
+        {
+          "icon": "users",
+          "title": "Pendências que fazem sentido",
+          "body": "O último resultado de cada empresa, automação e competência define o que precisa de atenção. Cancelar não esconde uma falha anterior, e um sucesso em outra competência não resolve o trabalho que ficou para trás."
+        },
+        {
+          "icon": "file-text",
+          "title": "Um contrato para os robôs",
+          "body": "Cada versão declara parâmetros e requisitos em um manifesto JSON. O agente entrega a configuração, acompanha eventos em JSON Lines e interpreta códigos de saída que distinguem sucesso, erro, resultado parcial e intervenção humana."
+        },
+        {
+          "icon": "shield-check",
+          "title": "Versões sob controle",
+          "body": "Pacotes passam por verificação de integridade e assinatura antes da instalação. O painel acompanha a versão instalada e pode exigir uma versão mínima; uma atualização que falha preserva o erro e bloqueia o robô abaixo desse mínimo."
+        }
+      ],
+      "story": [
+        {
+          "title": "A operação por trás de um disparo",
+          "paragraphs": [
+            "O cliente da plataforma tem um ambiente isolado, chamado tenant. Dentro dele ficam as empresas atendidas, os usuários, as máquinas e as automações liberadas. Uma mesma rotina pode precisar rodar para várias empresas e para um mês de referência específico, a competência. Por isso, acompanhar só o processo do robô não basta: o painel precisa identificar qual trabalho de cada empresa foi concluído.",
+            "No disparo manual, a pessoa escolhe a automação, a estação e as empresas. O servidor valida os vínculos e cria o grupo de execuções com uma chave de idempotência, para que reenviar o mesmo pedido não crie outro lote. O agendamento passa pelo mesmo caminho. Se a máquina estiver offline, a política escolhida registra que o trabalho foi pulado ou mantém a ordem aguardando a reconexão."
+          ]
+        },
+        {
+          "title": "O que desenvolvi na evolução da plataforma",
+          "paragraphs": [
+            "Trabalhei na fila central por máquina e na sua visibilidade no painel: execução em andamento, trabalhos aguardando e previsão de término a partir do histórico. Também implementei a visão de pendências, o acompanhamento por competência e a repetição automática de falhas técnicas. Resultado parcial e pedido de intervenção ficam para análise humana, porque repetir uma automação que transmite dados pode duplicar uma operação externa.",
+            "Outras entregas incluíram permissões por departamento, notas de versão, atualização em massa dos robôs e gestão do armazenamento dos pacotes. Mais tarde, acrescentei filas de empresas reutilizáveis em disparos e agendas, evitando selecionar a mesma carteira empresa por empresa. Também corrigi o salvamento da estação dos agendamentos e a escolha da máquina padrão no disparo manual, mantendo a possibilidade de selecionar outra estação pronta."
+          ]
+        },
+        {
+          "title": "Distribuir uma correção sem perder o trabalho da fila",
+          "paragraphs": [
+            "Publicar um pacote novo não atualiza sozinho todas as estações. Implementei um fluxo de versão mínima com uma prévia das instalações afetadas e acompanhamento por máquina. Quem está offline recebe a atualização quando volta. As execuções daquele robô aguardam a instalação; trabalhos de outras automações continuam elegíveis para usar a estação.",
+            "Se a própria automação está rodando quando a atualização obrigatória chega, o fluxo cancela essa execução e cria uma substituta com a mesma empresa, parâmetros e competência, priorizada na fila. Antes de liberar os trabalhos pendentes, o servidor valida os parâmetros contra o manifesto da versão nova. Uma incompatibilidade vira uma pendência com motivo; uma atualização malsucedida exige nova tentativa e mantém o bloqueio da versão antiga."
+          ]
+        },
+        {
+          "title": "Automação entre navegador e aplicações desktop",
+          "paragraphs": [
+            "Há fluxos que atravessam o navegador, uma aplicação Windows e arquivos em disco. Playwright controla a parte web, enquanto pywinauto e as APIs do Windows lidam com janelas, foco e teclado. A transição exige confirmar qual janela abriu, esperar o estado necessário e conferir o contexto antes de continuar. Um clique executado sem erro ainda precisa produzir a mudança esperada na interface.",
+            "Alguns robôs reaproveitam a sessão entre empresas do mesmo lote, reduzindo a necessidade de autenticar a cada execução. A sessão só é reutilizada enquanto válida. Credenciais recusadas, desafios de autenticação e bloqueios de acesso recebem tratamento próprio, com pausa ou pedido de intervenção, para evitar uma sequência de tentativas que agrave o bloqueio."
+          ]
+        },
+        {
+          "title": "OCR e calibração para interfaces sem controles acessíveis",
+          "paragraphs": [
+            "Algumas janelas mostram uma interface transmitida como imagem e não expõem os campos pela API de acessibilidade. Nesses casos, o robô usa o OCR nativo do Windows para localizar textos e reconhecer valores. Recortes de regiões pequenas podem ser ampliados antes da leitura; as posições reconhecidas são convertidas de volta para coordenadas de tela. Isso permite trabalhar com menus cuja posição muda e tabelas que exigem rolagem.",
+            "A estratégia varia conforme a tela: seletores acessíveis onde existem, leitura visual onde é necessária e coordenadas calibradas como alternativa. Os ajustes podem pertencer à estação, porque resolução, escala e tamanho da janela afetam o alvo. Campos importantes são conferidos após o preenchimento, e perguntas desconhecidas podem interromper o fluxo para análise humana."
+          ]
+        },
+        {
+          "title": "Leitura e conciliação de arquivos",
+          "paragraphs": [
+            "Os robôs combinam dados de arquivos e telas para conferir se as fontes concordam. Os leitores de planilhas localizam cabeçalhos e normalizam identificadores antes do cruzamento, em vez de depender apenas da posição de uma coluna. Os resultados distinguem ausência de dados, registros divergentes e arquivos que não puderam ser obtidos, preservando o motivo de cada diferença.",
+            "Em PDFs com caixas lado a lado, a posição das palavras permite associar cada valor ao rótulo correto e preservar colunas vazias. Nos leitores monetários que exigem comparação exata, os valores são convertidos para Decimal. Uma das validações exige a leitura principal e ao menos uma leitura adicional do mesmo valor; todas as encontradas precisam concordar. Uma divergência interrompe a decisão que depende daquele número."
+          ]
+        },
+        {
+          "title": "Execução em etapas e retomada após interrupções",
+          "paragraphs": [
+            "Nos fluxos com checkpoint, o progresso fica em disco por empresa, período e etapa. Uma nova execução pode aproveitar downloads e passos já concluídos, enquanto conferências que dependem do conteúdo atual dos arquivos são refeitas. O estado persistente fica separado da pasta da versão instalada, para continuar disponível após a troca do pacote.",
+            "A política depende do efeito de cada passo. Uma leitura pode ser repetida; uma ação externa exige mais cuidado. Etapas marcadas como não repetíveis registram que começaram antes de agir. Se houver uma interrupção nesse intervalo, o robô para e pede conferência do destino antes de tentar novamente. O checkpoint local ajuda a controlar a retomada, mas não elimina a incerteza sobre o que aconteceu em outro sistema."
+          ]
+        },
+        {
+          "title": "Controle explícito sobre ações externas",
+          "paragraphs": [
+            "Alguns fluxos permitem consultar e conferir sem habilitar a ação final. Nos envios de mensagens, o modo de simulação monta um rascunho completo para revisão. As ações que gravam ou enviam dependem de parâmetros explícitos, e uma validação que encontra divergência pode impedir a continuação mesmo com o envio habilitado.",
+            "Os fluxos de envio mantêm um registro local do que já foi realizado por empresa e período, com opção explícita de reenvio. Outros procuram também uma confirmação existente no destino ou nos arquivos compartilhados. Essas verificações reduzem a repetição acidental, mas continuam exigindo tratamento específico quando o processo cai entre a ação externa e a gravação da confirmação."
+          ]
+        },
+        {
+          "title": "Supervisão de sessão e diagnóstico por etapa",
+          "paragraphs": [
+            "A automação também precisa reconhecer se o ambiente está utilizável: sessão ativa, janela esperada, contexto selecionado e credenciais disponíveis. Há verificações que preservam uma sessão saudável e só iniciam a recuperação quando identificam que ela caiu. Na recuperação do navegador, o perfil identifica quais processos pertencem à automação, preservando navegadores pessoais e perfis de outros robôs.",
+            "Durante a execução, eventos informam a etapa atual e o motivo do resultado. Conforme o fluxo, logs, capturas de erro e relatórios em CSV ou planilha ficam associados à execução no painel. O diagnóstico distingue uma falha técnica de uma condição que precisa de alguém; um resultado sem trabalho a realizar também tem estado próprio. Assim, quem atende a pendência consegue ver onde o processo parou e o que chegou a ser concluído."
+          ]
+        }
+      ],
+      "outcome": "A operação passou a ter agenda, filas visíveis por estação, logs ao vivo e acompanhamento por empresa e competência. O time consegue separar o que aguarda máquina, o que falhou e o que precisa de uma pessoa, repetir o trabalho pendente e acompanhar a distribuição de uma correção. Filas de empresas permitem reaproveitar carteiras nas rotinas recorrentes, enquanto o histórico preserva o resultado de cada execução.",
+      "details": {
+        "decisions": [
+          {
+            "title": "PostgreSQL guarda o estado; WebSocket transporta",
+            "body": "Uma conexão aberta não é o registro de uma ordem. Comandos e estados ficam no banco; o WebSocket entrega as mensagens. O agente guarda localmente os eventos que não conseguiu enviar e os reenvia com números de sequência. Na reconexão, a reconciliação distingue um robô ainda vivo de uma execução interrompida."
+          },
+          {
+            "title": "O agendador enfileira, o agente executa",
+            "body": "O APScheduler mantém os jobs no PostgreSQL e cria execuções pelo fluxo compartilhado com o disparo manual. Corrigi também a interpretação dos dias da semana: o cron do painel considerava domingo como zero, enquanto a biblioteca partia da segunda. Converter os dias para nomes preserva a frequência escolhida na interface."
+          },
+          {
+            "title": "Parâmetros validados na versão que vai rodar",
+            "body": "O manifesto define os campos de configuração sem exigir uma coluna para cada parâmetro de cada robô. Valores da automação, da empresa e do disparo se sobrepõem nessa ordem. O conjunto final é validado contra a versão instalada; depois de uma atualização, trabalhos que aguardavam na fila passam por nova validação."
+          },
+          {
+            "title": "Permissão aplicada na consulta e na ação",
+            "body": "Ampliei o escopo por departamento para incluir também os administradores do tenant. O papel define quais ações a pessoa pode fazer, e o departamento define quais automações ela alcança. A API aplica o filtro nas consultas e confere o acesso ao executar ações; esconder um botão no React não concede nem revoga acesso."
+          },
+          {
+            "title": "Limpar pacotes preservando o histórico",
+            "body": "Implementei o arquivamento de versões para liberar espaço sem apagar o registro, as notas de versão ou as referências das execuções. A regra protege pacotes instalados, desejados por uma máquina, exigidos como versão mínima e outras versões ainda necessárias à distribuição. O painel mostra o motivo quando um pacote não pode ser arquivado."
+          },
+          {
+            "title": "Testes nas regras que mudam a operação",
+            "body": "As entregas incluem testes de fila com sessão bloqueada, retomada após reconexão, atualização obrigatória, isolamento por departamento e pendências por competência. Nas filas de empresas, os testes verificam também a composição lida pela agenda e a recusa de remover uma fila em uso. São cenários de estado e autorização que uma confirmação visual de sucesso não demonstra."
+          }
+        ],
+        "incident": {
+          "title": "A competência automática ficava presa no mês do salvamento",
+          "body": "Um parâmetro podia declarar mês atual ou mês anterior como padrão dinâmico. Ao salvar a configuração com o campo vazio, a validação resolvia o padrão e gravava um mês fixo. Assim, uma rotina recorrente continuava usando a competência do salvamento nos meses seguintes. Corrigi o fluxo para preservar a ausência do valor e resolver o padrão a cada novo disparo; quando a pessoa informa um mês, ele continua fixo. Acrescentei testes para os dois comportamentos. A repetição de um trabalho antigo segue outra regra: conserva a competência original, mesmo quando o calendário já avançou."
+        },
+        "limits": [
+          "A execução depende de uma sessão Windows utilizável. Tela bloqueada ou sessão remota desconectada pausam a fila; o agente precisa rodar na sessão do usuário para acessar a interface dos sistemas desktop.",
+          "Idempotência no painel evita criar o mesmo pedido duas vezes, mas não garante que um sistema externo aceite uma transmissão uma única vez. A repetição automática precisa permanecer desabilitada nas rotinas em que reenviar pode duplicar uma operação.",
+          "Mudanças de layout em portais, aplicações desktop e documentos podem exigir manutenção do robô ou nova calibração por estação. Resultados ambíguos precisam continuar visíveis para revisão humana."
+        ]
+      }
+    },
+    "en": {
+      "slug": "rpa-orchestration",
+      "category": "Automation",
+      "title": "Robots that drive systems with no API, and a panel to command them",
+      "summary": "A multi-tenant platform to distribute, schedule and monitor robots on Windows workstations. I worked on the web panel, API and agent, connecting automation execution with the tracking of recurring tax and accounting work.",
+      "role": "Full-stack work on an existing platform, from the multi-tenant architecture to running it in production, working directly with the client and reviewing code: workstation queues, pending work by company and reporting period, release distribution, department permissions and new robot integrations.",
+      "facts": [
+        "React and TypeScript panel",
+        "Python API and agent",
+        "Windows workstation execution"
+      ],
+      "problem": "The automations use the screen, mouse and keyboard to operate portals and desktop accounting software without APIs. The operation spans multiple clients, each with its own companies, credentials and machines. The platform has to coordinate what runs, where, on which version and for which reporting period, without opening inbound ports on the client's network. It also needs to show unfinished work: a lost connection, a tax discrepancy and a defective robot require different responses.",
+      "how": [
+        {
+          "icon": "plug-zap",
+          "title": "The workstation opens the connection",
+          "body": "The Windows agent opens a WebSocket to the panel, receives commands and sends events back. Heartbeats report machine availability; on reconnect, the agent and server reconcile what is still running."
+        },
+        {
+          "icon": "database-backup",
+          "title": "One queue per workstation",
+          "body": "The panel stores commands in PostgreSQL and releases one robot at a time per machine because they share a mouse and keyboard. Separate workstations run in parallel; a locked screen or disconnected session holds the queue."
+        },
+        {
+          "icon": "calendar-days",
+          "title": "From schedule to batch",
+          "body": "A request creates a batch with one execution per company. Schedules use a time zone and can follow all eligible companies, a fixed selection or a company queue whose current membership is read on each occurrence."
+        },
+        {
+          "icon": "users",
+          "title": "Pending work with a clear meaning",
+          "body": "The latest result for each company, automation and reporting period determines what needs attention. Cancellation does not hide an earlier failure, and success in another period does not resolve the work left behind."
+        },
+        {
+          "icon": "file-text",
+          "title": "A shared robot contract",
+          "body": "Each release declares its parameters and requirements in a JSON manifest. The agent supplies configuration, follows JSON Lines events and interprets exit codes that distinguish success, errors, partial results and human intervention."
+        },
+        {
+          "icon": "shield-check",
+          "title": "Controlled releases",
+          "body": "Package integrity and signatures are verified before installation. The panel tracks installed releases and can require a minimum version; a failed update keeps its error visible and blocks the robot below that minimum."
+        }
+      ],
+      "story": [
+        {
+          "title": "The operation behind an execution request",
+          "paragraphs": [
+            "Each platform client has an isolated environment, called a tenant. It holds the companies they serve, their users, machines and available automations. A routine may need to run for several companies and a specific reporting month, known as competência in Brazilian accounting. Tracking the robot process alone is insufficient: the panel needs to identify which company's work was completed for which period.",
+            "For a manual run, the operator selects the automation, workstation and companies. The server validates those relationships and creates an execution batch with an idempotency key, so resubmitting the same request does not create another batch. Scheduled runs use the same path. If the machine is offline, the selected policy records the work as skipped or keeps the command waiting for reconnection."
+          ]
+        },
+        {
+          "title": "My work on the platform",
+          "paragraphs": [
+            "I worked on the central machine queue and its visibility in the panel: the current execution, waiting work and completion estimates based on past runs. I also implemented pending-work tracking, reporting-period tracking and automatic retries for technical failures. Partial results and requests for intervention stay with a person, because retrying an automation that submits data can duplicate an external operation.",
+            "Other contributions included department permissions, release notes, bulk robot updates and package storage management. I later added reusable company queues for manual runs and schedules, avoiding repeated company-by-company selection. I also fixed workstation changes not being saved on schedules and made manual dispatch use the robot's configured default machine, while allowing the operator to select another ready workstation."
+          ]
+        },
+        {
+          "title": "Distributing a fix while preserving queued work",
+          "paragraphs": [
+            "Publishing a package does not update every workstation on its own. I implemented a minimum-version rollout with a preview of affected installations and progress per machine. Offline workstations update when they return. Executions for that robot wait for installation; other automations remain eligible to use the workstation.",
+            "If that automation is running when a mandatory update arrives, the rollout cancels the execution and creates a replacement with the same company, parameters and reporting period, prioritized in the queue. Before releasing queued work, the server validates its parameters against the new manifest. Incompatible work becomes a pending item with a reason; a failed update requires another attempt and keeps the old version blocked."
+          ]
+        },
+        {
+          "title": "Automation across browsers and desktop applications",
+          "paragraphs": [
+            "Some workflows cross a browser, a Windows application and files on disk. Playwright controls the web portion, while pywinauto and Windows APIs handle windows, focus and keyboard input. Each transition needs to confirm which window opened, wait for the required state and check the context before continuing. A click that raised no error still needs to produce the expected change in the interface.",
+            "Some robots reuse a session between companies in the same batch, reducing repeated authentication. A session is only reused while valid. Rejected credentials, authentication challenges and access restrictions receive their own handling, with a pause or a request for intervention, to avoid repeated attempts that could worsen a lockout."
+          ]
+        },
+        {
+          "title": "OCR and calibration for interfaces without accessible controls",
+          "paragraphs": [
+            "Some windows display a streamed interface as an image and expose no fields through accessibility APIs. The robot uses native Windows OCR to locate text and recognize values in those cases. Small regions can be enlarged before reading; recognized positions are converted back to screen coordinates. This supports menus whose positions change and tables that require scrolling.",
+            "The strategy depends on the screen: accessible selectors where available, visual recognition where needed and calibrated coordinates as an alternative. Adjustments can belong to a workstation because resolution, scaling and window size affect the target. Important fields are checked after input, and unfamiliar prompts can stop the workflow for human review."
+          ]
+        },
+        {
+          "title": "Reading and reconciling files",
+          "paragraphs": [
+            "The robots combine data from files and screens to check whether sources agree. Spreadsheet readers locate headers and normalize identifiers before matching records, instead of relying only on a column's position. Results distinguish missing data, mismatched records and files that could not be retrieved, preserving a reason for each difference.",
+            "In PDFs with adjacent boxes, word positions connect each amount to the correct label and preserve empty columns. Readers that require exact monetary comparisons convert amounts to Decimal. One validation requires the primary reading and at least one additional reading of the same amount; all readings found must agree. A mismatch stops the decision that depends on that number."
+          ]
+        },
+        {
+          "title": "Staged execution and recovery after interruptions",
+          "paragraphs": [
+            "In workflows with checkpoints, progress is stored on disk by company, period and stage. A new execution can reuse downloads and completed steps, while checks that depend on current file contents run again. Persistent state lives outside the installed release directory so it remains available after a package update.",
+            "The policy depends on each step's effect. Reading can be repeated; an external action needs more care. Steps marked as non-repeatable record that they have started before acting. If execution stops in that interval, the robot asks for the destination to be checked before trying again. A local checkpoint helps control recovery but cannot remove uncertainty about what happened in another system."
+          ]
+        },
+        {
+          "title": "Explicit control over external actions",
+          "paragraphs": [
+            "Some workflows support querying and checking without enabling the final action. For message delivery, simulation mode builds a complete draft for review. Actions that write or send require explicit parameters, and a validation mismatch can prevent continuation even when sending is enabled.",
+            "Delivery workflows keep a local record of completed actions by company and period, with an explicit resend option. Other workflows also look for an existing confirmation at the destination or in shared files. These checks reduce accidental repetition but still need specific handling when a process stops between the external action and recording its confirmation."
+          ]
+        },
+        {
+          "title": "Session supervision and diagnostics by stage",
+          "paragraphs": [
+            "An automation also needs to recognize whether its environment is usable: an active session, the expected window, the selected context and available credentials. Some checks preserve a healthy session and only start recovery when they identify that it has ended. During browser recovery, the profile identifies which processes belong to the automation, preserving personal browsers and other robots' profiles.",
+            "During execution, events report the current stage and the reason for the outcome. Depending on the workflow, logs, error screenshots and CSV or spreadsheet reports are attached to the execution in the panel. Diagnostics distinguish a technical failure from a condition that needs a person; having no work to perform also has its own state. Whoever handles a pending item can see where processing stopped and what was completed."
+          ]
+        }
+      ],
+      "outcome": "The operation gained schedules, visible workstation queues, live logs and tracking by company and reporting period. The team can distinguish work waiting for a machine from failures and requests for human attention, retry unfinished work and follow the rollout of a fix. Company queues let operators reuse company groups across recurring routines, while execution history preserves each result.",
+      "details": {
+        "decisions": [
+          {
+            "title": "PostgreSQL stores state; WebSocket transports it",
+            "body": "An open connection is not the record of a command. Commands and states live in the database; WebSocket delivers messages. The agent stores events it could not send locally and replays them with sequence numbers. On reconnect, reconciliation distinguishes a robot that is still alive from an interrupted execution."
+          },
+          {
+            "title": "The scheduler enqueues; the agent executes",
+            "body": "APScheduler stores jobs in PostgreSQL and creates executions through the same path as manual dispatch. I also corrected weekday interpretation: the panel's cron treated Sunday as zero, while the library started with Monday. Converting weekdays to names preserves the frequency selected in the interface."
+          },
+          {
+            "title": "Validate parameters against the release that will run",
+            "body": "The manifest defines configuration fields without requiring a database column for every robot parameter. Automation, company and dispatch values override each other in that order. The final set is validated against the installed release; after an update, queued work is validated again."
+          },
+          {
+            "title": "Enforce access in queries and actions",
+            "body": "I extended department scoping to include tenant administrators. A role determines which actions a person may perform, and their departments determine which automations they can reach. The API filters queries and checks access on actions; hiding a React button neither grants nor revokes access."
+          },
+          {
+            "title": "Remove packages while preserving history",
+            "body": "I implemented release archiving to free storage while keeping the record, release notes and execution references. The policy protects packages installed or requested on a machine, required as a minimum version, and other releases still needed for distribution. The panel explains why a package cannot be archived."
+          },
+          {
+            "title": "Tests for rules that affect the operation",
+            "body": "The contributions include tests for queues with locked sessions, reconciliation after reconnects, mandatory updates, department isolation and pending work by reporting period. Company-queue tests also check schedule membership and refusal to remove a queue still in use. These state and authorization scenarios need more evidence than a success notification in the interface."
+          }
+        ],
+        "incident": {
+          "title": "The automatic reporting period froze at the month of saving",
+          "body": "A parameter could declare current month or previous month as a dynamic default. Saving configuration with an empty field resolved that default and stored a fixed month. A recurring routine would then keep using the month of saving in later months. I changed the flow to preserve the missing value and resolve the default on each new dispatch; an explicitly entered month stays fixed. I added tests for both behaviors. Retrying old work follows a different rule: it retains the original reporting period, even after the calendar has moved on."
+        },
+        "limits": [
+          "Execution depends on a usable Windows session. A locked screen or disconnected remote session pauses the queue; the agent needs to run in the user's session to access desktop application interfaces.",
+          "Panel idempotency prevents creating the same request twice, but cannot guarantee that an external system accepts a submission only once. Automatic retries need to remain disabled for routines where resubmission can duplicate an operation.",
+          "Layout changes in portals, desktop applications and documents can require robot maintenance or new workstation calibration. Ambiguous results need to remain visible for human review."
+        ]
+      }
+    }
+  },
+  {
+    "id": "rastreio-equipamentos",
+    "featured": true,
+    "icon": "layout-grid",
+    "stack": [
+      "React",
+      "Node.js",
+      "Express",
+      "TypeScript",
+      "Knex",
+      "PostgreSQL",
+      "Puppeteer"
+    ],
+    "pt": {
+      "slug": "rastreio-equipamentos",
+      "category": "Sistemas de gestão",
+      "title": "A vida de cada equipamento, do recebimento à garantia",
+      "summary": "Um sistema de gestão em que cada terminal de pagamento é rastreado pelo número de série, por compras, vendas, manutenções e garantia.",
+      "problem": "A empresa compra, vende e conserta terminais de pagamento, e cada aparelho precisa bater com as notas de entrada e com o ERP.",
+      "how": [
+        {
+          "icon": "hand-coins",
+          "title": "Venda e manutenções",
+          "body": "Venda com vários aparelhos, chave ativa, valor unitário e romaneio, e rotinas de manutenção interna e externa."
+        },
+        {
+          "icon": "badge-alert",
+          "title": "Cancelar não apaga",
+          "body": "A exclusão vira uma movimentação cancelada no histórico do aparelho, com quem excluiu e por quê."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Nota manual com trava",
+          "body": "Só cancela se nenhum aparelho dela foi vendido ou entrou em manutenção."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Leitura em sequência",
+          "body": "Na venda, o leitor bipa um aparelho atrás do outro sem fechar a janela."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "Relatórios em PDF",
+          "body": "Venda, equipamentos, manutenção e rastreio por serial, gerados no servidor."
+        }
+      ],
+      "outcome": "Dá para responder onde está e por onde passou cada aparelho sem planilha paralela.",
+      "role": "Entrada num sistema já em produção para conduzir a segunda fase, chamado a chamado: a arquitetura das rotinas novas, a publicação em produção e a revisão de código. A base e a sincronização com o ERP vieram da fase anterior.",
+      "facts": [
+        "dezenas de chamados em dois meses",
+        "dez tipos de movimentação",
+        "quatro relatórios em PDF"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Excluir não apaga a história",
+            "body": "Excluir uma manutenção grava um registro de exclusão com uma cópia legível do que foi excluído (empresa, fabricante, serial e cliente, não só IDs), e a movimentação do aparelho vira cancelada. O histórico continua contando a verdade, e o registro continua legível mesmo se o cadastro mudar depois."
+          },
+          {
+            "title": "Nota manual só cancela se nada dela andou",
+            "body": "Antes de cancelar, as linhas dos aparelhos ficam travadas (FOR UPDATE), e o cancelamento é recusado se algum já foi vendido ou entrou em manutenção. A justificativa é obrigatória, e quem, quando e por quê ficam gravados."
+          },
+          {
+            "title": "Leitura contínua na venda",
+            "body": "Depois de confirmar um aparelho, a janela limpa e espera o próximo, em vez de fechar. Cadastrar um lote vira bipar em sequência."
+          },
+          {
+            "title": "PDF a partir de HTML, no servidor",
+            "body": "Os relatórios são templates HTML renderizados com Puppeteer, com o mesmo layout na tela e no papel."
+          }
+        ],
+        "incident": {
+          "title": "Manutenções antigas sem elo com o histórico",
+          "body": "As manutenções antigas não tinham o identificador de transação que liga a manutenção às movimentações do aparelho, porque ele foi criado depois. Excluir uma delas não achava o histórico para atualizar. A correção procura as movimentações pelo motivo e pelos seriais da manutenção, grava o identificador nelas e só então registra a exclusão, tudo na mesma transação."
+        },
+        "limits": [
+          "Achar as movimentações antigas é uma heurística: motivo e serial, a mais recente.",
+          "Manutenção interna e externa repetem a mesma lógica em dois lugares.",
+          "O sistema não tem testes automatizados. Próximo passo: cobrir com testes as transações de cancelamento e exclusão."
+        ]
+      }
+    },
+    "en": {
+      "slug": "equipment-tracking",
+      "category": "Business systems",
+      "title": "The life of every device, from receiving to warranty",
+      "summary": "A management system where every payment terminal is tracked by serial number through purchases, sales, repairs and warranty.",
+      "problem": "The company buys, sells and repairs payment terminals, and every device has to match the purchase invoices and the ERP.",
+      "how": [
+        {
+          "icon": "hand-coins",
+          "title": "Sales and repairs",
+          "body": "Sales of several devices with an active key, unit price and packing list, plus internal and external repair routines."
+        },
+        {
+          "icon": "badge-alert",
+          "title": "Cancelling keeps the history",
+          "body": "A deletion becomes a cancelled movement in the device's history, with who deleted it and why."
+        },
+        {
+          "icon": "receipt-text",
+          "title": "Manual invoices with a lock",
+          "body": "One can only be cancelled if none of its devices was sold or sent to repair."
+        },
+        {
+          "icon": "scan-text",
+          "title": "Scanning in sequence",
+          "body": "In a sale, the scanner reads one device after another without closing the dialog."
+        },
+        {
+          "icon": "file-chart-line",
+          "title": "PDF reports",
+          "body": "Sales, equipment, repairs and tracking by serial, rendered on the server."
+        }
+      ],
+      "outcome": "Where each device is and where it has been can be answered without a side spreadsheet.",
+      "role": "Joined a system already in production to lead its second phase, ticket by ticket: the architecture of the new routines, production releases and code review. The foundation and the ERP sync came from the earlier phase.",
+      "facts": [
+        "dozens of tickets in two months",
+        "ten movement types",
+        "four PDF reports"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Deleting keeps the history",
+            "body": "Deleting a repair writes a deletion record with a readable copy of what was deleted (company, manufacturer, serial and customer, not just IDs), and the device's movement becomes cancelled. The history keeps telling the truth, and the record stays readable even if the master data changes later."
+          },
+          {
+            "title": "A manual invoice only cancels if nothing on it moved",
+            "body": "Before cancelling, the device rows are locked (FOR UPDATE), and the cancellation is refused if any device was already sold or sent to repair. A reason is required, and who, when and why are stored."
+          },
+          {
+            "title": "Continuous scanning in a sale",
+            "body": "After a device is confirmed, the dialog clears and waits for the next one instead of closing. Registering a batch becomes scanning in sequence."
+          },
+          {
+            "title": "PDF from HTML, on the server",
+            "body": "Reports are HTML templates rendered with Puppeteer, with the same layout on screen and on paper."
+          }
+        ],
+        "incident": {
+          "title": "Old repairs with no link to the history",
+          "body": "Older repairs had no transaction id linking the repair to the device's movements, because the id came later. Deleting one of them could not find the history to update. The fix finds the movements by the repair's reason and serials, writes the id onto them and only then logs the deletion, all in the same transaction."
+        },
+        "limits": [
+          "Finding the old movements is a heuristic: reason and serial, the most recent one.",
+          "Internal and external repairs repeat the same logic in two places.",
+          "The system has no automated tests. Next step: cover the cancellation and deletion transactions with tests."
+        ]
+      }
+    }
+  },
+  {
     "id": "authsales",
     "featured": true,
     "icon": "blocks",
@@ -431,540 +1037,6 @@
     }
   },
   {
-    "id": "separacao-pedidos",
-    "featured": true,
-    "icon": "smartphone-nfc",
-    "stack": [
-      "React Native",
-      "Expo",
-      "TypeScript",
-      "Jest"
-    ],
-    "pt": {
-      "slug": "separacao-pedidos",
-      "category": "Mobile",
-      "title": "Separar e conferir pedidos no depósito sem perder o fio",
-      "summary": "Um app de celular para separadores e coletores bipar produtos, dividir pedidos em partes e retomar o trabalho de onde parou.",
-      "problem": "Separadores e coletores bipam produtos com o celular no meio do depósito, e o app precisa saber exatamente onde cada pedido parou.",
-      "how": [
-        {
-          "icon": "workflow",
-          "title": "Regras em funções puras",
-          "body": "Continuar, recomeçar, abrir a próxima parte e detectar parte finalizada ficam fora das telas."
-        },
-        {
-          "icon": "clipboard-check",
-          "title": "Cerca de 50 testes",
-          "body": "Chaves duplicadas, partes fora de ordem, coleta divergente, setor repetido e confirmação final."
-        },
-        {
-          "icon": "scan-text",
-          "title": "Toda leitura tem resultado",
-          "body": "Aceita, repetida ou divergente, e uma divergência fica visível até o fim do pedido."
-        },
-        {
-          "icon": "refresh-cw",
-          "title": "Atualização obrigatória",
-          "body": "Todo mundo trabalha sempre com a mesma regra."
-        }
-      ],
-      "outcome": "A separação passou a ser retomável e auditável, e um erro de bipagem aparece na hora, não no cliente.",
-      "role": "App criado do zero em 2024. Em 2026, o fluxo foi reescrito para pedidos divididos em partes, com as regras fora das telas e cobertas por testes.",
-      "facts": [
-        "três funções",
-        "dois modos de leitura",
-        "cerca de 50 testes"
-      ],
-      "details": {
-        "decisions": [
-          {
-            "title": "Câmera e leitor, uma regra só",
-            "body": "Só muda a forma de ler. As regras saíram das telas para módulos puros, então as duas versões da tela não divergem na regra."
-          },
-          {
-            "title": "Recomeçar não apaga na hora",
-            "body": "O processo antigo só é substituído quando o novo é finalizado. Quem desiste no meio de um recomeço não perde o que existia."
-          },
-          {
-            "title": "Item divergente não conta",
-            "body": "A quantidade que o coletor precisa conferir ignora o que saiu divergente na separação. Senão a conta nunca fecharia."
-          },
-          {
-            "title": "Só as últimas 50 leituras na tela",
-            "body": "O lote completo fica fora do estado da tela, para o app continuar leve em celulares simples."
-          }
-        ],
-        "incident": {
-          "title": "Versões antigas em campo",
-          "body": "Quando os pedidos passaram a ser divididos em partes, quem ainda estava numa versão antiga do app continuava bipando com a regra velha. A atualização deixou de ser opcional: ao entrar, o app compara a própria versão com a publicada e só deixa trabalhar depois de atualizar, com o botão levando direto ao instalador da versão nova."
-        },
-        "limits": [
-          "A parte em andamento só existe na memória do celular até ser finalizada: fechar o app perde a parte. Próximo passo: guardar a parte no aparelho.",
-          "Recomeçar apaga e grava em duas chamadas, não numa transação. Próximo passo: uma rota única que substitui a parte de uma vez.",
-          "As telas de câmera e de leitor ainda são duplicadas, mesmo com as regras compartilhadas. Próximo passo: uma tela só, com a forma de leitura trocável."
-        ]
-      }
-    },
-    "en": {
-      "slug": "order-picking",
-      "category": "Mobile",
-      "title": "Picking and checking orders on the warehouse floor without losing track",
-      "summary": "A phone app for pickers and collectors to scan products, split orders into parts and resume work where it stopped.",
-      "problem": "Pickers and collectors scan products with their phones in the middle of the warehouse, and the app has to know exactly where each order stopped.",
-      "how": [
-        {
-          "icon": "workflow",
-          "title": "Rules in pure functions",
-          "body": "Continue, restart, open the next part and detect a finished part live outside the screens."
-        },
-        {
-          "icon": "clipboard-check",
-          "title": "About 50 tests",
-          "body": "Duplicate keys, parts out of order, mismatched collection, repeated sector and final confirmation."
-        },
-        {
-          "icon": "scan-text",
-          "title": "Every scan has a result",
-          "body": "Accepted, repeated or mismatched, and a mismatch stays visible until the order is done."
-        },
-        {
-          "icon": "refresh-cw",
-          "title": "Mandatory updates",
-          "body": "Everyone always works with the same rules."
-        }
-      ],
-      "outcome": "Picking became resumable and auditable, and a scanning mistake shows up on the spot, not at the customer.",
-      "role": "App built from scratch in 2024. In 2026 the flow was rewritten for orders split into parts, with the rules moved out of the screens and covered by tests.",
-      "facts": [
-        "three roles",
-        "two scanning modes",
-        "about 50 tests"
-      ],
-      "details": {
-        "decisions": [
-          {
-            "title": "Camera and scanner, one set of rules",
-            "body": "Only the way of reading changes. The rules moved out of the screens into pure modules, so the two versions of the screen cannot drift apart on the rules."
-          },
-          {
-            "title": "Restarting does not delete right away",
-            "body": "The old process is only replaced when the new one is finished. Someone who gives up halfway through a restart loses nothing."
-          },
-          {
-            "title": "A mismatched item does not count",
-            "body": "The quantity the collector has to check ignores what came out mismatched in picking. Otherwise the count would never close."
-          },
-          {
-            "title": "Only the last 50 scans on screen",
-            "body": "The full batch lives outside the screen state, so the app stays light on basic phones."
-          }
-        ],
-        "incident": {
-          "title": "Old versions in the field",
-          "body": "When orders started being split into parts, anyone still on an old version of the app kept scanning with the old rules. Updating stopped being optional: on entry, the app compares its own version with the published one and only lets people work after updating, with the button going straight to the new installer."
-        },
-        "limits": [
-          "The part in progress only lives in the phone’s memory until it is finished: closing the app loses it. Next step: keep the part on the device.",
-          "Restarting deletes and saves in two calls, not in one transaction. Next step: a single route that replaces the part at once.",
-          "The camera and scanner screens are still duplicated, even with shared rules. Next step: one screen with a swappable way of reading."
-        ]
-      }
-    }
-  },
-  {
-    "id": "rastreio-equipamentos",
-    "featured": true,
-    "icon": "layout-grid",
-    "stack": [
-      "React",
-      "Node.js",
-      "Express",
-      "TypeScript",
-      "PostgreSQL"
-    ],
-    "pt": {
-      "slug": "rastreio-equipamentos",
-      "category": "Sistemas de gestão",
-      "title": "A vida de cada equipamento, do recebimento à garantia",
-      "summary": "Um sistema de gestão em que cada terminal de pagamento é rastreado pelo número de série, por compras, vendas, manutenções e garantia.",
-      "problem": "A empresa compra, vende e conserta terminais de pagamento, e cada aparelho precisa bater com as notas de entrada e com o ERP.",
-      "how": [
-        {
-          "icon": "scan-text",
-          "title": "O serial é a identidade",
-          "body": "Entrada, venda, troca, manutenção e garantia viram movimentações do mesmo aparelho."
-        },
-        {
-          "icon": "database-backup",
-          "title": "Transações explícitas",
-          "body": "Registrar seriais, salvar uma venda ou excluir uma manutenção mexem em várias tabelas de uma vez."
-        },
-        {
-          "icon": "receipt-text",
-          "title": "Notas de entrada",
-          "body": "Importadas ou digitadas, com cancelamento e status próprio."
-        },
-        {
-          "icon": "refresh-cw",
-          "title": "ERP e leitor",
-          "body": "Produtos sincronizados com o ERP em nuvem e seriais cadastrados em lote pelo código de barras."
-        },
-        {
-          "icon": "file-chart-line",
-          "title": "Relatórios",
-          "body": "Venda, manutenção e rastreio por número de série."
-        }
-      ],
-      "outcome": "Dá para responder onde está e por onde passou cada aparelho sem planilha paralela."
-    },
-    "en": {
-      "slug": "equipment-tracking",
-      "category": "Business systems",
-      "title": "The life of every device, from receiving to warranty",
-      "summary": "A management system where every payment terminal is tracked by serial number through purchases, sales, repairs and warranty.",
-      "problem": "The company buys, sells and repairs payment terminals, and every device has to match the purchase invoices and the ERP.",
-      "how": [
-        {
-          "icon": "scan-text",
-          "title": "The serial is the identity",
-          "body": "Receiving, sale, swap, repair and warranty become movements of the same device."
-        },
-        {
-          "icon": "database-backup",
-          "title": "Explicit transactions",
-          "body": "Registering serials, saving a sale or deleting a repair touch several tables at once."
-        },
-        {
-          "icon": "receipt-text",
-          "title": "Purchase invoices",
-          "body": "Imported or typed in, with cancellation and their own status."
-        },
-        {
-          "icon": "refresh-cw",
-          "title": "ERP and scanner",
-          "body": "Products synced with the cloud ERP and serials registered in bulk from the barcode."
-        },
-        {
-          "icon": "file-chart-line",
-          "title": "Reports",
-          "body": "Sales, repairs and tracking by serial number."
-        }
-      ],
-      "outcome": "Where each device is and where it has been can be answered without a side spreadsheet."
-    }
-  },
-  {
-    "id": "orquestracao-rpa",
-    "featured": true,
-    "icon": "bot",
-    "stack": [
-      "Python",
-      "FastAPI",
-      "PostgreSQL",
-      "WebSocket",
-      "React",
-      "TypeScript",
-      "APScheduler",
-      "pdfplumber"
-    ],
-    "pt": {
-      "slug": "orquestracao-rpa",
-      "category": "Automação",
-      "title": "Robôs que operam sistemas sem API, e um painel para comandá-los",
-      "summary": "Uma plataforma multiempresa para distribuir, agendar e acompanhar robôs em estações Windows. Trabalhei na evolução do painel, da API e do agente, conectando a execução das automações ao acompanhamento da rotina fiscal e contábil.",
-      "role": "Atuação full stack na evolução de uma base existente: filas por estação, pendências por empresa e competência, distribuição de versões, permissões por departamento e integração de novos robôs.",
-      "facts": [
-        "Painel React e TypeScript",
-        "API e agente em Python",
-        "Execução em estações Windows"
-      ],
-      "problem": "As automações acessam portais e sistemas contábeis desktop sem API, usando a tela, o mouse e o teclado da estação. A operação envolve vários clientes, cada um com suas empresas, credenciais e máquinas. Era preciso coordenar quem roda, onde, em qual versão e para qual competência, sem abrir portas de entrada na rede do cliente. Também era necessário mostrar o que ficou pendente: uma conexão perdida, uma divergência fiscal e um robô com defeito exigem tratamentos diferentes.",
-      "how": [
-        {
-          "icon": "plug-zap",
-          "title": "A estação inicia a conexão",
-          "body": "O agente Windows abre um WebSocket para o painel, recebe ordens e devolve eventos. Sinais de vida informam a disponibilidade da máquina; ao reconectar, agente e servidor conferem o que continuou rodando."
-        },
-        {
-          "icon": "database-backup",
-          "title": "Uma fila por estação",
-          "body": "O painel mantém as ordens no PostgreSQL e libera um robô por vez em cada máquina, porque eles compartilham mouse e teclado. Estações diferentes trabalham em paralelo; tela bloqueada ou sessão desconectada seguram a fila."
-        },
-        {
-          "icon": "calendar-days",
-          "title": "Da agenda ao lote",
-          "body": "Um disparo cria um grupo com uma execução por empresa. A agenda usa fuso horário e pode seguir todas as empresas elegíveis, uma seleção fixa ou uma fila de empresas cuja composição é consultada a cada ocorrência."
-        },
-        {
-          "icon": "users",
-          "title": "Pendências que fazem sentido",
-          "body": "O último resultado de cada empresa, automação e competência define o que precisa de atenção. Cancelar não esconde uma falha anterior, e um sucesso em outra competência não resolve o trabalho que ficou para trás."
-        },
-        {
-          "icon": "file-text",
-          "title": "Um contrato para os robôs",
-          "body": "Cada versão declara parâmetros e requisitos em um manifesto JSON. O agente entrega a configuração, acompanha eventos em JSON Lines e interpreta códigos de saída que distinguem sucesso, erro, resultado parcial e intervenção humana."
-        },
-        {
-          "icon": "shield-check",
-          "title": "Versões sob controle",
-          "body": "Pacotes passam por verificação de integridade e assinatura antes da instalação. O painel acompanha a versão instalada e pode exigir uma versão mínima; uma atualização que falha preserva o erro e bloqueia o robô abaixo desse mínimo."
-        }
-      ],
-      "story": [
-        {
-          "title": "A operação por trás de um disparo",
-          "paragraphs": [
-            "O cliente da plataforma tem um ambiente isolado, chamado tenant. Dentro dele ficam as empresas atendidas, os usuários, as máquinas e as automações liberadas. Uma mesma rotina pode precisar rodar para várias empresas e para um mês de referência específico, a competência. Por isso, acompanhar só o processo do robô não basta: o painel precisa identificar qual trabalho de cada empresa foi concluído.",
-            "No disparo manual, a pessoa escolhe a automação, a estação e as empresas. O servidor valida os vínculos e cria o grupo de execuções com uma chave de idempotência, para que reenviar o mesmo pedido não crie outro lote. O agendamento passa pelo mesmo caminho. Se a máquina estiver offline, a política escolhida registra que o trabalho foi pulado ou mantém a ordem aguardando a reconexão."
-          ]
-        },
-        {
-          "title": "O que desenvolvi na evolução da plataforma",
-          "paragraphs": [
-            "Trabalhei na fila central por máquina e na sua visibilidade no painel: execução em andamento, trabalhos aguardando e previsão de término a partir do histórico. Também implementei a visão de pendências, o acompanhamento por competência e a repetição automática de falhas técnicas. Resultado parcial e pedido de intervenção ficam para análise humana, porque repetir uma automação que transmite dados pode duplicar uma operação externa.",
-            "Outras entregas incluíram permissões por departamento, notas de versão, atualização em massa dos robôs e gestão do armazenamento dos pacotes. Mais tarde, acrescentei filas de empresas reutilizáveis em disparos e agendas, evitando selecionar a mesma carteira empresa por empresa. Também corrigi o salvamento da estação dos agendamentos e a escolha da máquina padrão no disparo manual, mantendo a possibilidade de selecionar outra estação pronta."
-          ]
-        },
-        {
-          "title": "Distribuir uma correção sem perder o trabalho da fila",
-          "paragraphs": [
-            "Publicar um pacote novo não atualiza sozinho todas as estações. Implementei um fluxo de versão mínima com uma prévia das instalações afetadas e acompanhamento por máquina. Quem está offline recebe a atualização quando volta. As execuções daquele robô aguardam a instalação; trabalhos de outras automações continuam elegíveis para usar a estação.",
-            "Se a própria automação está rodando quando a atualização obrigatória chega, o fluxo cancela essa execução e cria uma substituta com a mesma empresa, parâmetros e competência, priorizada na fila. Antes de liberar os trabalhos pendentes, o servidor valida os parâmetros contra o manifesto da versão nova. Uma incompatibilidade vira uma pendência com motivo; uma atualização malsucedida exige nova tentativa e mantém o bloqueio da versão antiga."
-          ]
-        },
-        {
-          "title": "Automação entre navegador e aplicações desktop",
-          "paragraphs": [
-            "Há fluxos que atravessam o navegador, uma aplicação Windows e arquivos em disco. Playwright controla a parte web, enquanto pywinauto e as APIs do Windows lidam com janelas, foco e teclado. A transição exige confirmar qual janela abriu, esperar o estado necessário e conferir o contexto antes de continuar. Um clique executado sem erro ainda precisa produzir a mudança esperada na interface.",
-            "Alguns robôs reaproveitam a sessão entre empresas do mesmo lote, reduzindo a necessidade de autenticar a cada execução. A sessão só é reutilizada enquanto válida. Credenciais recusadas, desafios de autenticação e bloqueios de acesso recebem tratamento próprio, com pausa ou pedido de intervenção, para evitar uma sequência de tentativas que agrave o bloqueio."
-          ]
-        },
-        {
-          "title": "OCR e calibração para interfaces sem controles acessíveis",
-          "paragraphs": [
-            "Algumas janelas mostram uma interface transmitida como imagem e não expõem os campos pela API de acessibilidade. Nesses casos, o robô usa o OCR nativo do Windows para localizar textos e reconhecer valores. Recortes de regiões pequenas podem ser ampliados antes da leitura; as posições reconhecidas são convertidas de volta para coordenadas de tela. Isso permite trabalhar com menus cuja posição muda e tabelas que exigem rolagem.",
-            "A estratégia varia conforme a tela: seletores acessíveis onde existem, leitura visual onde é necessária e coordenadas calibradas como alternativa. Os ajustes podem pertencer à estação, porque resolução, escala e tamanho da janela afetam o alvo. Campos importantes são conferidos após o preenchimento, e perguntas desconhecidas podem interromper o fluxo para análise humana."
-          ]
-        },
-        {
-          "title": "Leitura e conciliação de arquivos",
-          "paragraphs": [
-            "Os robôs combinam dados de arquivos e telas para conferir se as fontes concordam. Os leitores de planilhas localizam cabeçalhos e normalizam identificadores antes do cruzamento, em vez de depender apenas da posição de uma coluna. Os resultados distinguem ausência de dados, registros divergentes e arquivos que não puderam ser obtidos, preservando o motivo de cada diferença.",
-            "Em PDFs com caixas lado a lado, a posição das palavras permite associar cada valor ao rótulo correto e preservar colunas vazias. Nos leitores monetários que exigem comparação exata, os valores são convertidos para Decimal. Uma das validações exige a leitura principal e ao menos uma leitura adicional do mesmo valor; todas as encontradas precisam concordar. Uma divergência interrompe a decisão que depende daquele número."
-          ]
-        },
-        {
-          "title": "Execução em etapas e retomada após interrupções",
-          "paragraphs": [
-            "Nos fluxos com checkpoint, o progresso fica em disco por empresa, período e etapa. Uma nova execução pode aproveitar downloads e passos já concluídos, enquanto conferências que dependem do conteúdo atual dos arquivos são refeitas. O estado persistente fica separado da pasta da versão instalada, para continuar disponível após a troca do pacote.",
-            "A política depende do efeito de cada passo. Uma leitura pode ser repetida; uma ação externa exige mais cuidado. Etapas marcadas como não repetíveis registram que começaram antes de agir. Se houver uma interrupção nesse intervalo, o robô para e pede conferência do destino antes de tentar novamente. O checkpoint local ajuda a controlar a retomada, mas não elimina a incerteza sobre o que aconteceu em outro sistema."
-          ]
-        },
-        {
-          "title": "Controle explícito sobre ações externas",
-          "paragraphs": [
-            "Alguns fluxos permitem consultar e conferir sem habilitar a ação final. Nos envios de mensagens, o modo de simulação monta um rascunho completo para revisão. As ações que gravam ou enviam dependem de parâmetros explícitos, e uma validação que encontra divergência pode impedir a continuação mesmo com o envio habilitado.",
-            "Os fluxos de envio mantêm um registro local do que já foi realizado por empresa e período, com opção explícita de reenvio. Outros procuram também uma confirmação existente no destino ou nos arquivos compartilhados. Essas verificações reduzem a repetição acidental, mas continuam exigindo tratamento específico quando o processo cai entre a ação externa e a gravação da confirmação."
-          ]
-        },
-        {
-          "title": "Supervisão de sessão e diagnóstico por etapa",
-          "paragraphs": [
-            "A automação também precisa reconhecer se o ambiente está utilizável: sessão ativa, janela esperada, contexto selecionado e credenciais disponíveis. Há verificações que preservam uma sessão saudável e só iniciam a recuperação quando identificam que ela caiu. Na recuperação do navegador, o perfil identifica quais processos pertencem à automação, preservando navegadores pessoais e perfis de outros robôs.",
-            "Durante a execução, eventos informam a etapa atual e o motivo do resultado. Conforme o fluxo, logs, capturas de erro e relatórios em CSV ou planilha ficam associados à execução no painel. O diagnóstico distingue uma falha técnica de uma condição que precisa de alguém; um resultado sem trabalho a realizar também tem estado próprio. Assim, quem atende a pendência consegue ver onde o processo parou e o que chegou a ser concluído."
-          ]
-        }
-      ],
-      "outcome": "A operação passou a ter agenda, filas visíveis por estação, logs ao vivo e acompanhamento por empresa e competência. O time consegue separar o que aguarda máquina, o que falhou e o que precisa de uma pessoa, repetir o trabalho pendente e acompanhar a distribuição de uma correção. Filas de empresas permitem reaproveitar carteiras nas rotinas recorrentes, enquanto o histórico preserva o resultado de cada execução.",
-      "details": {
-        "decisions": [
-          {
-            "title": "PostgreSQL guarda o estado; WebSocket transporta",
-            "body": "Uma conexão aberta não é o registro de uma ordem. Comandos e estados ficam no banco; o WebSocket entrega as mensagens. O agente guarda localmente os eventos que não conseguiu enviar e os reenvia com números de sequência. Na reconexão, a reconciliação distingue um robô ainda vivo de uma execução interrompida."
-          },
-          {
-            "title": "O agendador enfileira, o agente executa",
-            "body": "O APScheduler mantém os jobs no PostgreSQL e cria execuções pelo fluxo compartilhado com o disparo manual. Corrigi também a interpretação dos dias da semana: o cron do painel considerava domingo como zero, enquanto a biblioteca partia da segunda. Converter os dias para nomes preserva a frequência escolhida na interface."
-          },
-          {
-            "title": "Parâmetros validados na versão que vai rodar",
-            "body": "O manifesto define os campos de configuração sem exigir uma coluna para cada parâmetro de cada robô. Valores da automação, da empresa e do disparo se sobrepõem nessa ordem. O conjunto final é validado contra a versão instalada; depois de uma atualização, trabalhos que aguardavam na fila passam por nova validação."
-          },
-          {
-            "title": "Permissão aplicada na consulta e na ação",
-            "body": "Ampliei o escopo por departamento para incluir também os administradores do tenant. O papel define quais ações a pessoa pode fazer, e o departamento define quais automações ela alcança. A API aplica o filtro nas consultas e confere o acesso ao executar ações; esconder um botão no React não concede nem revoga acesso."
-          },
-          {
-            "title": "Limpar pacotes preservando o histórico",
-            "body": "Implementei o arquivamento de versões para liberar espaço sem apagar o registro, as notas de versão ou as referências das execuções. A regra protege pacotes instalados, desejados por uma máquina, exigidos como versão mínima e outras versões ainda necessárias à distribuição. O painel mostra o motivo quando um pacote não pode ser arquivado."
-          },
-          {
-            "title": "Testes nas regras que mudam a operação",
-            "body": "As entregas incluem testes de fila com sessão bloqueada, retomada após reconexão, atualização obrigatória, isolamento por departamento e pendências por competência. Nas filas de empresas, os testes verificam também a composição lida pela agenda e a recusa de remover uma fila em uso. São cenários de estado e autorização que uma confirmação visual de sucesso não demonstra."
-          }
-        ],
-        "incident": {
-          "title": "A competência automática ficava presa no mês do salvamento",
-          "body": "Um parâmetro podia declarar mês atual ou mês anterior como padrão dinâmico. Ao salvar a configuração com o campo vazio, a validação resolvia o padrão e gravava um mês fixo. Assim, uma rotina recorrente continuava usando a competência do salvamento nos meses seguintes. Corrigi o fluxo para preservar a ausência do valor e resolver o padrão a cada novo disparo; quando a pessoa informa um mês, ele continua fixo. Acrescentei testes para os dois comportamentos. A repetição de um trabalho antigo segue outra regra: conserva a competência original, mesmo quando o calendário já avançou."
-        },
-        "limits": [
-          "A execução depende de uma sessão Windows utilizável. Tela bloqueada ou sessão remota desconectada pausam a fila; o agente precisa rodar na sessão do usuário para acessar a interface dos sistemas desktop.",
-          "Idempotência no painel evita criar o mesmo pedido duas vezes, mas não garante que um sistema externo aceite uma transmissão uma única vez. A repetição automática precisa permanecer desabilitada nas rotinas em que reenviar pode duplicar uma operação.",
-          "Mudanças de layout em portais, aplicações desktop e documentos podem exigir manutenção do robô ou nova calibração por estação. Resultados ambíguos precisam continuar visíveis para revisão humana."
-        ]
-      }
-    },
-    "en": {
-      "slug": "rpa-orchestration",
-      "category": "Automation",
-      "title": "Robots that drive systems with no API, and a panel to command them",
-      "summary": "A multi-tenant platform to distribute, schedule and monitor robots on Windows workstations. I worked on the web panel, API and agent, connecting automation execution with the tracking of recurring tax and accounting work.",
-      "role": "Full-stack work on an existing platform: workstation queues, pending work by company and reporting period, release distribution, department permissions and new robot integrations.",
-      "facts": [
-        "React and TypeScript panel",
-        "Python API and agent",
-        "Windows workstation execution"
-      ],
-      "problem": "The automations use the screen, mouse and keyboard to operate portals and desktop accounting software without APIs. The operation spans multiple clients, each with its own companies, credentials and machines. The platform has to coordinate what runs, where, on which version and for which reporting period, without opening inbound ports on the client's network. It also needs to show unfinished work: a lost connection, a tax discrepancy and a defective robot require different responses.",
-      "how": [
-        {
-          "icon": "plug-zap",
-          "title": "The workstation opens the connection",
-          "body": "The Windows agent opens a WebSocket to the panel, receives commands and sends events back. Heartbeats report machine availability; on reconnect, the agent and server reconcile what is still running."
-        },
-        {
-          "icon": "database-backup",
-          "title": "One queue per workstation",
-          "body": "The panel stores commands in PostgreSQL and releases one robot at a time per machine because they share a mouse and keyboard. Separate workstations run in parallel; a locked screen or disconnected session holds the queue."
-        },
-        {
-          "icon": "calendar-days",
-          "title": "From schedule to batch",
-          "body": "A request creates a batch with one execution per company. Schedules use a time zone and can follow all eligible companies, a fixed selection or a company queue whose current membership is read on each occurrence."
-        },
-        {
-          "icon": "users",
-          "title": "Pending work with a clear meaning",
-          "body": "The latest result for each company, automation and reporting period determines what needs attention. Cancellation does not hide an earlier failure, and success in another period does not resolve the work left behind."
-        },
-        {
-          "icon": "file-text",
-          "title": "A shared robot contract",
-          "body": "Each release declares its parameters and requirements in a JSON manifest. The agent supplies configuration, follows JSON Lines events and interprets exit codes that distinguish success, errors, partial results and human intervention."
-        },
-        {
-          "icon": "shield-check",
-          "title": "Controlled releases",
-          "body": "Package integrity and signatures are verified before installation. The panel tracks installed releases and can require a minimum version; a failed update keeps its error visible and blocks the robot below that minimum."
-        }
-      ],
-      "story": [
-        {
-          "title": "The operation behind an execution request",
-          "paragraphs": [
-            "Each platform client has an isolated environment, called a tenant. It holds the companies they serve, their users, machines and available automations. A routine may need to run for several companies and a specific reporting month, known as competência in Brazilian accounting. Tracking the robot process alone is insufficient: the panel needs to identify which company's work was completed for which period.",
-            "For a manual run, the operator selects the automation, workstation and companies. The server validates those relationships and creates an execution batch with an idempotency key, so resubmitting the same request does not create another batch. Scheduled runs use the same path. If the machine is offline, the selected policy records the work as skipped or keeps the command waiting for reconnection."
-          ]
-        },
-        {
-          "title": "My work on the platform",
-          "paragraphs": [
-            "I worked on the central machine queue and its visibility in the panel: the current execution, waiting work and completion estimates based on past runs. I also implemented pending-work tracking, reporting-period tracking and automatic retries for technical failures. Partial results and requests for intervention stay with a person, because retrying an automation that submits data can duplicate an external operation.",
-            "Other contributions included department permissions, release notes, bulk robot updates and package storage management. I later added reusable company queues for manual runs and schedules, avoiding repeated company-by-company selection. I also fixed workstation changes not being saved on schedules and made manual dispatch use the robot's configured default machine, while allowing the operator to select another ready workstation."
-          ]
-        },
-        {
-          "title": "Distributing a fix while preserving queued work",
-          "paragraphs": [
-            "Publishing a package does not update every workstation on its own. I implemented a minimum-version rollout with a preview of affected installations and progress per machine. Offline workstations update when they return. Executions for that robot wait for installation; other automations remain eligible to use the workstation.",
-            "If that automation is running when a mandatory update arrives, the rollout cancels the execution and creates a replacement with the same company, parameters and reporting period, prioritized in the queue. Before releasing queued work, the server validates its parameters against the new manifest. Incompatible work becomes a pending item with a reason; a failed update requires another attempt and keeps the old version blocked."
-          ]
-        },
-        {
-          "title": "Automation across browsers and desktop applications",
-          "paragraphs": [
-            "Some workflows cross a browser, a Windows application and files on disk. Playwright controls the web portion, while pywinauto and Windows APIs handle windows, focus and keyboard input. Each transition needs to confirm which window opened, wait for the required state and check the context before continuing. A click that raised no error still needs to produce the expected change in the interface.",
-            "Some robots reuse a session between companies in the same batch, reducing repeated authentication. A session is only reused while valid. Rejected credentials, authentication challenges and access restrictions receive their own handling, with a pause or a request for intervention, to avoid repeated attempts that could worsen a lockout."
-          ]
-        },
-        {
-          "title": "OCR and calibration for interfaces without accessible controls",
-          "paragraphs": [
-            "Some windows display a streamed interface as an image and expose no fields through accessibility APIs. The robot uses native Windows OCR to locate text and recognize values in those cases. Small regions can be enlarged before reading; recognized positions are converted back to screen coordinates. This supports menus whose positions change and tables that require scrolling.",
-            "The strategy depends on the screen: accessible selectors where available, visual recognition where needed and calibrated coordinates as an alternative. Adjustments can belong to a workstation because resolution, scaling and window size affect the target. Important fields are checked after input, and unfamiliar prompts can stop the workflow for human review."
-          ]
-        },
-        {
-          "title": "Reading and reconciling files",
-          "paragraphs": [
-            "The robots combine data from files and screens to check whether sources agree. Spreadsheet readers locate headers and normalize identifiers before matching records, instead of relying only on a column's position. Results distinguish missing data, mismatched records and files that could not be retrieved, preserving a reason for each difference.",
-            "In PDFs with adjacent boxes, word positions connect each amount to the correct label and preserve empty columns. Readers that require exact monetary comparisons convert amounts to Decimal. One validation requires the primary reading and at least one additional reading of the same amount; all readings found must agree. A mismatch stops the decision that depends on that number."
-          ]
-        },
-        {
-          "title": "Staged execution and recovery after interruptions",
-          "paragraphs": [
-            "In workflows with checkpoints, progress is stored on disk by company, period and stage. A new execution can reuse downloads and completed steps, while checks that depend on current file contents run again. Persistent state lives outside the installed release directory so it remains available after a package update.",
-            "The policy depends on each step's effect. Reading can be repeated; an external action needs more care. Steps marked as non-repeatable record that they have started before acting. If execution stops in that interval, the robot asks for the destination to be checked before trying again. A local checkpoint helps control recovery but cannot remove uncertainty about what happened in another system."
-          ]
-        },
-        {
-          "title": "Explicit control over external actions",
-          "paragraphs": [
-            "Some workflows support querying and checking without enabling the final action. For message delivery, simulation mode builds a complete draft for review. Actions that write or send require explicit parameters, and a validation mismatch can prevent continuation even when sending is enabled.",
-            "Delivery workflows keep a local record of completed actions by company and period, with an explicit resend option. Other workflows also look for an existing confirmation at the destination or in shared files. These checks reduce accidental repetition but still need specific handling when a process stops between the external action and recording its confirmation."
-          ]
-        },
-        {
-          "title": "Session supervision and diagnostics by stage",
-          "paragraphs": [
-            "An automation also needs to recognize whether its environment is usable: an active session, the expected window, the selected context and available credentials. Some checks preserve a healthy session and only start recovery when they identify that it has ended. During browser recovery, the profile identifies which processes belong to the automation, preserving personal browsers and other robots' profiles.",
-            "During execution, events report the current stage and the reason for the outcome. Depending on the workflow, logs, error screenshots and CSV or spreadsheet reports are attached to the execution in the panel. Diagnostics distinguish a technical failure from a condition that needs a person; having no work to perform also has its own state. Whoever handles a pending item can see where processing stopped and what was completed."
-          ]
-        }
-      ],
-      "outcome": "The operation gained schedules, visible workstation queues, live logs and tracking by company and reporting period. The team can distinguish work waiting for a machine from failures and requests for human attention, retry unfinished work and follow the rollout of a fix. Company queues let operators reuse company groups across recurring routines, while execution history preserves each result.",
-      "details": {
-        "decisions": [
-          {
-            "title": "PostgreSQL stores state; WebSocket transports it",
-            "body": "An open connection is not the record of a command. Commands and states live in the database; WebSocket delivers messages. The agent stores events it could not send locally and replays them with sequence numbers. On reconnect, reconciliation distinguishes a robot that is still alive from an interrupted execution."
-          },
-          {
-            "title": "The scheduler enqueues; the agent executes",
-            "body": "APScheduler stores jobs in PostgreSQL and creates executions through the same path as manual dispatch. I also corrected weekday interpretation: the panel's cron treated Sunday as zero, while the library started with Monday. Converting weekdays to names preserves the frequency selected in the interface."
-          },
-          {
-            "title": "Validate parameters against the release that will run",
-            "body": "The manifest defines configuration fields without requiring a database column for every robot parameter. Automation, company and dispatch values override each other in that order. The final set is validated against the installed release; after an update, queued work is validated again."
-          },
-          {
-            "title": "Enforce access in queries and actions",
-            "body": "I extended department scoping to include tenant administrators. A role determines which actions a person may perform, and their departments determine which automations they can reach. The API filters queries and checks access on actions; hiding a React button neither grants nor revokes access."
-          },
-          {
-            "title": "Remove packages while preserving history",
-            "body": "I implemented release archiving to free storage while keeping the record, release notes and execution references. The policy protects packages installed or requested on a machine, required as a minimum version, and other releases still needed for distribution. The panel explains why a package cannot be archived."
-          },
-          {
-            "title": "Tests for rules that affect the operation",
-            "body": "The contributions include tests for queues with locked sessions, reconciliation after reconnects, mandatory updates, department isolation and pending work by reporting period. Company-queue tests also check schedule membership and refusal to remove a queue still in use. These state and authorization scenarios need more evidence than a success notification in the interface."
-          }
-        ],
-        "incident": {
-          "title": "The automatic reporting period froze at the month of saving",
-          "body": "A parameter could declare current month or previous month as a dynamic default. Saving configuration with an empty field resolved that default and stored a fixed month. A recurring routine would then keep using the month of saving in later months. I changed the flow to preserve the missing value and resolve the default on each new dispatch; an explicitly entered month stays fixed. I added tests for both behaviors. Retrying old work follows a different rule: it retains the original reporting period, even after the calendar has moved on."
-        },
-        "limits": [
-          "Execution depends on a usable Windows session. A locked screen or disconnected remote session pauses the queue; the agent needs to run in the user's session to access desktop application interfaces.",
-          "Panel idempotency prevents creating the same request twice, but cannot guarantee that an external system accepts a submission only once. Automatic retries need to remain disabled for routines where resubmission can duplicate an operation.",
-          "Layout changes in portals, desktop applications and documents can require robot maintenance or new workstation calibration. Ambiguous results need to remain visible for human review."
-        ]
-      }
-    }
-  },
-  {
     "id": "checklist-notas-fiscais",
     "featured": false,
     "icon": "webhook",
@@ -990,12 +1062,12 @@
         {
           "icon": "badge-alert",
           "title": "Exceções primeiro",
-          "body": "Cancelamento e descarte encerram antes de qualquer conferência."
+          "body": "Cancelamento e remessa encerram antes do checklist."
         },
         {
           "icon": "clipboard-check",
           "title": "Checklist",
-          "body": "Cerca de dez itens, e cada um grava se passou, falhou ou foi pulado."
+          "body": "Doze itens, e cada um grava se passou, falhou ou foi pulado. Nota já lançada à mão é descartada, sem virar inconsistência."
         },
         {
           "icon": "file-check",
@@ -1003,12 +1075,50 @@
           "body": "A nota sai com o motivo para quem vai tratar, não só com um status."
         },
         {
-          "icon": "wrench",
-          "title": "Regras de casos reais",
-          "body": "Como saldo de pedido e fornecedor validado pelo emitente da nota."
+          "icon": "users",
+          "title": "Aprovação por alçadas",
+          "body": "Individual ou em lote, com prazo mínimo de vencimento, reprovação automática fora do prazo e e-mail diário com o que espera aprovação."
         }
       ],
-      "outcome": "A triagem passou a acontecer na entrada, e o time fiscal só olha o que falhou, já com o motivo."
+      "outcome": "A triagem passou a acontecer na entrada, e o time fiscal só olha o que falhou, já com o motivo.",
+      "role": "O validador e o fluxo de aprovação que vem depois dele, dentro de um sistema grande mantido por várias pessoas: a arquitetura dessas partes e a sustentação delas em produção.",
+      "facts": [
+        "doze itens no checklist",
+        "cinco destinos finais",
+        "centenas de testes"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Pulado não é reprovado",
+            "body": "Uma etapa que depende de outra que falhou fica pulada. Sem pedido de compra ou contrato identificado, as etapas que dependem dele nem consultam o ERP."
+          },
+          {
+            "title": "Um motivo em vez de seis",
+            "body": "Os motivos são gravados em cascata: quem trata a nota vê a causa raiz, não a lista de tudo o que ela derrubou. A regra vale em duas camadas, de propósito, e um teste cobre a segunda."
+          },
+          {
+            "title": "Saldo desconhecido não reprova",
+            "body": "Se a integração não devolve dados suficientes para calcular o saldo, a validação fica pulada com o motivo registrado. Indisponibilidade não é saldo insuficiente."
+          },
+          {
+            "title": "Duplicidade é descarte, não problema",
+            "body": "Uma nota que já foi lançada à mão é descartada, sem ir para a fila de inconsistências. Uma nota reenviada com o XML corrigido passa de novo pelo fluxo inteiro."
+          },
+          {
+            "title": "Depois do checklist, a aprovação",
+            "body": "Aprovação por alçadas, individual ou em lote, com prazo mínimo de vencimento; reprovação automática fora do prazo e e-mail diário com o que espera aprovação."
+          }
+        ],
+        "incident": {
+          "title": "Saldo calculado com o preço errado",
+          "body": "O saldo do pedido era calculado com o preço unitário, e não com o preço que forma o total, e itens sem preço ficavam de fora da conta. O saldo saía menor do que o real, e notas que o pedido comportava eram reprovadas. A correção usa o preço líquido, arredonda para centavos e, se algum item não tem preço, pula a validação com o motivo, em vez de reprovar."
+        },
+        "limits": [
+          "Documento de transporte ainda não segue o fluxo automático.",
+          "O saldo custa uma chamada por item do pedido, por isso é calculado só para a referência escolhida."
+        ]
+      }
     },
     "en": {
       "slug": "invoice-checklist",
@@ -1025,12 +1135,12 @@
         {
           "icon": "badge-alert",
           "title": "Exceptions first",
-          "body": "Cancellations and discards stop before any check runs."
+          "body": "Cancellations and shipment-only invoices end before the checklist."
         },
         {
           "icon": "clipboard-check",
           "title": "Checklist",
-          "body": "About ten items, each recording whether it passed, failed or was skipped."
+          "body": "Twelve items, each recording whether it passed, failed or was skipped. An invoice already posted by hand is discarded, not flagged."
         },
         {
           "icon": "file-check",
@@ -1038,12 +1148,50 @@
           "body": "Each invoice leaves with the reason for whoever handles it, not just a status."
         },
         {
-          "icon": "wrench",
-          "title": "Rules from real cases",
-          "body": "Such as order balance and supplier validated by the invoice issuer."
+          "icon": "users",
+          "title": "Approval by level",
+          "body": "One by one or in bulk, with a minimum time to due date, automatic rejection outside it and a daily e-mail with what is waiting."
         }
       ],
-      "outcome": "Triage now happens on arrival, and the tax team only looks at what failed, reason included."
+      "outcome": "Triage now happens on arrival, and the tax team only looks at what failed, reason included.",
+      "role": "The validator and the approval flow that follows it, inside a large system maintained by several people: the architecture of those parts and keeping them running in production.",
+      "facts": [
+        "twelve checklist items",
+        "five final destinations",
+        "hundreds of tests"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Skipped is not failed",
+            "body": "A step that depends on one that failed is skipped. With no purchase order or contract found, the steps that depend on it don't even call the ERP."
+          },
+          {
+            "title": "One reason instead of six",
+            "body": "Reasons are stored as a cascade: whoever handles the invoice sees the root cause, not a list of everything it knocked over. The rule holds in two layers on purpose, and a test covers the second."
+          },
+          {
+            "title": "An unknown balance doesn't fail",
+            "body": "If the integration doesn't return enough data to compute the balance, the check is skipped with the reason stored. Being unavailable is not the same as not having enough balance."
+          },
+          {
+            "title": "A duplicate is discarded, not flagged",
+            "body": "An invoice already posted by hand is discarded without going to the issues queue. An invoice sent again with a corrected XML goes through the whole flow again."
+          },
+          {
+            "title": "After the checklist, approval",
+            "body": "Approval by level, one by one or in bulk, with a minimum time to due date; automatic rejection outside it and a daily e-mail with what is waiting for approval."
+          }
+        ],
+        "incident": {
+          "title": "Balance computed with the wrong price",
+          "body": "The order balance was computed from the unit price, not the price that makes up the total, and items with no price were left out. The balance came out lower than it was, and invoices the order could cover were rejected. The fix uses the net price, rounds to cents and, if an item has no price, skips the check with the reason instead of rejecting."
+        },
+        "limits": [
+          "Transport documents don't follow the automatic flow yet.",
+          "The balance costs one call per order item, so it is only computed for the chosen reference."
+        ]
+      }
     }
   },
   {
@@ -1061,13 +1209,13 @@
       "slug": "gestao-oficinas",
       "category": "Sistemas de gestão",
       "title": "Ordens de serviço e estoque para uma rede de oficinas",
-      "summary": "Cada oficina vê só o que é dela, e a contagem de estoque aponta onde o número não bate.",
+      "summary": "Cada oficina com o próprio estoque e as próprias ordens de serviço, e a contagem de estoque aponta onde o número não bate.",
       "problem": "Uma rede de oficinas de pneus precisava de ordens de serviço e estoque por unidade, com a equipe de campo no celular e dados vindos de um sistema antigo.",
       "how": [
         {
-          "icon": "shield-check",
-          "title": "Escopo por oficina",
-          "body": "Cada unidade vê apenas as próprias ordens de serviço."
+          "icon": "layers",
+          "title": "Dados por oficina",
+          "body": "Estoque e ordens de serviço separados por unidade."
         },
         {
           "icon": "search",
@@ -1090,19 +1238,45 @@
           "body": "Tabelas do sistema antigo levadas para a nova estrutura, com as sequências reajustadas."
         }
       ],
-      "outcome": "As oficinas passaram a trabalhar no mesmo sistema, cada uma com seus dados, e as diferenças de estoque aparecem na contagem."
+      "outcome": "As oficinas passaram a trabalhar no mesmo sistema, cada uma com seus dados, e as diferenças de estoque aparecem na contagem.",
+      "role": "Desenvolvimento principal no primeiro semestre de 2024, sobre uma base de CRUD já existente: a arquitetura do domínio de pneus e oficinas, o app Android, a migração do sistema antigo e o deploy, com contato direto com o cliente e revisão de código.",
+      "facts": [
+        "cerca de dez tabelas migradas",
+        "um app Android",
+        "relatórios de estoque e de OS"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Contagem como registro, não como sobrescrita",
+            "body": "Cada contagem é gravada com a sequência do dia, por medida e por oficina, e a diferença aparece contra o esperado."
+          },
+          {
+            "title": "Migração por script, tabela por tabela",
+            "body": "As sequências são reajustadas no fim, para os cadastros novos não colidirem com os IDs que vieram do sistema antigo."
+          }
+        ],
+        "incident": {
+          "title": "Divergências que não existiam",
+          "body": "A tela de contagem comparava o que foi contado com apenas a primeira página do estoque e mostrava divergências que não existiam. A correção carregou o estoque inteiro."
+        },
+        "limits": [
+          "O filtro por oficina fica no app, e o servidor recebe a oficina pela requisição. Próximo passo: prender a oficina ao usuário logado, no servidor.",
+          "A comparação da contagem carrega tudo no navegador. O certo seria fazer no servidor."
+        ]
+      }
     },
     "en": {
       "slug": "workshop-management",
       "category": "Business systems",
       "title": "Work orders and stock for a network of workshops",
-      "summary": "Each workshop sees only its own data, and stock counts point out where the numbers don't match.",
+      "summary": "Each workshop with its own stock and work orders, and stock counts point out where the numbers don't match.",
       "problem": "A network of tire workshops needed work orders and stock per location, with a field team on their phones and data coming from an old system.",
       "how": [
         {
-          "icon": "shield-check",
-          "title": "Per-workshop scope",
-          "body": "Each location sees only its own work orders."
+          "icon": "layers",
+          "title": "Data per workshop",
+          "body": "Stock and work orders kept separate for each location."
         },
         {
           "icon": "search",
@@ -1125,7 +1299,33 @@
           "body": "The old system's tables moved to the new structure, with sequences reset."
         }
       ],
-      "outcome": "The workshops now work in the same system, each with its own data, and stock differences show up in the count."
+      "outcome": "The workshops now work in the same system, each with its own data, and stock differences show up in the count.",
+      "role": "Lead development in the first half of 2024, on an existing CRUD foundation: the architecture of the tire and workshop domain, the Android app, the migration from the old system and the deploy, working directly with the client and reviewing code.",
+      "facts": [
+        "about ten tables migrated",
+        "one Android app",
+        "stock and work order reports"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Counts are records, not overwrites",
+            "body": "Each count is stored with the day's sequence, per size and per workshop, and the gap shows against what was expected."
+          },
+          {
+            "title": "Migration by script, table by table",
+            "body": "Sequences are reset at the end, so new records don't collide with the IDs that came from the old system."
+          }
+        ],
+        "incident": {
+          "title": "Gaps that didn't exist",
+          "body": "The count screen compared what was counted with only the first page of stock and showed gaps that didn't exist. The fix loaded the whole stock."
+        },
+        "limits": [
+          "The workshop filter lives in the app, and the server takes the workshop from the request. Next step: tie the workshop to the signed-in user, on the server.",
+          "The count comparison loads everything in the browser. It belongs on the server."
+        ]
+      }
     }
   },
   {
@@ -1136,78 +1336,137 @@
       "React",
       "Node.js",
       "Express",
+      "Fastify",
       "PostgreSQL",
       "Omie API"
     ],
     "pt": {
       "slug": "financeiro-erp",
       "category": "Integrações",
-      "title": "Contas a pagar sincronizadas com um ERP em nuvem",
-      "summary": "Um painel financeiro para várias empresas de um grupo, com títulos agrupados por nota e sincronização com o ERP.",
-      "problem": "O financeiro de várias empresas de um grupo lançava contas num ERP em nuvem, com cadastros espalhados e uma API com limites e lentidão.",
+      "title": "Contas a pagar e pedidos de venda num ERP em nuvem",
+      "summary": "Um painel financeiro para várias empresas de um grupo e um coletor de pedidos de venda, dois sistemas integrados a um ERP em nuvem.",
+      "problem": "O financeiro de várias empresas de um grupo lançava contas num ERP em nuvem, com cadastros espalhados e uma API com limites e lentidão. Em outro sistema, os pedidos de venda precisavam ser criados e editados direto no ERP.",
       "how": [
         {
           "icon": "refresh-cw",
-          "title": "Sincronização por empresa",
-          "body": "Categorias, contas bancárias, clientes, fornecedores, ordens de serviço e contratos."
-        },
-        {
-          "icon": "layers",
-          "title": "Lotes de 50",
-          "body": "Consultas ao ERP em lotes, com pausa entre eles, para respeitar os limites da API."
+          "title": "Uma camada para o ERP",
+          "body": "Todas as chamadas à API do ERP passam por uma camada só, por empresa."
         },
         {
           "icon": "receipt-text",
-          "title": "Agrupados por nota",
-          "body": "Baixa e estorno de títulos refletidos no ERP."
+          "title": "Lançamento em lote",
+          "body": "Contas a pagar lançadas em lote na API do ERP, com desconto, em vez de uma chamada por conta."
         },
         {
           "icon": "shield-check",
           "title": "Sem duplicidade",
-          "body": "Checagem antes da baixa, e exclusão de agrupamento só com justificativa registrada."
+          "body": "Antes da baixa, o painel confere se um registro igual já existe no ERP."
         },
         {
-          "icon": "file-chart-line",
-          "title": "Painéis",
-          "body": "Recebimentos e saídas de contas a pagar."
+          "icon": "badge-alert",
+          "title": "Excluir exige motivo",
+          "body": "A exclusão de um agrupamento pede justificativa e fica numa tela de registro."
+        },
+        {
+          "icon": "hand-coins",
+          "title": "Pedidos de venda",
+          "body": "No coletor, pedidos criados e editados direto no ERP, e documentos gerados de modelos .docx por empresa, em PDF e por e-mail."
         }
       ],
-      "outcome": "Os lançamentos passaram a nascer no painel e chegar ao ERP sem retrabalho, com registro de quem excluiu o quê e por quê."
+      "outcome": "Os lançamentos passaram a nascer no painel e chegar ao ERP sem retrabalho, com registro de quem excluiu o quê e por quê. No coletor, os pedidos nascem no ERP e os documentos saem prontos do modelo de cada empresa.",
+      "role": "Parte de uma equipe num painel financeiro para várias empresas de um grupo, com a integração com o ERP e o que protege o lançamento; e, num segundo sistema, os pedidos de venda criados e editados direto no ERP. Nessas partes: a arquitetura, o contato com o cliente, a publicação em produção e a revisão de código.",
+      "facts": [
+        "dois sistemas",
+        "várias empresas por sistema",
+        "documentos de modelos por empresa"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Lançamento em lote",
+            "body": "As contas a pagar vão para a API do ERP em lote, em vez de uma chamada por conta, o que pesa menos numa API lenta e com limite."
+          },
+          {
+            "title": "Excluir exige motivo",
+            "body": "A exclusão de um agrupamento pede justificativa e fica numa tela de registro, com quem excluiu, quando e por quê."
+          },
+          {
+            "title": "Documento de modelo editável",
+            "body": "Pedidos e comprovantes saem de modelos .docx por empresa, convertidos em PDF e enviados por e-mail. Quem ajusta o layout não precisa de desenvolvedor."
+          }
+        ],
+        "incident": {
+          "title": "Tempo limite que virava duplicata",
+          "body": "As chamadas ao ERP estouravam o tempo limite com o ERP ainda processando, e a nova tentativa criava o mesmo agrupamento duas vezes. A correção aumentou o tempo limite e passou a checar se um registro igual já existe antes de gravar."
+        },
+        "limits": [
+          "A checagem de duplicidade compara o registro inteiro, então um campo diferente deixa a duplicata passar. Próximo passo: uma chave de idempotência por agrupamento."
+        ]
+      }
     },
     "en": {
       "slug": "finance-erp",
       "category": "Integrations",
-      "title": "Accounts payable in sync with a cloud ERP",
-      "summary": "A finance panel for several companies in a group, with bills grouped by invoice and synced with the ERP.",
-      "problem": "The finance team of several companies in one group posted bills in a cloud ERP, with scattered master data and a slow, rate-limited API.",
+      "title": "Accounts payable and sales orders in a cloud ERP",
+      "summary": "A finance panel for several companies in a group and a sales order collector, two systems integrated with a cloud ERP.",
+      "problem": "The finance team of several companies in one group posted bills in a cloud ERP, with scattered master data and a slow, rate-limited API. In another system, sales orders had to be created and edited straight in the ERP.",
       "how": [
         {
           "icon": "refresh-cw",
-          "title": "Per-company sync",
-          "body": "Categories, bank accounts, customers, suppliers, work orders and contracts."
-        },
-        {
-          "icon": "layers",
-          "title": "Batches of 50",
-          "body": "ERP queries in batches with a pause between them, to respect the API limits."
+          "title": "One layer for the ERP",
+          "body": "Every call to the ERP's API goes through a single layer, per company."
         },
         {
           "icon": "receipt-text",
-          "title": "Grouped by invoice",
-          "body": "Settling and reversing bills is reflected in the ERP."
+          "title": "Batch posting",
+          "body": "Bills posted in batches through the ERP's API, with discounts, instead of one call per bill."
         },
         {
           "icon": "shield-check",
           "title": "No duplicates",
-          "body": "A check before settling, and group deletion only with a recorded justification."
+          "body": "Before settling, the panel checks whether a matching record already exists in the ERP."
         },
         {
-          "icon": "file-chart-line",
-          "title": "Dashboards",
-          "body": "Incoming payments and outgoing payables."
+          "icon": "badge-alert",
+          "title": "Deleting takes a reason",
+          "body": "Deleting a group asks for a reason and lands on a log screen."
+        },
+        {
+          "icon": "hand-coins",
+          "title": "Sales orders",
+          "body": "In the collector, orders are created and edited straight in the ERP, and documents are generated from each company's .docx templates, as PDF and by e-mail."
         }
       ],
-      "outcome": "Entries now start in the panel and reach the ERP without rework, with a record of who deleted what and why."
+      "outcome": "Entries now start in the panel and reach the ERP without rework, with a record of who deleted what and why. In the collector, orders start in the ERP and documents come out ready from each company's template.",
+      "role": "Part of a team on a finance panel for several companies in a group, owning the ERP integration and what protects each posting; and, in a second system, the sales orders created and edited straight in the ERP. In those parts: the architecture, working with the client, production releases and code review.",
+      "facts": [
+        "two systems",
+        "several companies per system",
+        "documents from per-company templates"
+      ],
+      "details": {
+        "decisions": [
+          {
+            "title": "Batch posting",
+            "body": "Bills go to the ERP's API in batches instead of one call per bill, which weighs less on a slow, rate-limited API."
+          },
+          {
+            "title": "Deleting takes a reason",
+            "body": "Deleting a group asks for a reason and lands on a log screen with who deleted it, when and why."
+          },
+          {
+            "title": "Editable document templates",
+            "body": "Orders and receipts come from each company's .docx templates, converted to PDF and sent by e-mail. Changing the layout doesn't need a developer."
+          }
+        ],
+        "incident": {
+          "title": "A timeout that became a duplicate",
+          "body": "Calls to the ERP hit the timeout while the ERP was still processing, and the retry created the same group twice. The fix raised the timeout and added a check for a matching record before writing."
+        },
+        "limits": [
+          "The duplicate check compares the whole record, so one different field lets a duplicate through. Next step: an idempotency key per group."
+        ]
+      }
     }
   }
 ]

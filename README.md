@@ -1,5 +1,7 @@
 # edumes.dev
 
+[![CI](https://github.com/edumes/edumes.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/edumes/edumes.dev/actions/workflows/ci.yml)
+
 The source of [edumes.dev](https://edumes.dev/en/), the portfolio of Eduardo Santarosa, a full-stack developer who builds web systems for companies with React, Node.js, Python and PostgreSQL.
 
 [![The edumes.dev home page](.github/screenshot.png)](https://edumes.dev/en/)

@@ -98,9 +98,10 @@ export function Stage({ icon, title, active, className = '', children }: { icon:
 }
 
 // The scenario names above a visual, with a bar filling under the one playing.
+const TAB_COLS: Record<number, string> = { 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4' };
 export function Tabs({ labels, s, total, on, inView }: { labels: string[]; s: number; total: number; on: boolean; inView: boolean }) {
   return (
-    <ol className={`mb-5 grid gap-2 ${labels.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`} aria-hidden>
+    <ol className={`mb-5 grid gap-2 ${TAB_COLS[labels.length]}`} aria-hidden>
       {labels.map((label, k) => (
         <li key={label} className={`morph text-xs/tight sm:text-[0.8125rem] ${k === s ? 'text-foreground' : 'text-muted-foreground'}`}>
           <span className="mb-2 block h-0.5 overflow-hidden rounded-full bg-border">

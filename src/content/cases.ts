@@ -13,10 +13,9 @@ type CaseText = {
   story?: { id?: string; title: string; paragraphs: string[] }[];
   outcome: string;
   // The depth layer: the role line under the summary, and the closed "technical details" block at the end.
-  // ponytail: optional while the cases are rolled out one by one; required once every case has it.
-  role?: string;
-  facts?: string[];
-  details?: {
+  role: string;
+  facts: string[];
+  details: {
     decisions: { title: string; body: string }[];
     incident: { title: string; body: string };
     limits: string[];

@@ -43,6 +43,7 @@
     "actions": "Ações"
   },
   "hero": {
+    "intro": "Desenvolvedor full stack · 4+ anos · Node.js, React, PostgreSQL",
     "opening": "Sistemas para empresas,",
     "titles": [
       "desenhados a partir do processo.",
@@ -135,14 +136,6 @@
     "code": "Código no GitHub",
     "items": [
       {
-        "name": "Aurora Mainframe Banking",
-        "icon": "terminal",
-        "stack": [
-          "GnuCOBOL"
-        ],
-        "body": "Fechamento financeiro diário de um banco fictício em COBOL: normaliza as transações, contabiliza em partidas dobradas, concilia e gera relatórios batch."
-      },
-      {
         "name": "LoreForge",
         "icon": "book-text",
         "stack": [
@@ -181,15 +174,6 @@
         "body": "Perguntas sobre PDFs e imagens com OCR feito no próprio navegador e respostas com referência ao trecho de origem."
       },
       {
-        "name": "Deep Drill",
-        "icon": "pickaxe",
-        "stack": [
-          "Go",
-          "TypeScript"
-        ],
-        "body": "Jogo idle de mineração no navegador, com refino, brocas, geradores, limite de energia e ganhos offline."
-      },
-      {
         "name": "YT Radio Stream",
         "icon": "radio-tower",
         "stack": [
@@ -210,26 +194,6 @@
         ],
         "body": "App desktop que mostra um quadro por minuto de um vídeo longo e corta os minutos escolhidos, em horizontal ou vertical 9:16, com o encoder de hardware da máquina (VideoToolbox ou NVENC).",
         "href": "https://github.com/edumes/Segmentor"
-      },
-      {
-        "name": "Salário Contado",
-        "icon": "circle-dollar-sign",
-        "stack": [
-          "Next.js"
-        ],
-        "body": "Mostra em tempo real quanto você já ganhou hoje, a partir do salário e do horário de trabalho.",
-        "href": "https://github.com/edumes/salariocontado"
-      },
-      {
-        "name": "Chatbot Assistant",
-        "icon": "message-circle-more",
-        "stack": [
-          "Laravel",
-          "Livewire",
-          "MySQL"
-        ],
-        "body": "Chat com login em que cada conversa fica salva e pode ser retomada pela lista lateral, com indicador de digitação enquanto a resposta chega.",
-        "href": "https://github.com/edumes/chatbot-ai"
       }
     ]
   },
@@ -322,7 +286,7 @@
         "org": "NEC Brasil",
         "period": "ago. 2022 até hoje",
         "place": "Americana, SP",
-        "body": "Desenvolvo e mantenho sistemas web para clientes de vários setores. Faço integrações com APIs de parceiros como Omie, TecnoSpeed, Vuupt e D4Sign, automações de relatórios em PDF e Excel, robôs de RPA e a sustentação de sistemas em produção."
+        "body": "Respondo por sistemas de gestão de clientes em 12 domínios, do modelo de dados à interface, e sigo responsável por eles em produção: deploy, incidentes e evolução. Defino a arquitetura de sistemas novos, levanto requisitos e apresento entregas direto aos clientes e reviso o código dos colegas. O trabalho inclui integrações com APIs de parceiros como Omie, TecnoSpeed, Vuupt e D4Sign, relatórios em PDF e Excel, robôs de RPA e um app mobile de separação de pedidos."
       }
     ],
     "domainsTitle": "Sistemas que já construí e mantive",
@@ -419,13 +383,14 @@
   "cv": {
     "place": "Americana, SP, Brasil",
     "summaryTitle": "Resumo",
-    "summary": "Desenvolvedor full stack desde 2022. Construo sistemas web completos para empresas: interfaces em React, APIs em Node.js e Python, PostgreSQL, integrações com ERPs, apps mobile e automações. Curso Ciência da Computação.",
+    "summary": "Desenvolvedor full stack há mais de 4 anos, construindo e mantendo sistemas para empresas: React e Next.js, APIs em Node.js, TypeScript e Python, PostgreSQL, integrações com ERPs e parceiros, apps mobile e automações. Defino a arquitetura de sistemas novos, trabalho direto com clientes, reviso código e respondo pela produção.",
     "bullets": [
-      "Desenvolvo e mantenho sistemas web para clientes de vários setores com TypeScript, Node.js, React, Next.js, PHP e React Native.",
-      "Sistemas de gestão para RH, financeiro, faturamento, oficinas, assistência técnica, logística e transporte, do banco de dados à interface.",
-      "App mobile de separação e conferência de pedidos por código de barras, com as regras cobertas por testes automatizados.",
-      "Integrações com ERPs e APIs de parceiros como Omie, TecnoSpeed, Vuupt e D4Sign, e automação de relatórios em PDF e Excel.",
-      "Robôs de RPA em Python e uma plataforma para agendá-los e acompanhá-los em estações Windows."
+      "Respondo por sistemas em produção em 12 domínios, do banco à interface: deploy, incidentes e evolução.",
+      "Defino arquitetura e stack de sistemas novos; levanto requisitos, estimo e apresento entregas direto aos clientes.",
+      "Criei do zero um app React Native de separação de pedidos por código de barras (2024); em 2026, reescrevi o fluxo de pedidos em partes, com as regras fora das telas e cobertas por cerca de 50 testes.",
+      "Evoluí uma plataforma multi-tenant de robôs Python em estações Windows: filas, versões e permissões.",
+      "Integrei ERPs e APIs de parceiros (Omie, TecnoSpeed, Vuupt, D4Sign) e automatizei relatórios em PDF e Excel.",
+      "Reviso o código dos colegas e ajudo quem está chegando ao time."
     ],
     "highlightsTitle": "Estudos de caso",
     "languagesTitle": "Idiomas",
