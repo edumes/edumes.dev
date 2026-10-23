@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check:themes
+      - run: npm run test:blog
+      - run: npm run build
+
+  examples:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - uses: astral-sh/setup-uv@v6
+      - name: invoice-checklist
+        working-directory: examples/invoice-checklist
+        run: python3 check.py
+      - name: robot-contract
+        working-directory: examples/robot-contract
+        run: python3 check.py
+      - name: pdf-geometry-extract
+        working-directory: examples/pdf-geometry-extract
+        run: uv run check.py
+      - name: temporal-kinds
+        working-directory: examples/temporal-kinds
+        run: node --test kinds.test.ts
+      - name: tiny-outbox
+        working-directory: examples/tiny-outbox
+        run: npm ci && npm run check
