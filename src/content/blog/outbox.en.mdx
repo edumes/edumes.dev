@@ -41,6 +41,8 @@ await c.query('insert into idempotency (key, response) values ($1, $2)', [key, {
 
 If any step fails, the rollback takes everything with it. There is no order without its event and no event without its order.
 
+<Illustration />
+
 ## Same request, same answer
 
 The client sends an idempotency key with every operation that changes data. The key is the primary key of the `idempotency` table, and that's what settles a race. When two requests with the same key arrive together, both try to insert the receipt; the second gets error `23505` (unique violation) and rolls back. Instead of returning an error, it reads the first one's answer:

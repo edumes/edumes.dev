@@ -31,7 +31,8 @@ npm run build    # static site in out/
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Development server. It also shows drafts (see [Content](#content)). |
-| `npm run build` | Static export to `out/`. Fails on type errors, missing translations included. |
+| `npm run build` | Static export to `out/`. Fails on type errors, missing translations and missing blog illustrations. |
+| `npm run test:blog` | Checks every published MDX body and the rule requiring a standalone illustration. |
 | `npm run cv` | Prints the résumé pages to PDF in `public/`. Run it after `build`. It needs Google Chrome; set `CHROME` to use another path. |
 | `npm run check:themes` | WCAG AA contrast check of every preset and mode. |
 | `npm run sync:themes` | Rebuilds `presets.json` from the AuthSales boilerplate presets plus [`overrides.mjs`](src/themes/overrides.mjs). It needs the boilerplate at `../boilerplate` or in `BOILERPLATE_ROOT`. `presets.json` is committed, so nothing else needs it. |
@@ -58,6 +59,8 @@ public/         résumé PDFs and vCard
 - **Drafts** follow the same format in `.private/drafts/` (`cases.json`, `blog.json` and `blog/`). The folder is git-ignored, and drafts only render under `npm run dev`, never in a build.
 - **Interface text** goes in both `src/i18n/messages/pt.json` and `en.json`.
 - **Theme changes** go in [`overrides.mjs`](src/themes/overrides.mjs), then `npm run sync:themes && npm run check:themes`.
+
+Every blog article needs an animated illustration with fictional data in both languages. Add a scene keyed by the post's `id` and Portuguese/English copy in [`src/components/visuals/blog.tsx`](src/components/visuals/blog.tsx), then place a standalone `<Illustration />` in each MDX body near the explanation it supports. Reuse the shared player and case study visual primitives so scenario selection, pause/resume, keyboard access and reduced-motion behavior stay consistent. A code sample or comment containing the tag does not count. Run `npm run test:blog` and `npm run build`; the build rejects missing illustrations and unregistered scenes.
 
 ## Deployment
 

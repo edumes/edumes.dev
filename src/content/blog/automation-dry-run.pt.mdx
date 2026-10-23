@@ -1,0 +1,92 @@
+Uma automação pode preencher a tela certa, montar uma mensagem correta e ainda executar uma ação que ninguém pretendia naquele momento. Nas rotinas em que trabalhei, consultar, conferir e enviar eram decisões separadas. Algumas ações ficavam desabilitadas por padrão até que a pessoa habilitasse a execução.
+
+Um modo de simulação precisa preservar essa separação no código. Se ele apenas troca a última mensagem do log por "simulado", um envio pode ter acontecido antes. Para conseguir testar o limite, prefiro representar a intenção como dados e concentrar o efeito externo em um ponto explícito.
+
+## Montar um plano que possa ser inspecionado
+
+O exemplo usa uma mensagem fictícia, já validada pelas regras de quem a preparou. O plano contém os valores que serão entregues ao transporte, sem abrir uma conexão ou enviar nada:
+
+```python
+from dataclasses import asdict, dataclass
+from typing import Callable
+
+
+@dataclass(frozen=True)
+class MessagePlan:
+    recipient: str
+    subject: str
+    body: str
+
+
+plan = MessagePlan(
+    recipient="review@example.invalid",
+    subject="Example batch",
+    body="Three fictional items are ready for review.",
+)
+```
+
+As propriedades são strings e o objeto é congelado. A execução recebe esse mesmo plano, evitando montar destinatário e conteúdo novamente por um caminho diferente. Em uma automação com anexos, o planejamento também precisa identificar o conteúdo revisado: um caminho de arquivo pode passar a apontar para outros bytes depois da prévia.
+
+A validação deve acontecer antes de criar um plano executável. Isso inclui as regras do fluxo e a conferência de destinatários e campos necessários. O objeto do exemplo representa esse resultado; ele não implementa um validador de endereço de e-mail.
+
+## Concentrar o efeito no transporte
+
+A função abaixo recebe o transporte como dependência. O padrão é devolver a prévia. O envio exige o booleano `True`, evitando que uma string de configuração como `"false"` habilite a ação por ser um valor não vazio. Quando habilitada, esta execução faz uma chamada a `send`:
+
+```python
+def execute(plan: MessagePlan, *,
+            send: Callable[[MessagePlan], None],
+            enabled: bool = False) -> dict:
+    if enabled is not True:
+        return {"status": "simulated", "preview": asdict(plan)}
+
+    send(plan)
+    return {"status": "submitted"}
+```
+
+O retorno distingue simulação de submissão. Se o transporte lança uma exceção, a função deixa o erro aparecer e não devolve `submitted`. O significado desse estado depende do contrato do transporte: aceitar uma mensagem para envio não comprova que ela foi entregue ao destinatário.
+
+Essa fronteira também precisa ser respeitada pelas etapas anteriores. Gerar a prévia não pode, escondido em um helper, enviar uma mensagem, confirmar um formulário ou marcar o trabalho como concluído. Logs e arquivos de revisão podem existir na simulação, mas devem estar identificados como resultado de uma simulação.
+
+<Illustration />
+
+## Testar a ausência do envio
+
+O teste deve observar a dependência que produz o efeito. Em Python, [Mock.assert_not_called](https://docs.python.org/3.12/library/unittest.mock.html#unittest.mock.Mock.assert_not_called) verifica que o mock não recebeu chamadas. Aqui, ele também falharia imediatamente se alguém tentasse usá-lo como transporte:
+
+```python
+from unittest.mock import Mock
+
+
+blocked_sender = Mock(side_effect=AssertionError("Unexpected send"))
+result = execute(plan, send=blocked_sender)
+
+assert result == {"status": "simulated", "preview": asdict(plan)}
+blocked_sender.assert_not_called()
+```
+
+O caminho habilitado precisa conferir o conteúdo, além da quantidade de chamadas:
+
+```python
+sender = Mock()
+result = execute(plan, send=sender, enabled=True)
+
+assert result == {"status": "submitted"}
+sender.assert_called_once_with(plan)
+```
+
+Essas verificações cobrem o limite da função. Para testar um fluxo completo, é preciso instrumentar todos os pontos que podem produzir efeitos e executar os mesmos casos que chegam pela interface ou pelo agendamento. Um mock isolado não detecta uma conexão aberta por outro caminho.
+
+## A prévia precisa corresponder ao que será executado
+
+Uma lista pode mudar entre a revisão e o envio. Um arquivo pode ser substituído, o destinatário pode mudar no cadastro e uma regra pode ter sido atualizada. Se a execução remonta tudo com os dados atuais, a pessoa não revisou necessariamente aquela ação.
+
+Em um fluxo que guarda planos para executar depois, é preciso decidir como identificar a versão revisada, verificar se os dados ainda são válidos e pedir nova revisão quando a mudança for relevante. A autorização também precisa continuar válida no momento da execução.
+
+O exemplo mantém o mesmo objeto apenas dentro do processo. Ele não implementa persistência de planos, controle de acesso ou aprovação por outra pessoa. Esses mecanismos dependem do produto que usa a automação.
+
+## A simulação não resolve um resultado incerto
+
+Quando o transporte real recebe uma mensagem e a resposta se perde, o processo pode enxergar um timeout mesmo depois de a ação ter acontecido. Repetir exige a política descrita no artigo sobre [checkpoints e retomada](/blog/checkpoints-retomada-rpa/).
+
+O modo de simulação também não demonstra que credenciais reais funcionam ou que um serviço externo vai aceitar o conteúdo. Essas condições exigem verificações próprias em um ambiente controlado. O que o exemplo permite demonstrar é mais específico: a mesma intenção pode ser inspecionada, e o caminho padrão não chama o transporte de envio.

@@ -47,6 +47,8 @@ export const civilDateIn = (d: Date, timeZone: string): CivilDate =>
 export const isOverdue = (due: CivilDate, now: Date, timeZone: string): boolean => civilDateIn(now, timeZone) > due;
 ```
 
+<Illustration />
+
 ## Tipos que não se misturam
 
 No TypeScript, os quatro tipos são strings com marca (*branded types*). Em tempo de execução continuam sendo strings, mas o compilador não deixa passar um instante onde se espera uma data civil:

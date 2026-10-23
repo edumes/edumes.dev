@@ -1,31 +1,41 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useInView, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useInView } from 'motion/react';
 import { defineCopy } from '@/i18n/copy';
 import { Icon, type IconName } from '../icon';
 
+const motionPreference = '(prefers-reduced-motion: reduce)';
+const reducedMotion = () => matchMedia(motionPreference).matches;
+const serverMotion = () => false;
+function subscribeMotion(listener: () => void) {
+  const query = matchMedia(motionPreference);
+  query.addEventListener('change', listener);
+  return () => query.removeEventListener('change', listener);
+}
+
 // Steps a looping timeline (one duration in ms per step; keep it a module constant) while its element is on screen,
 // and pauses off screen. Before it is first seen, and always under reduced motion, it holds `still`: the complete
-// picture, so the server render and calm viewers get the whole story in one frame. `on` turns true once it plays.
-export function useLoop(durations: number[], still = durations.length - 1) {
+// picture, so the server render and calm viewers get the whole story in one frame. `enabled` pauses the timeline;
+// `on` turns true once it plays.
+export function useLoop(durations: number[], still = durations.length - 1, enabled = true) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.3 });
-  const calm = useReducedMotion();
+  const calm = useSyncExternalStore(subscribeMotion, reducedMotion, serverMotion);
   const [step, setStep] = useState(still);
   const [on, setOn] = useState(false);
 
   useEffect(() => {
-    if (!inView || calm) return;
+    if (!inView || calm || !enabled) return;
     if (!on) {
       setOn(true);
       return setStep(0);
     }
     const id = setTimeout(() => setStep((s) => (s + 1) % durations.length), durations[step]);
     return () => clearTimeout(id);
-  }, [inView, calm, on, step, durations]);
+  }, [inView, calm, enabled, on, step, durations]);
 
-  return { ref, step, on, inView };
+  return { ref, step: calm ? still : step, on, inView };
 }
 
 // Several scenarios played one after another, each a list of [phase, ms]. A phase number means the same moment in

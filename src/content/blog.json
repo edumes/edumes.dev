@@ -1,5 +1,53 @@
 [
   {
+    "id": "desktop-ocr",
+    "date": "2026-10-23",
+    "case": "orquestracao-rpa",
+    "tags": ["Python", "OCR", "Windows", "RPA"],
+    "pt": {
+      "slug": "ocr-automacao-desktop",
+      "title": "Automação desktop com OCR: encontrar o alvo e conferir o resultado",
+      "description": "Como transformar a posição de um texto reconhecido em coordenadas de tela, recusar alvos ambíguos e verificar o que aconteceu depois do clique."
+    },
+    "en": {
+      "slug": "desktop-automation-ocr",
+      "title": "Desktop automation with OCR: finding a target and checking the result",
+      "description": "How to map recognized text back to screen coordinates, reject ambiguous targets and check what happened after a click."
+    }
+  },
+  {
+    "id": "rpa-checkpoints",
+    "date": "2026-10-23",
+    "case": "orquestracao-rpa",
+    "tags": ["Python", "RPA", "Idempotency"],
+    "pt": {
+      "slug": "checkpoints-retomada-rpa",
+      "title": "Checkpoints em RPA: quando retomar e quando pedir revisão",
+      "description": "Progresso por empresa, período e etapa, com um exemplo em Python que interrompe a repetição de uma ação externa cujo resultado ficou incerto."
+    },
+    "en": {
+      "slug": "rpa-checkpoints-recovery",
+      "title": "RPA checkpoints: when to resume and when to request a review",
+      "description": "Progress by company, period and stage, with a Python example that stops a repeated external action when its previous outcome is uncertain."
+    }
+  },
+  {
+    "id": "automation-dry-run",
+    "date": "2026-10-23",
+    "case": "orquestracao-rpa",
+    "tags": ["Python", "RPA", "Testing"],
+    "pt": {
+      "slug": "simulacao-acoes-externas",
+      "title": "Simular antes de enviar: separar a decisão do efeito externo",
+      "description": "Um plano de ação compartilhado entre simulação e execução, envio desabilitado por padrão e testes que conferem se o transporte foi chamado."
+    },
+    "en": {
+      "slug": "simulating-external-actions",
+      "title": "Simulate before sending: separating decisions from external effects",
+      "description": "An action plan shared by simulation and execution, sending disabled by default and tests that check whether the transport was called."
+    }
+  },
+  {
     "id": "outbox",
     "date": "2026-10-18",
     "case": "authsales",

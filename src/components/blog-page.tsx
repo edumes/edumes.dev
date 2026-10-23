@@ -8,6 +8,7 @@ import * as runtime from 'react/jsx-runtime';
 import type { MDXComponents } from 'mdx/types';
 import { profile } from '@/content/site';
 import { blogHref, getPosts, postHref, postSource, type Post } from '@/content/blog';
+import { requireBlogIllustration } from '@/content/require-blog-illustration';
 import { caseHref, getCases } from '@/content/cases';
 import { localeConfig, type Locale } from '@/i18n/config';
 import { Header } from './header';
@@ -15,6 +16,7 @@ import { Footer } from './home';
 import { Icon } from './icon';
 import { JsonLd, author, pageMetadata } from './seo';
 import { ogImage } from './og';
+import { BlogIllustration } from './visuals/blog';
 
 const findPost = (locale: Locale, slug: string) => getPosts().find((p) => p[locale].slug === slug);
 const minutes = (source: string) => Math.max(1, Math.round(source.split(/\s+/).length / 200));
@@ -135,7 +137,7 @@ export async function PostPage({ locale, slug }: { locale: Locale; slug: string 
   const source = postSource(p, locale);
   const { default: Body } = await evaluate(source, {
     ...runtime,
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [remarkGfm, [requireBlogIllustration, { id: p.id, locale }]],
     rehypePlugins: [[rehypeShiki, { themes: { light: 'github-light', dark: 'github-dark' }, defaultColor: false }]]
   });
   const t = await getTranslations({ locale, namespace: 'blog' });
@@ -171,7 +173,11 @@ export async function PostPage({ locale, slug }: { locale: Locale; slug: string 
           <h1 className="type-display mt-3 text-[clamp(2.1rem,1.4rem+3vw,3.8rem)]!">{p[locale].title}</h1>
           <p className="type-lead mt-6 text-muted-foreground">{p[locale].description}</p>
           <div className="mt-10">
-            <Body components={{ ...mdx, Source: (props: { path: string }) => <Source label={code} {...props} /> }} />
+            <Body components={{
+              ...mdx,
+              Source: (props: { path: string }) => <Source label={code} {...props} />,
+              Illustration: () => <BlogIllustration id={p.id} />
+            }} />
           </div>
           <ul className="mt-12 flex flex-wrap gap-2" aria-label="Tags">
             {p.tags.map((s) => (

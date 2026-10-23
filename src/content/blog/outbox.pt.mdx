@@ -41,6 +41,8 @@ await c.query('insert into idempotency (key, response) values ($1, $2)', [key, {
 
 Se qualquer passo falhar, o rollback leva tudo junto. Não existe pedido sem evento, nem evento sem pedido.
 
+<Illustration />
+
 ## A mesma requisição, a mesma resposta
 
 O cliente manda uma chave de idempotência em cada operação que muda dados. A chave é a chave primária da tabela `idempotency`, e é isso que decide uma corrida. Se duas requisições com a mesma chave chegam juntas, as duas tentam inserir o recibo, e a segunda recebe o erro `23505` (violação de unicidade) e faz rollback. Em vez de devolver erro, ela lê a resposta da primeira:

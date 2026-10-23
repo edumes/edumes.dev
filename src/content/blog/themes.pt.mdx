@@ -58,6 +58,8 @@ const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lu
 
 Qualquer par abaixo do mínimo aparece na saída com o tema, o modo e a razão, e o script termina com código 1. A borda tem um mínimo mais baixo, porque ela só precisa ser visível, não legível.
 
+<Illustration />
+
 ## Consertar sem descaracterizar
 
 Os temas originais ficam intactos no projeto de onde vêm. O site tem um arquivo próprio de ajustes, e um script junta os dois num `presets.json`. Um ajuste típico escurece só o necessário:

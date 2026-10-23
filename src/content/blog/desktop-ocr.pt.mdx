@@ -1,0 +1,86 @@
+Uma aplicação desktop pode mostrar todos os campos na tela e, ainda assim, não oferecer nenhum deles para a API de acessibilidade. Isso acontece, por exemplo, quando a janela recebe uma interface transmitida como imagem. Nas automações em que trabalhei, esse tipo de tela exigia combinar reconhecimento de texto, posição e confirmação do estado seguinte.
+
+O problema começa quando o robô encontra a palavra certa e clica no lugar errado. O OCR pode ter lido um recorte ampliado, enquanto o mouse continua usando as coordenadas da tela inteira. Também pode haver dois botões com o mesmo texto, em janelas diferentes.
+
+## Primeiro, saber em qual imagem o texto foi encontrado
+
+O OCR retorna texto e geometria. No Windows, a propriedade [OcrWord.BoundingRect](https://learn.microsoft.com/en-us/uwp/api/windows.media.ocr.ocrword.boundingrect?view=winrt-26100) descreve a posição e o tamanho da palavra na imagem reconhecida, com uma ressalva sobre imagens rotacionadas.
+
+Isso significa que um retângulo encontrado em um recorte não está automaticamente no sistema de coordenadas do mouse. Antes de agir, o robô precisa conhecer a origem do recorte, a ampliação aplicada e a posição da palavra dentro dele.
+
+O exemplo abaixo usa retângulos fictícios, uma imagem sem rotação e ampliação uniforme. A captura original e o mouse precisam usar o mesmo sistema de coordenadas, incluindo o tratamento de escala do Windows.
+
+```python
+from dataclasses import dataclass
+from math import isfinite
+
+
+@dataclass(frozen=True)
+class Box:
+    left: float
+    top: float
+    width: float
+    height: float
+
+
+def screen_point(box: Box, origin: tuple[int, int], scale: float):
+    if not isfinite(scale) or scale <= 0:
+        raise ValueError("Scale must be positive and finite")
+    x = origin[0] + (box.left + box.width / 2) / scale
+    y = origin[1] + (box.top + box.height / 2) / scale
+    return round(x), round(y)
+
+
+box = Box(left=100, top=40, width=80, height=20)
+assert screen_point(box, origin=(420, 180), scale=2) == (490, 205)
+```
+
+O centro da palavra estava em `(140, 50)` na imagem ampliada. Dividir por dois devolve a posição no recorte original; somar `(420, 180)` leva o ponto para a tela.
+
+Se a captura for rotacionada ou redimensionada de forma diferente em cada eixo, essa função deixa de representar a transformação. O ajuste de DPI também precisa acontecer na captura e no controle do mouse, antes de tentar corrigir a diferença com deslocamentos fixos.
+
+## Restringir a busca antes de reconhecer
+
+Ler a tela inteira aumenta a chance de encontrar o mesmo texto em lugares diferentes. Uma janela pode ter um botão "Export" e outra, ao fundo, mostrar a mesma palavra no histórico.
+
+O recorte deve partir da janela e da região esperada: uma barra de ferramentas, o diálogo ativo ou a área de uma tabela. Ele reduz o espaço de busca, mas não elimina a necessidade de lidar com ambiguidade.
+
+Para ilustrar a escolha, esta função recebe pares de texto e retângulo já reconhecidos. Ela exige uma correspondência única:
+
+```python
+def unique_word(words: list[tuple[str, Box]], label: str) -> Box:
+    matches = [
+        box for text, box in words
+        if text.strip().casefold() == label.strip().casefold()
+    ]
+    if len(matches) != 1:
+        raise LookupError(f"Expected one target, found {len(matches)}")
+    return matches[0]
+
+
+words = [("Export", Box(100, 40, 80, 20))]
+target = unique_word(words, "export")
+assert screen_point(target, (420, 180), 2) == (490, 205)
+```
+
+O exemplo trata rótulos de uma palavra. Rótulos maiores exigem agrupar palavras pela linha, respeitar a ordem e calcular a caixa do grupo. Um motor que lê errado pode continuar produzindo um único candidato; a unicidade só resolve a ambiguidade entre os resultados recebidos.
+
+Usar comparação aproximada também exige cuidado. Tornar "Salvar" parecido o suficiente com "Excluir" seria um erro de decisão. Para um controle que altera dados, prefiro exigir mais contexto ou pedir revisão quando a leitura não é suficiente.
+
+<Illustration />
+
+## Um clique precisa de uma condição de saída
+
+Depois de localizar o alvo, ainda falta confirmar a interação. O robô deve verificar uma condição observável: um diálogo abriu, o campo recebeu o valor esperado, a lista mudou ou um arquivo apareceu com o conteúdo necessário.
+
+Essa condição precisa ter um prazo. Quando ele acaba, o diagnóstico deve registrar a etapa, o estado que era esperado e a imagem disponível naquele momento. Repetir o clique sem saber se o primeiro funcionou pode executar uma ação duas vezes.
+
+O alvo também pode ficar desatualizado entre a captura e o clique. Uma janela se move, um menu fecha ou outro diálogo toma o foco. Antes de uma ação importante, é preciso confirmar que a janela e o contexto continuam sendo os mesmos.
+
+## O que os testes conseguem demonstrar
+
+Os exemplos permitem testar a transformação de coordenadas, inclusive com uma origem negativa em outro monitor, e a recusa de zero ou vários candidatos. Esses testes rodam com dados inventados e não dependem de uma estação Windows.
+
+Eles não demonstram a qualidade do reconhecimento em uma tela real. Essa parte exige capturas representativas, variações de resolução e escala e verificação na estação em que o robô opera. Logs e imagens de diagnóstico também precisam respeitar os dados que aparecem na tela.
+
+Quando a confirmação de uma ação fica incerta, a próxima decisão passa a ser a retomada. É o problema tratado em [checkpoints por etapa](/blog/checkpoints-retomada-rpa/).

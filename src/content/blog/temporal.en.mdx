@@ -47,6 +47,8 @@ export const civilDateIn = (d: Date, timeZone: string): CivilDate =>
 export const isOverdue = (due: CivilDate, now: Date, timeZone: string): boolean => civilDateIn(now, timeZone) > due;
 ```
 
+<Illustration />
+
 ## Types that don't mix
 
 In TypeScript the four kinds are branded strings. At run time they are still strings, but the compiler won't accept an instant where a civil date is expected:

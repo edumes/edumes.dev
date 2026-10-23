@@ -1,0 +1,116 @@
+Um robô confirma uma ação em outro sistema e o processo termina antes de salvar o resultado local. Quando ele volta, o checkpoint ainda diz "em andamento". Repetir pode executar a ação duas vezes; assumir que terminou pode deixar trabalho sem fazer.
+
+Esse intervalo apareceu nas decisões de retomada das automações em que trabalhei. Guardar progresso por etapa ajuda a recuperar o trabalho, desde que o significado de cada estado esteja claro e a política de repetição considere o efeito daquela etapa.
+
+## Identificar o trabalho que está sendo retomado
+
+Um registro chamado apenas `concluido` não informa a qual trabalho ele pertence. Em uma operação com vários clientes, a identidade precisa incluir o ambiente, a empresa, o período e a etapa.
+
+Trocar o período de uma rodada não pode apagar o progresso de outra. O mesmo vale para duas empresas com o mesmo código em ambientes diferentes. No exemplo, a chave é uma lista serializada como JSON, evitando colisões que uma concatenação com separadores poderia introduzir.
+
+Os estados usados são pequenos, mas têm consequências diferentes:
+
+| Estado | O que sabemos | Decisão de retomada |
+| --- | --- | --- |
+| Ausente | A etapa ainda não foi registrada | Pode começar |
+| `running` | O início foi registrado; falta a confirmação final | Depende de ser seguro repetir |
+| `done` | A confirmação local foi gravada | Pula a etapa |
+
+`running` inclui tanto uma queda antes da ação quanto uma queda depois dela. O arquivo local, sozinho, não distingue as duas situações.
+
+<Illustration />
+
+## Gravar um arquivo completo antes de substituí-lo
+
+Sobrescrever o checkpoint diretamente pode deixar JSON incompleto se o processo cair durante a escrita. Este helper escreve em um arquivo temporário no mesmo diretório, descarrega os buffers e só então substitui o destino:
+
+```python
+import json
+import os
+import tempfile
+from pathlib import Path
+
+
+def save_checkpoint(path: Path, state: dict) -> None:
+    descriptor, name = tempfile.mkstemp(dir=path.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(state, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+```
+
+A documentação de [os.replace](https://docs.python.org/3.12/library/os.html#os.replace) descreve a substituição e o requisito de atomicidade do POSIX. O temporário fica no mesmo diretório para evitar atravessar sistemas de arquivos. Essa troca não é uma transação com o sistema externo, nem uma garantia completa contra queda de energia; durabilidade também depende do sistema de arquivos e da persistência dos metadados do diretório.
+
+## Registrar o início antes de agir
+
+Este exemplo foi escrito para um único executor usando o arquivo. Ele não coordena duas máquinas nem dois processos concorrentes. O diretório do checkpoint já deve existir.
+
+```python
+class ReviewRequired(RuntimeError):
+    pass
+
+
+def run_step(path: Path, identity: tuple[str, str, str], step: str,
+             action, *, repeatable: bool = False) -> str:
+    state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    if not isinstance(state, dict):
+        raise ReviewRequired("Invalid checkpoint")
+
+    key = json.dumps([*identity, step])
+    status = state.get(key, "pending")
+    if status not in ("pending", "running", "done"):
+        raise ReviewRequired("Unknown stage state")
+    if status == "done":
+        return "already_done"
+    if status == "running" and not repeatable:
+        raise ReviewRequired("Check the external outcome before retrying")
+
+    state[key] = "running"
+    save_checkpoint(path, state)
+    action()
+    state[key] = "done"
+    save_checkpoint(path, state)
+    return "done"
+```
+
+Se a primeira gravação falha, `action()` não é chamada. Se a ação falha ou a gravação final não acontece, o estado permanece `running` no arquivo. Na retomada de uma etapa não repetível, isso pede revisão.
+
+Um JSON ilegível também interrompe o fluxo: o exemplo deixa o erro de leitura aparecer. Tratar corrupção como um checkpoint vazio poderia liberar uma ação que já aconteceu.
+
+## A política pertence à etapa
+
+Uma consulta sem efeitos externos pode aceitar nova tentativa. Um download pode ser refeito, desde que o arquivo e sua substituição sejam tratados corretamente. Uma confirmação que altera outro sistema precisa de uma política diferente.
+
+Um exemplo com uma função fictícia mostra a etapa concluída sendo preservada:
+
+```python
+from tempfile import TemporaryDirectory
+from unittest.mock import Mock
+
+
+with TemporaryDirectory() as directory:
+    checkpoint = Path(directory) / "progress.json"
+    identity = ("workspace-a", "company-7", "2026-10")
+    action = Mock()
+
+    assert run_step(checkpoint, identity, "submit", action) == "done"
+    assert run_step(checkpoint, identity, "submit", action) == "already_done"
+    action.assert_called_once_with()
+```
+
+Para cobrir a incerteza, o teste também precisa simular uma função que produz um efeito fictício e depois lança uma exceção. Uma nova chamada deve pedir revisão sem chamar a função novamente. Outros testes importantes mudam a empresa, o ambiente e o período, verificando que os históricos não se misturam.
+
+## Conferir o destino antes de decidir
+
+Na revisão de uma etapa incerta, é preciso procurar uma evidência no sistema de destino: uma operação identificável, um arquivo de confirmação ou um registro consultável. Um timeout não confirma falha, e a ausência de um registro local não confirma que nada aconteceu.
+
+Se o destino oferece uma chave de idempotência, ela deve identificar o mesmo trabalho em cada tentativa. Se não oferece confirmação suficiente, o caso pode precisar de uma pessoa. Apagar `running` só para a fila andar remove a informação que motivou a revisão.
+
+O exemplo guarda apenas o estado, sem os resultados da etapa. Um fluxo que precisa reutilizar arquivos deve conferir se eles ainda existem e continuam válidos. Se a regra mudar entre versões do robô, os checkpoints também precisam de uma política de compatibilidade.
+
+Com vários executores, a reserva da etapa exige coordenação compartilhada, como uma transação em banco. Mesmo assim, o efeito externo continua fora dessa transação. A [simulação antes do envio](/blog/simulacao-acoes-externas/) ajuda a revisar o que será feito, mas a confirmação de uma ação real continua precisando dessa política de retomada.

@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:blog": "node --test scripts/check-blog.test.mjs",
     "sync:themes": "node scripts/sync-themes.mjs",
     "cv": "node scripts/build-cv.mjs",
     "check:themes": "node scripts/check-themes.mjs",

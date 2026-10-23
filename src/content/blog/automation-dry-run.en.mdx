@@ -1,0 +1,92 @@
+An automation can fill the right screen, build a correct message and still perform an action that nobody intended at that moment. In routines I worked on, querying, checking and sending were separate decisions. Some actions stayed disabled by default until an operator enabled execution.
+
+Simulation mode needs to preserve that separation in code. If it only changes the last log message to "simulated," sending may already have happened earlier. To make the boundary testable, I prefer representing intent as data and concentrating the external effect at an explicit point.
+
+## Build a plan that can be inspected
+
+The example uses a fictional message, already validated by the rules of its caller. The plan contains the values to be handed to the transport, without opening a connection or sending anything:
+
+```python
+from dataclasses import asdict, dataclass
+from typing import Callable
+
+
+@dataclass(frozen=True)
+class MessagePlan:
+    recipient: str
+    subject: str
+    body: str
+
+
+plan = MessagePlan(
+    recipient="review@example.invalid",
+    subject="Example batch",
+    body="Three fictional items are ready for review.",
+)
+```
+
+Its properties are strings and the object is frozen. Execution receives that same plan, avoiding a different path that rebuilds recipients and contents. In an automation with attachments, planning also needs to identify the contents reviewed: a file path can point to different bytes after the preview.
+
+Validation belongs before creation of an executable plan. That includes workflow rules and checks on recipients and required fields. The example object represents that result; it does not implement an e-mail address validator.
+
+## Concentrate the effect in the transport
+
+The function below receives the transport as a dependency. It returns the preview by default. Sending requires the boolean `True`, preventing a configuration string such as `"false"` from enabling the action because it is nonempty. When enabled, this execution calls `send` once:
+
+```python
+def execute(plan: MessagePlan, *,
+            send: Callable[[MessagePlan], None],
+            enabled: bool = False) -> dict:
+    if enabled is not True:
+        return {"status": "simulated", "preview": asdict(plan)}
+
+    send(plan)
+    return {"status": "submitted"}
+```
+
+The result distinguishes simulation from submission. If the transport raises an exception, the function lets it surface and does not return `submitted`. That status depends on the transport's contract: accepting a message for sending does not prove delivery to its recipient.
+
+Earlier stages must respect this boundary too. Producing a preview cannot secretly send a message, confirm a form or mark work completed inside a helper. Logs and review files can exist during simulation, but they should be identified as simulation output.
+
+<Illustration />
+
+## Test that sending did not happen
+
+The test should observe the dependency that produces the effect. In Python, [Mock.assert_not_called](https://docs.python.org/3.12/library/unittest.mock.html#unittest.mock.Mock.assert_not_called) checks that a mock received no calls. Here, it would also fail immediately if anyone tried to use it as a transport:
+
+```python
+from unittest.mock import Mock
+
+
+blocked_sender = Mock(side_effect=AssertionError("Unexpected send"))
+result = execute(plan, send=blocked_sender)
+
+assert result == {"status": "simulated", "preview": asdict(plan)}
+blocked_sender.assert_not_called()
+```
+
+The enabled path needs to check the contents as well as the call count:
+
+```python
+sender = Mock()
+result = execute(plan, send=sender, enabled=True)
+
+assert result == {"status": "submitted"}
+sender.assert_called_once_with(plan)
+```
+
+These checks cover the function's boundary. Testing a complete workflow requires observing every point that can produce effects and exercising the same cases reached through the interface or scheduler. An isolated mock cannot detect a connection opened through another path.
+
+## The preview needs to match the action executed
+
+A list can change between review and sending. A file can be replaced, a recipient can change in the company registry and a rule can be updated. If execution rebuilds everything from current data, the operator may not have reviewed that action.
+
+A workflow that stores plans for later execution needs a policy for identifying the reviewed version, checking whether its inputs are still valid and requesting another review when a change matters. Authorization also needs to remain valid at execution time.
+
+The example preserves the same object only within the process. It does not implement plan persistence, access control or approval by another person. Those mechanisms depend on the product using the automation.
+
+## Simulation does not resolve an uncertain outcome
+
+When the real transport receives a message but its response is lost, the process may see a timeout after the action already happened. Retrying needs the policy described in [checkpoints and recovery](/en/blog/rpa-checkpoints-recovery/).
+
+Simulation also does not demonstrate that real credentials work or that an external service will accept the contents. Those conditions need separate checks in a controlled environment. What this example can demonstrate is more specific: the same intent can be inspected, and the default path does not call the sending transport.

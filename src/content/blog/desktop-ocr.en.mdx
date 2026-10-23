@@ -1,0 +1,86 @@
+A desktop application can display every field on screen without exposing any of them through accessibility APIs. This happens, for example, when a window receives an interface streamed as an image. In automations I worked on, those screens required combining text recognition, position and confirmation of the next state.
+
+The problem starts when a robot finds the right word and clicks in the wrong place. OCR may have read an enlarged crop while the mouse still uses coordinates for the entire screen. Two buttons in different windows may also have the same label.
+
+## First, identify which image contains the text
+
+OCR returns text and geometry. On Windows, [OcrWord.BoundingRect](https://learn.microsoft.com/en-us/uwp/api/windows.media.ocr.ocrword.boundingrect?view=winrt-26100) describes a word's position and size in the recognized image, with a qualification for rotated images.
+
+A rectangle found in a crop does not automatically use the mouse's coordinate system. Before acting, the robot needs the crop's origin, its enlargement factor and the word's position inside it.
+
+The example below uses fictional rectangles, an unrotated image and uniform scaling. The original capture and the mouse must use the same coordinate system, including how Windows scaling is handled.
+
+```python
+from dataclasses import dataclass
+from math import isfinite
+
+
+@dataclass(frozen=True)
+class Box:
+    left: float
+    top: float
+    width: float
+    height: float
+
+
+def screen_point(box: Box, origin: tuple[int, int], scale: float):
+    if not isfinite(scale) or scale <= 0:
+        raise ValueError("Scale must be positive and finite")
+    x = origin[0] + (box.left + box.width / 2) / scale
+    y = origin[1] + (box.top + box.height / 2) / scale
+    return round(x), round(y)
+
+
+box = Box(left=100, top=40, width=80, height=20)
+assert screen_point(box, origin=(420, 180), scale=2) == (490, 205)
+```
+
+The word's center was at `(140, 50)` in the enlarged image. Dividing by two returns its position in the original crop; adding `(420, 180)` maps it to the screen.
+
+If the capture is rotated or resized differently on each axis, this function no longer represents the transformation. DPI handling also needs to be consistent between capture and mouse control before trying to fix a mismatch with constant offsets.
+
+## Narrow the search before recognition
+
+Reading the entire screen makes it more likely that the same text will appear in different places. One window may have an "Export" button while another, behind it, shows the same word in a history view.
+
+The crop should come from the expected window and region: a toolbar, the active dialog or a table area. This narrows the search but does not remove the need to handle ambiguity.
+
+To illustrate selection, this function receives pairs of recognized text and rectangles. It requires exactly one match:
+
+```python
+def unique_word(words: list[tuple[str, Box]], label: str) -> Box:
+    matches = [
+        box for text, box in words
+        if text.strip().casefold() == label.strip().casefold()
+    ]
+    if len(matches) != 1:
+        raise LookupError(f"Expected one target, found {len(matches)}")
+    return matches[0]
+
+
+words = [("Export", Box(100, 40, 80, 20))]
+target = unique_word(words, "export")
+assert screen_point(target, (420, 180), 2) == (490, 205)
+```
+
+The example handles single-word labels. Longer labels need words grouped by line, kept in order and combined into a group rectangle. A recognition error can still produce a single candidate; uniqueness only handles ambiguity among the results received.
+
+Approximate matching also needs care. Treating "Save" as sufficiently similar to "Delete" would be a decision error. For a control that changes data, I prefer requiring more context or requesting a review when the reading is insufficient.
+
+<Illustration />
+
+## A click needs an exit condition
+
+After finding a target, the interaction still needs confirmation. The robot should check an observable condition: a dialog opened, a field received the expected value, a list changed or a file appeared with the required contents.
+
+That condition needs a deadline. On timeout, diagnostics should record the stage, the expected state and the image available at that moment. Repeating a click without knowing whether the first one worked can perform an action twice.
+
+A target can also become stale between capture and click. A window moves, a menu closes or another dialog takes focus. Before an important action, the robot needs to confirm that the window and context are still the same.
+
+## What the tests can demonstrate
+
+The examples support tests for coordinate transformation, including a negative origin on another monitor, and rejection of zero or multiple candidates. Those tests use made-up data and do not require a Windows workstation.
+
+They do not demonstrate recognition quality on a real screen. That requires representative captures, resolution and scaling variations, and checks on the workstation where the robot operates. Diagnostic logs and images also need to account for the data visible on screen.
+
+When confirmation of an action is uncertain, the next decision concerns recovery. That is the problem covered in [checkpoints by stage](/en/blog/rpa-checkpoints-recovery/).

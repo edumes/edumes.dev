@@ -197,6 +197,16 @@ function VisualStory({ text, v }: { text: CaseStudy[Locale]; v?: Visuals }) {
         </ul>
       </Part>
 
+      {text.story?.map((section) => (
+        <Part key={section.title} icon="book-text" title={section.title}>
+          <div className="mt-4 grid max-w-[68ch] gap-4 text-muted-foreground">
+            {section.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </Part>
+      ))}
+
       <Part icon="trending-up" title={t('results')}>
         {v && (
           <div className={`${figure} mt-8`}>

@@ -1,0 +1,116 @@
+A robot confirms an action in another system, then its process ends before saving the local result. When it returns, the checkpoint still says "running." Retrying could perform the action twice; assuming it finished could leave work undone.
+
+That interval shaped recovery decisions in automations I worked on. Recording progress by stage helps recover work when each state has a clear meaning and the retry policy accounts for that stage's effect.
+
+## Identify the work being resumed
+
+A record called only `completed` does not identify the work it belongs to. In an operation serving several clients, identity needs to include the environment, company, period and stage.
+
+Changing a batch's period must not erase progress for another period. The same applies to two companies with the same code in different environments. The example serializes a list as JSON for its key, avoiding collisions that concatenation with separators could introduce.
+
+The states are small, but their consequences differ:
+
+| State | What we know | Recovery decision |
+| --- | --- | --- |
+| Missing | The stage has not been recorded | May start |
+| `running` | The start was recorded; final confirmation is missing | Depends on whether repeating is safe |
+| `done` | Local confirmation was saved | Skip the stage |
+
+`running` covers both stopping before the action and stopping after it. The local file cannot distinguish those situations on its own.
+
+<Illustration />
+
+## Write a complete file before replacing the old one
+
+Overwriting a checkpoint directly can leave incomplete JSON if the process stops during writing. This helper writes to a temporary file in the same directory, flushes the buffers and only then replaces the destination:
+
+```python
+import json
+import os
+import tempfile
+from pathlib import Path
+
+
+def save_checkpoint(path: Path, state: dict) -> None:
+    descriptor, name = tempfile.mkstemp(dir=path.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(state, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+```
+
+The [os.replace documentation](https://docs.python.org/3.12/library/os.html#os.replace) describes replacement and the POSIX atomicity requirement. Keeping the temporary file in the same directory avoids crossing filesystems. This replacement is not a transaction with the external system or a complete power-loss guarantee; durability also depends on the filesystem and persistence of directory metadata.
+
+## Record the start before acting
+
+This example is written for one executor using the file. It does not coordinate two machines or concurrent processes. The checkpoint directory must already exist.
+
+```python
+class ReviewRequired(RuntimeError):
+    pass
+
+
+def run_step(path: Path, identity: tuple[str, str, str], step: str,
+             action, *, repeatable: bool = False) -> str:
+    state = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    if not isinstance(state, dict):
+        raise ReviewRequired("Invalid checkpoint")
+
+    key = json.dumps([*identity, step])
+    status = state.get(key, "pending")
+    if status not in ("pending", "running", "done"):
+        raise ReviewRequired("Unknown stage state")
+    if status == "done":
+        return "already_done"
+    if status == "running" and not repeatable:
+        raise ReviewRequired("Check the external outcome before retrying")
+
+    state[key] = "running"
+    save_checkpoint(path, state)
+    action()
+    state[key] = "done"
+    save_checkpoint(path, state)
+    return "done"
+```
+
+If the first save fails, `action()` is not called. If the action fails or the final save does not happen, the file remains in `running`. Resuming a non-repeatable stage then requires review.
+
+Unreadable JSON also stops the flow: the example lets the read error surface. Treating corruption as an empty checkpoint could release an action that already happened.
+
+## The policy belongs to the stage
+
+A query without external effects may permit another attempt. A download can be repeated if its file and replacement are handled correctly. A confirmation that changes another system needs a different policy.
+
+An example with a fictional function shows completed work being preserved:
+
+```python
+from tempfile import TemporaryDirectory
+from unittest.mock import Mock
+
+
+with TemporaryDirectory() as directory:
+    checkpoint = Path(directory) / "progress.json"
+    identity = ("workspace-a", "company-7", "2026-10")
+    action = Mock()
+
+    assert run_step(checkpoint, identity, "submit", action) == "done"
+    assert run_step(checkpoint, identity, "submit", action) == "already_done"
+    action.assert_called_once_with()
+```
+
+To cover uncertainty, a test also needs a function that produces a fictional effect and then raises an exception. A new call must request review without calling the function again. Other useful tests change the company, environment and period, checking that their histories remain separate.
+
+## Check the destination before deciding
+
+Reviewing an uncertain stage means looking for evidence at the destination: an identifiable operation, a confirmation file or a queryable record. A timeout does not confirm failure, and a missing local record does not confirm that nothing happened.
+
+If the destination supports an idempotency key, that key should identify the same work on every attempt. If it cannot provide enough confirmation, a person may need to handle the case. Erasing `running` just to move the queue removes the information that prompted the review.
+
+The example stores only state, without stage results. A workflow that reuses files needs to check that they still exist and remain valid. If a rule changes between robot versions, checkpoints also need a compatibility policy.
+
+With multiple executors, reserving a stage requires shared coordination, such as a database transaction. Even then, the external effect remains outside that transaction. [Simulation before sending](/en/blog/simulating-external-actions/) helps review the intended action, but confirmation of a real action still needs this recovery policy.

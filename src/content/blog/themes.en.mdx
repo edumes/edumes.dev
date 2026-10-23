@@ -58,6 +58,8 @@ const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lu
 
 Any pair below its minimum is printed with the theme, the mode and the ratio, and the script exits with code 1. Borders get a lower minimum, because they only need to be visible, not readable.
 
+<Illustration />
+
 ## Fixing without flattening
 
 The original themes stay untouched in the project they come from. The site has its own file of adjustments, and a script merges both into a `presets.json`. A typical adjustment darkens only what it must:

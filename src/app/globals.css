@@ -370,6 +370,11 @@ dialog.command::backdrop {
 }
 
 /* Case visuals (src/components/visuals). Unlayered so .lit beats a border utility on the same element. */
+.blog-illustration[data-paused='true'] *,
+.blog-illustration [data-playing='false'] * {
+  animation-play-state: paused !important;
+}
+
 .morph {
   transition:
     color 300ms ease,
@@ -460,6 +465,10 @@ dialog.command::backdrop {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .blog-illustration * {
+    animation: none !important;
+    transition: none !important;
+  }
   html {
     scroll-behavior: auto;
   }
